@@ -1649,11 +1649,23 @@ function endTutorial() {
     tutorialActive = false;
 
     const overlay = document.getElementById('tutorialOverlay');
+    const spotlight = document.getElementById('tutorialSpotlight');
+    const instruction = document.getElementById('tutorialInstruction');
+
+    // Hide all tutorial elements
     overlay.classList.remove('active');
+    spotlight.style.display = 'none';
+    instruction.style.display = 'none';
 
     // Reset submit button z-index
     const submitButton = document.getElementById('submitButton');
     if (submitButton) {
         submitButton.style.zIndex = '';
     }
+
+    // Reset displays when tutorial starts again
+    setTimeout(() => {
+        spotlight.style.display = '';
+        instruction.style.display = '';
+    }, 500);
 }
