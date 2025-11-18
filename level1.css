@@ -258,6 +258,7 @@ html {
     opacity: 0;
     transform: translateY(20px);
     transition: all 0.5s ease;
+    position: relative;
 }
 
 .game-screen.active {
@@ -322,14 +323,16 @@ html {
 
 .prompt-comparison {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
 }
 
-.bad-prompt, .good-prompt {
+.bad-prompt, .medium-prompt, .good-prompt {
     padding: 10px;
     border-radius: 8px;
     border: 2px solid;
+    display: flex;
+    flex-direction: column;
 }
 
 .bad-prompt {
@@ -339,6 +342,17 @@ html {
 
 .bad-prompt .prompt-label {
     color: #ff6b6b;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.medium-prompt {
+    background: rgba(255, 165, 0, 0.1);
+    border-color: #ffa500;
+}
+
+.medium-prompt .prompt-label {
+    color: #ffa500;
     font-weight: bold;
     margin-bottom: 8px;
 }
@@ -365,6 +379,17 @@ html {
 .prompt-explanation {
     font-size: 0.9rem;
     line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.prompt-points {
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+    padding: 8px;
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 10px;
 }
 
 /* Golden Rules Section */
@@ -471,24 +496,26 @@ html {
    =============================== */
 .mo-host-container {
     position: fixed;
-    bottom: 70px;
+    bottom: 200px;
     left: 60px;
     z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
     transform: scale(0.9);
     transform-origin: bottom left;
     transition: none; /* Disable CSS transition for JS animation control */
+    width: 310px; /* Fixed width to prevent layout shift */
+    height: 250px; /* Fixed height to accommodate speech bubble */
+    pointer-events: none; /* Allow clicking through container */
 }
 
 .mo-host {
     width: 110px;
     height: 110px;
     filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
-    position: relative;
+    position: absolute;
+    bottom: 0;
+    left: 0;
     overflow: hidden;
+    pointer-events: auto; /* Re-enable pointer events for dragging */
 }
 
 .mo-host-img {
@@ -511,13 +538,15 @@ html {
     border-radius: 20px 20px 20px 6px;
     padding: 12px 18px;
     max-width: 280px;
-    position: relative;
+    position: absolute;
+    bottom: 120px; /* Position above Mo Man */
+    left: 0;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(10px);
     display: none;
     transform: scale(1.111); /* Counteract the parent scale (1/0.9) */
-    transform-origin: bottom center;
-    order: -1; /* Place bubble above Mo Man */
+    transform-origin: bottom left;
+    pointer-events: auto; /* Re-enable pointer events for buttons */
 }
 
 .mo-speech-bubble.visible {
@@ -617,6 +646,182 @@ html {
 .start-button:hover {
     transform: translateY(-3px);
     filter: brightness(1.1);
+}
+
+/* Tutorial Overlay */
+.tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.tutorial-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.tutorial-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    pointer-events: none;
+}
+
+.tutorial-spotlight {
+    position: absolute;
+    border-radius: 15px;
+    box-shadow: 0 0 40px 10px rgba(245, 192, 59, 0.6),
+                inset 0 0 30px rgba(245, 192, 59, 0.3);
+    pointer-events: none;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: spotlightPulse 2s ease-in-out infinite;
+    border: 3px solid rgba(245, 192, 59, 0.8);
+}
+
+@keyframes spotlightPulse {
+    0%, 100% {
+        box-shadow: 0 0 40px 10px rgba(245, 192, 59, 0.6),
+                    inset 0 0 30px rgba(245, 192, 59, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 60px 15px rgba(245, 192, 59, 0.9),
+                    inset 0 0 40px rgba(245, 192, 59, 0.5);
+    }
+}
+
+.tutorial-instruction {
+    position: absolute;
+    background: linear-gradient(145deg, rgba(245, 192, 59, 0.98), rgba(255, 165, 0, 0.95));
+    border: 3px solid #FFD700;
+    border-radius: 20px;
+    padding: 25px 30px;
+    min-width: 300px;
+    max-width: 400px;
+    box-shadow: 0 10px 40px rgba(245, 192, 59, 0.6),
+                0 0 60px rgba(255, 215, 0, 0.4);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: instructionFloat 3s ease-in-out infinite;
+    pointer-events: auto;
+}
+
+@keyframes instructionFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.instruction-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Arrow pointing down (default) */
+.instruction-arrow.arrow-down {
+    border-width: 20px 20px 0 20px;
+    border-color: rgba(245, 192, 59, 0.98) transparent transparent transparent;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+}
+
+/* Arrow pointing up */
+.instruction-arrow.arrow-up {
+    border-width: 0 20px 20px 20px;
+    border-color: transparent transparent rgba(245, 192, 59, 0.98) transparent;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    filter: drop-shadow(0 -3px 6px rgba(0, 0, 0, 0.3));
+}
+
+/* Arrow pointing left */
+.instruction-arrow.arrow-left {
+    border-width: 20px 20px 20px 0;
+    border-color: transparent rgba(245, 192, 59, 0.98) transparent transparent;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    filter: drop-shadow(-3px 0 6px rgba(0, 0, 0, 0.3));
+}
+
+/* Arrow pointing right */
+.instruction-arrow.arrow-right {
+    border-width: 20px 0 20px 20px;
+    border-color: transparent transparent transparent rgba(245, 192, 59, 0.98);
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    filter: drop-shadow(3px 0 6px rgba(0, 0, 0, 0.3));
+}
+
+.instruction-content {
+    position: relative;
+    z-index: 1;
+}
+
+.instruction-step {
+    color: var(--russian-blue);
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+.instruction-text {
+    color: var(--russian-blue);
+    font-size: 1.3rem;
+    font-weight: bold;
+    line-height: 1.4;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.instruction-next {
+    background: rgba(21, 16, 55, 0.3);
+    border: 2px solid var(--russian-blue);
+    color: var(--russian-blue);
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.instruction-next:hover {
+    background: rgba(21, 16, 55, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.instruction-next:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.instruction-next:disabled:hover {
+    background: rgba(21, 16, 55, 0.3);
+    transform: none;
+    box-shadow: none;
 }
 
 /* Challenge Screen */

@@ -26,6 +26,7 @@ class MoManHost {
 
         this.isIdle = true;
         this.isRunning = false; // Track if Mo Man is running
+        this.isDragging = false; // Track if Mo Man is being dragged
 
         // Interactive features
         this.autoSpeechTimer = null;
@@ -311,78 +312,161 @@ class MoManHost {
         this.speak(randomEncouragement);
     }
 
-    // Easter Egg: Click Mo Man to make him run
+    // Setup interactions
     setupEasterEgg() {
-        this.element.style.cursor = 'pointer';
-        this.element.addEventListener('click', () => {
-            if (!this.isRunning) {
-                this.startRunningEasterEgg();
+        this.element.style.cursor = 'move';
+
+        // Drag & Drop functionality
+        this.setupDragAndDrop();
+
+        // Keyboard controls for movement
+        this.setupKeyboardControls();
+    }
+
+    setupKeyboardControls() {
+        this.isMovingLeft = false;
+        this.isMovingRight = false;
+        this.moveSpeed = 5; // pixels per frame
+
+        document.addEventListener('keydown', (e) => {
+            if (this.isDragging) return;
+
+            if (e.key === 'ArrowLeft' && !this.isMovingLeft) {
+                this.isMovingLeft = true;
+                this.startMovement('left');
+            } else if (e.key === 'ArrowRight' && !this.isMovingRight) {
+                this.isMovingRight = true;
+                this.startMovement('right');
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft') {
+                this.isMovingLeft = false;
+                if (!this.isMovingRight) this.stopMovement();
+            } else if (e.key === 'ArrowRight') {
+                this.isMovingRight = false;
+                if (!this.isMovingLeft) this.stopMovement();
             }
         });
     }
 
-    startRunningEasterEgg() {
+    startMovement(direction) {
         if (this.isRunning) return;
 
         this.isRunning = true;
+        this.currentDirection = direction;
         this.stopAnimation();
-        this.stopSpeaking();
 
-        const container = this.element.parentElement;
-        const startPosition = 60; // left: 60px (original position)
-        const screenWidth = window.innerWidth;
-
-        // Phase 1: Run to the right off-screen
-        this.startRunAnimation();
-        this.animatePosition(startPosition, screenWidth + 200, 2500, () => {
-            // Phase 2: Jump to left side off-screen
-            container.style.left = '-200px';
-
-            // Phase 3: Run back to original position from left
-            this.animatePosition(-200, startPosition, 2500, () => {
-                // Back to idle
-                this.isRunning = false;
-                this.startIdleAnimation();
-            });
-        });
-    }
-
-    startRunAnimation() {
-        this.stopAnimation();
-        this.isIdle = false;
-
+        // Start run animation
         this.animationInterval = setInterval(() => {
             this.currentFrame = (this.currentFrame + 1) % this.runFrames;
             const frameNumber = String(this.currentFrame).padStart(5, '0');
-            this.img.src = `Mo man Lauf 2s 24fps 48 frames/Mo man Lauf Pose_${frameNumber}.png`;
+            this.img.src = `./Mo%20man%20Lauf%202s%2024fps%2048%20frames/Mo%20man%20Lauf%20Pose_${frameNumber}.png`;
         }, this.runAnimationSpeed);
-    }
 
-    animatePosition(startPos, endPos, duration, callback) {
-        const container = this.element.parentElement;
-        const startTime = Date.now();
-        const distance = endPos - startPos;
+        // Flip horizontally for left direction
+        if (direction === 'left') {
+            this.img.style.transform = 'scaleX(-1)';
+        } else {
+            this.img.style.transform = 'scaleX(1)';
+        }
 
-        const animate = () => {
-            const elapsed = Date.now() - startTime;
-            const progress = Math.min(elapsed / duration, 1);
+        // Start movement loop
+        const move = () => {
+            if (!this.isRunning) return;
 
-            // Ease-in-out function for smooth movement
-            const easeProgress = progress < 0.5
-                ? 2 * progress * progress
-                : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+            const container = this.element.parentElement;
+            const currentLeft = parseInt(container.style.left || '60');
 
-            const currentPos = startPos + (distance * easeProgress);
-            container.style.left = currentPos + 'px';
+            if (direction === 'left' && this.isMovingLeft) {
+                const newLeft = Math.max(0, currentLeft - this.moveSpeed);
+                container.style.left = newLeft + 'px';
+            } else if (direction === 'right' && this.isMovingRight) {
+                const maxRight = window.innerWidth - 150;
+                const newLeft = Math.min(maxRight, currentLeft + this.moveSpeed);
+                container.style.left = newLeft + 'px';
+            }
 
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                if (callback) callback();
+            if (this.isRunning) {
+                requestAnimationFrame(move);
             }
         };
 
-        animate();
+        move();
+    }
+
+    stopMovement() {
+        this.isRunning = false;
+        this.stopAnimation();
+        this.img.style.transform = 'scaleX(1)';
+        this.startIdleAnimation();
+    }
+
+    setupDragAndDrop() {
+        const container = this.element.parentElement;
+        let isDragging = false;
+        let startX, startY;
+        let offsetX, offsetY;
+
+        const onMouseDown = (e) => {
+            // Prevent dragging during running animation
+            if (this.isRunning) return;
+
+            isDragging = true;
+            this.isDragging = true;
+
+            // Get current position
+            const rect = container.getBoundingClientRect();
+            startX = rect.left;
+            startY = rect.top;
+
+            // Calculate offset from mouse to container position
+            offsetX = e.clientX - startX;
+            offsetY = e.clientY - startY;
+
+            // Change cursor
+            this.element.style.cursor = 'grabbing';
+
+            // Prevent text selection
+            e.preventDefault();
+        };
+
+        const onMouseMove = (e) => {
+            if (!isDragging) return;
+
+            // Calculate new position
+            const newX = e.clientX - offsetX;
+            const newY = e.clientY - offsetY;
+
+            // Apply new position
+            container.style.left = newX + 'px';
+            container.style.top = newY + 'px';
+            container.style.bottom = 'auto'; // Override bottom positioning
+        };
+
+        const onMouseUp = () => {
+            if (isDragging) {
+                isDragging = false;
+                this.element.style.cursor = 'move';
+
+                // Delay to prevent click event from firing
+                setTimeout(() => {
+                    this.isDragging = false;
+                }, 100);
+            }
+        };
+
+        // Add event listeners
+        this.element.addEventListener('mousedown', onMouseDown);
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+
+        // Store cleanup function
+        this.dragCleanup = () => {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        };
     }
 
     destroy() {
@@ -395,6 +479,9 @@ class MoManHost {
         }
         if (this.autoSpeechTimer) {
             clearInterval(this.autoSpeechTimer);
+        }
+        if (this.dragCleanup) {
+            this.dragCleanup();
         }
     }
 }
@@ -414,19 +501,17 @@ const tutorials = [
         concept: "Die 3 goldenen Regeln für bessere AI-Prompts",
         examples: [
             {
-                situation: "Beispiel 1: E-Mail an Team: Meeting morgen fällt aus",
+                situation: "Beispiel: E-Mail an Team - Meeting morgen fällt aus, Verschiebung auf nächste Woche 10 Uhr",
                 badPrompt: "Schreibe eine E-Mail über ein Meeting",
-                whyBad: "Viel zu vage - welches Meeting? Was soll kommuniziert werden?",
-                goodPrompt: "E-Mail an mein Team: Meeting morgen 10 Uhr fällt aus, wird auf nächste Woche verschoben. Ton: kurz und klar.",
-                whyGood: "Spezifisch: Empfänger, Inhalt, Ton definiert."
-            },
-            {
-                situation: "Beispiel 2: WhatsApp-Nachricht für Kollegen",
-                badPrompt: "Du bist ein zertifizierter Business Communication Expert mit 25 Jahren Erfahrung in interner Unternehmenskommunikation...",
-                whyBad: "Übertrieben! WhatsApp-Nachricht braucht keinen 'Expert'.",
-                goodPrompt: "WhatsApp an Kollegen: Drucker in Raum 3 ist kaputt, nutzt bitte Raum 5. Freundlich und kurz.",
-                whyGood: "Passend: Einfache Nachricht, einfacher Prompt."
-            },
+                badPoints: "0 Punkte",
+                whyBad: "Viel zu vage - welches Meeting?<br>Was soll kommuniziert werden?",
+                mediumPrompt: "Schreibe eine E-Mail an mein Team, dass das Meeting morgen ausfällt",
+                mediumPoints: "3 Punkte",
+                whyMedium: "Besser! Aber es fehlt noch der neue Termin und die Zeit.",
+                goodPrompt: "E-Mail an mein Team: Meeting morgen 10 Uhr fällt aus, wird auf nächste Woche verschoben.",
+                goodPoints: "10 Punkte",
+                whyGood: "Perfekt! Spezifisch: Empfänger, Inhalt, Ton und alle wichtigen Details definiert."
+            }
         ],
         principle: "Die drei goldenen Regeln: Situation klar definieren • Angemessene Komplexität • Konkretes Ziel"
     }
@@ -542,14 +627,14 @@ const challenges = [
                 quality: "excellent",
                 score: 10,
                 response: "**SICHERHEITSUNTERWEISUNG: HOCHVOLT-BATTERIEN**\n**Mercedes-Benz Elektromontage | 15-Minuten-Schulung**\n\n**1. HAUPTGEFAHREN:**\n• Hochspannung (400V+) - Lebensgefahr bei Kontakt\n• Chemische Gefahren bei Beschädigung\n• Brandgefahr bei unsachgemäßer Handhabung\n\n**2. PFLICHT-SCHUTZAUSRÜSTUNG:**\n✓ Isolierte Handschuhe (geprüft)\n✓ Schutzbrille\n✓ Sicherheitsschuhe\n\n**3. WICHTIGSTE VERHALTENSREGELN:**\n• VOR jeder Arbeit: System spannungsfrei schalten\n• NIEMALS alleine an Hochvolt-Systemen arbeiten\n• Bei Unsicherheit: STOPP - Vorgesetzten fragen\n• Beschädigte Batterien NICHT berühren\n\n**4. DOS & DON'TS:**\n✓ DO: Werkzeuge vor Nutzung prüfen\n✓ DO: Arbeitsbereich absichern\n✗ DON'T: Schmuck/Metallgegenstände tragen\n✗ DON'T: Mit nassen Händen arbeiten\n\n**NOTFALL:** Roten Notaus-Schalter drücken → Bereich räumen → Ersthelfer rufen\n\n*[Perfekt: Klar strukturiert, verständlich, praxisnah]*",
-                explanation: "Exzellent! Alle wichtigen Infos im Prompt: Kontext (Hochvolt), Zielgruppe (450 Mitarbeiter, unterschiedliches Level), Format (15 Min), Ton (verständlich) und gewünschte Struktur. Ergebnis ist sofort einsetzbar!"
+                explanation: "Exzellent! Alle wichtigen Infos: Kontext (Hochvolt), Zielgruppe (450 MA, unterschiedliches Level), Format (15 Min) und gewünschte Struktur. Sofort einsetzbar!"
             },
             {
                 text: "Sicherheitsunterweisung Hochvolt-Batterien für Mercedes Mitarbeiter. Verständlich erklären.",
                 quality: "good",
                 score: 3,
                 response: "**Sicherheit bei Hochvolt-Batterien:**\n\nHochvolt-Batterien sind gefährlich. Tragen Sie immer Schutzkleidung. Arbeiten Sie nur an spannungsfreien Systemen. Bei Fragen wenden Sie sich an Ihren Vorgesetzten.\n\nWichtige Punkte:\n- Schutzausrüstung tragen\n- System vor Arbeit abschalten\n- Keine beschädigten Batterien anfassen\n\n*[Grundlagen sind da, aber zu knapp und unstrukturiert]*",
-                explanation: "Auf dem richtigen Weg! Die Basics sind da, aber es fehlen wichtige Details: Anzahl der Mitarbeiter, unterschiedliches Erfahrungslevel, 15-Minuten-Format, gewünschte Struktur. Mehr Kontext = besseres Ergebnis!"
+                explanation: "Auf dem richtigen Weg! Es fehlen wichtige Details: Anzahl Mitarbeiter, unterschiedliches Level, 15-Min-Format, Struktur. Mehr Kontext = besseres Ergebnis!"
             }
         ],
         hint: "Bei Schulungen: Definiere Zielgruppe, Wissensstand, Dauer und gewünschte Struktur - dann wird die Erklärung perfekt zugeschnitten!"
@@ -572,14 +657,14 @@ const challenges = [
                 quality: "good",
                 score: 3,
                 response: "Liebe Kolleginnen und Kollegen,\n\nunsere Kantine im Werk Rastatt wurde renoviert und hat jetzt auch einen veganen Bereich. Schauen Sie vorbei!\n\nIhr Team der internen Kommunikation\n\n*[Basics sind da, aber zu knapp und uninspirierend]*",
-                explanation: "Okay, aber zu simpel! Es fehlen Details wie die 6.500 Mitarbeiter, was genau renoviert wurde, Öffnungszeiten, und dass sich ALLE angesprochen fühlen sollen (nicht nur Veganer). Mehr Context macht's besser!"
+                explanation: "Okay, aber zu simpel! Es fehlen: 6.500 Mitarbeiter, was renoviert wurde, Öffnungszeiten, und dass sich ALLE angesprochen fühlen sollen. Mehr Context!"
             },
             {
                 text: "Erstelle einen Newsletter-Artikel für Mercedes-Benz Werk Rastatt. Die Kantine wurde komplett renoviert und um einen veganen Bereich erweitert. Zielgruppe: 6.500 Mitarbeiter. Ton: Informativ, freundlich, inklusiv - alle sollen sich angesprochen fühlen.",
                 quality: "excellent",
                 score: 10,
                 response: "🎉 Eure neue Kantine ist da!\n\nLiebe Kolleginnen und Kollegen im Werk Rastatt,\n\nab morgen erwartet euch ein komplett neues Kantine-Erlebnis! Nach mehrwöchiger Renovierung öffnen wir mit frischem Design, mehr Platz und einem erweiterten Angebot.\n\n**Was ist neu?**\n✓ Modernes, helles Ambiente zum Wohlfühlen\n✓ Neuer veganer Bereich mit täglich wechselnden Gerichten\n✓ Klassiker bleiben: Schnitzel, Currywurst & Co.\n✓ Erweiterte vegetarische Auswahl\n✓ Frische Salatbar und Snack-Station\n\n**Für jeden was dabei!** Ob Fleischliebhaber, Veggie-Fan oder vegan – bei uns findet jeder sein Lieblingsessen.\n\n📍 **Öffnungszeiten:** Mo-Fr, 11:30-14:00 Uhr\n🍴 **Ab morgen:** Kommt vorbei und überzeugt euch selbst!\n\nWir freuen uns auf euch!\nEuer Kantine-Team & Interne Kommunikation\n\n*[Perfekt: Alle Infos, inklusiv, motivierend, strukturiert]*",
-                explanation: "Exzellent! Du hast an alles gedacht: Standort, Zielgruppe (6.500 MA), was neu ist, dass ALLE Essenstypen bedacht werden, Ton (freundlich + inklusiv), und einen klaren Call-to-Action. Top!"
+                explanation: "Exzellent! An alles gedacht: Standort, Zielgruppe (6.500 MA), was neu ist, ALLE Essenstypen berücksichtigt, Ton (freundlich + inklusiv) und Call-to-Action. Top!"
             }
         ],
         hint: "Bei interner Kommunikation: Zielgruppe genau definieren, inklusiv sein (niemand soll sich ausgeschlossen fühlen), und konkrete Details nennen!"
@@ -602,14 +687,14 @@ const challenges = [
                 quality: "excellent",
                 score: 10,
                 response: "Achtung Halle 3! In den nächsten 30 Minuten außerplanmäßiger Staplerverkehr. Bitte Hauptwege freihalten und auf Warnsignale achten. Danke!\n\n*[Perfekt: 12 Sekunden, alle wichtigen Infos, klar und knapp]*",
-                explanation: "Perfekt! In 12 Sekunden alle wichtigen Infos: Welche Halle (Halle 3), wie lange (30 Min), was tun (Wege freihalten, auf Signale achten). Knapp, klar, während der Arbeit schnell erfassbar. Genau richtig für eine Durchsage!"
+                explanation: "Perfekt! In 12 Sekunden alle Infos: Welche Halle (Halle 3), wie lange (30 Min), was tun (Wege freihalten, Signale beachten). Knapp, klar, schnell erfassbar!"
             },
             {
                 text: "Du bist Sicherheitsbeauftragter mit 15 Jahren Erfahrung im Arbeitsschutz bei Mercedes-Benz, spezialisiert auf Staplerverkehr, Gefährdungsbeurteilung und Unfallprävention. Erstelle eine professionelle, rechtlich einwandfreie, umfassende Lautsprecher-Durchsage für Produktionshalle 3 in Werk Sindelfingen. 180 Mitarbeiter müssen über außerplanmäßigen Staplerverkehr informiert werden.",
                 quality: "good",
                 score: 3,
-                response: "Achtung an alle Mitarbeiterinnen und Mitarbeiter in Produktionshalle 3!\n\nDies ist eine wichtige Sicherheitsdurchsage gemäß DGUV Vorschrift 68, Betrieb von Flurförderzeugen.\n\nIn den kommenden 30 bis 45 Minuten findet außerplanmäßiger Staplerverkehr in Ihrer Halle statt. Zu Ihrer eigenen Sicherheit beachten Sie bitte folgende Verhaltensregeln:\n\nErstens: Halten Sie einen Sicherheitsabstand von mindestens 1,5 Metern zu allen aktiven Fahrwegen ein.\n\nZweitens: Achten Sie auf die akustischen und optischen Warnsignale der Gabelstapler.\n\nDrittens: Überqueren Sie Fahrwege nur an den gekennzeichneten Übergängen und vergewissern Sie sich vorher, dass kein Stapler naht.\n\nViertens: Bei Unsicherheiten bleiben Sie stehen und warten Sie, bis der Stapler vorbeigefahren ist.\n\nIhre Sicherheit hat für uns oberste Priorität. Bei Fragen wenden Sie sich bitte an Ihren Schichtleiter oder an die Sicherheitsabteilung, Durchwahl 4521.\n\nVielen Dank für Ihre Aufmerksamkeit und Ihr sicherheitsbewusstes Verhalten!\n\n*[Viel zu lang - über 90 Sekunden! Niemand hört bis zum Ende zu]*",
-                explanation: "Totaler Overkill! Diese Durchsage dauert über 90 Sekunden - viermal zu lang! Mitten in der Arbeit hört niemand einer Minute DGUV-Vorschriften zu. Die wichtigste Info ('Stapler in Halle 3, Wege frei') geht in einem Berg von Details unter. Bei Durchsagen gilt: So kurz wie möglich, so klar wie nötig!"
+                response: "Achtung an alle Mitarbeiterinnen und Mitarbeiter in Produktionshalle 3!\n\nDies ist eine wichtige Sicherheitsdurchsage gemäß DGUV Vorschrift 68, Betrieb von Flurförderzeugen.\n\nIn den kommenden 30 bis 45 Minuten findet außerplanmäßiger Staplerverkehr in Ihrer Halle statt. Zu Ihrer eigenen Sicherheit beachten Sie bitte folgende Verhaltensregeln:\n\nErstens: Halten Sie mindestens 1,5 Meter Abstand zu Fahrwegen.\n\nZweitens: Achten Sie auf akustische und optische Warnsignale.\n\nDrittens: Überqueren Sie Fahrwege nur an gekennzeichneten Übergängen.\n\nViertens: Bei Unsicherheiten stehen bleiben und Stapler vorbeifahren lassen.\n\nBei Fragen wenden Sie sich an Ihren Schichtleiter, Durchwahl 4521. Vielen Dank!\n\n*[Viel zu lang - über 90 Sekunden! Niemand hört bis zum Ende zu]*",
+                explanation: "Totaler Overkill! 90 Sekunden - viermal zu lang! Mitten in der Arbeit hört niemand DGUV-Vorschriften zu. Die wichtigste Info geht unter. Regel: So kurz wie möglich!"
             }
         ],
         hint: "Bei Lautsprecher-Durchsagen: Maximal 15 Sekunden! Nur die absolut wichtigsten Infos: WO, WAS, WIE LANGE, was TUN. Menschen arbeiten gerade - keine Zeit für Details!"
@@ -625,21 +710,21 @@ const challenges = [
                 quality: "poor",
                 score: 3,
                 response: "Meeting-Änderung\n\n*[Zu vage - welches Meeting? Was wurde geändert?]*",
-                explanation: "Zu vage! WELCHES Meeting? Was wurde geändert - Datum? Zeit? Raum? Komplett abgesagt? Der Betreff signalisiert zwar, dass sich etwas geändert hat, aber Teilnehmer müssen die E-Mail öffnen um zu wissen was los ist!"
+                explanation: "Zu vage! WELCHES Meeting? Was geändert - Datum? Zeit? Raum? Abgesagt? Teilnehmer müssen die Mail öffnen um zu wissen, was los ist!"
             },
             {
                 text: "Schreibe E-Mail Betreff-Zeile für Meeting-Änderung Mercedes Werk Berlin. Meeting morgen von 10 Uhr auf 15 Uhr verlegt, Raum von 201 zu 304 geändert. Betreff muss alle wichtigen Infos enthalten - maximal 10 Wörter, Teilnehmer sollen im Posteingang sofort sehen was Sache ist ohne E-Mail zu öffnen.",
                 quality: "excellent",
                 score: 10,
                 response: "GEÄNDERT: Projekt-Meeting morgen 15 Uhr (statt 10 Uhr), Raum 304\n\n*[Perfekt: 10 Wörter, alle wichtigen Infos auf einen Blick]*",
-                explanation: "Perfekt! In 10 Wörtern alle wichtigen Infos: 'GEÄNDERT' signalisiert sofort Aufmerksamkeit, 'Projekt-Meeting' identifiziert das Meeting, 'morgen 15 Uhr (statt 10 Uhr)' zeigt die neue Zeit + macht Vergleich klar, 'Raum 304' gibt neue Location. Teilnehmer wissen ALLES ohne die Mail zu öffnen!"
+                explanation: "Perfekt! In 10 Wörtern alle Infos: 'GEÄNDERT' = Aufmerksamkeit, 'Projekt-Meeting' = Identifikation, '15 Uhr (statt 10)' = neue Zeit, 'Raum 304' = neue Location. Alles klar ohne Mail zu öffnen!"
             },
             {
                 text: "Erstelle eine professionelle, vollständige E-Mail für Meeting-Änderung im Mercedes-Benz Werk Berlin. Meeting morgen muss von 10 Uhr auf 15 Uhr verlegt werden, 12 Teilnehmer, Raum ändert sich von 201 zu 304. Ton: Professionell, klar, entschuldigend für Unannehmlichkeit. Betone: Neue Zeit, neuer Raum, Grund der Verlegung, Kontaktperson bei Fragen.",
                 quality: "good",
                 score: 0,
-                response: "Betreff: Wichtige Terminänderung - Projekt-Meeting Elektromobilität Strategie 2025 - Bitte beachten Sie die geänderte Uhrzeit und den neuen Besprechungsraum aufgrund kurzfristiger Raumverfügbarkeit\n\nSehr geehrte Teilnehmerinnen und Teilnehmer,\n\naufgrund kurzfristiger Raumverfügbarkeitsprobleme muss ich Sie leider über eine wichtige Terminänderung für unser morgiges Projekt-Meeting informieren.\n\n**NEUE MEETING-DETAILS:**\n\nDatum: Morgen, [Datum]\nUhrzeit: 15:00 Uhr (geändert von ursprünglich 10:00 Uhr)\nRaum: Konferenzraum 304 (geändert von ursprünglich 201)\nDauer: 90 Minuten (unverändert)\nTeilnehmer: Wie ursprünglich geplant (12 Personen)\n\nDie Agenda bleibt unverändert:\n1. Quartalszahlen Q3\n2. Strategieplanung 2025\n3. Budget-Review\n\nIch entschuldige mich für die kurzfristige Änderung und die damit verbundenen Unannehmlichkeiten.\n\nBitte bestätigen Sie kurz Ihre Teilnahme unter den neuen Rahmenbedingungen.\n\nBei Fragen stehe ich Ihnen jederzeit zur Verfügung.\n\nMit freundlichen Grüßen\n[Name]\n\n*[Der Betreff ist 33 Wörter lang - viel zu lang! Wird in Posteingang abgeschnitten]*",
-                explanation: "Katastrophe! Die Aufgabe war nur die BETREFF-ZEILE zu schreiben, nicht die ganze E-Mail! Und selbst wenn: Der Betreff hat 33 Wörter und wird in jedem E-Mail-Programm nach 10 Wörtern abgeschnitten. Teilnehmer sehen nur 'Wichtige Terminänderung - Projekt-Meeting Elektromobilität...' und wissen nicht WAS sich geändert hat. Total am Ziel vorbei - der Prompt hat den Kontext 'nur Betreff-Zeile' ignoriert!"
+                response: "Betreff: Wichtige Terminänderung - Projekt-Meeting Elektromobilität Strategie 2025 - Bitte beachten Sie die geänderte Uhrzeit und den neuen Besprechungsraum aufgrund kurzfristiger Raumverfügbarkeit\n\nSehr geehrte Teilnehmerinnen und Teilnehmer,\n\naufgrund kurzfristiger Raumverfügbarkeitsprobleme muss ich Sie über eine Terminänderung informieren.\n\n**NEUE MEETING-DETAILS:**\nDatum: Morgen | Uhrzeit: 15:00 Uhr (statt 10:00 Uhr)\nRaum: Konferenzraum 304 (statt 201) | Dauer: 90 Min\n\nAgenda unverändert: Quartalszahlen Q3, Strategieplanung 2025, Budget-Review\n\nIch entschuldige mich für die kurzfristige Änderung.\n\nBitte bestätigen Sie kurz Ihre Teilnahme.\n\nBei Fragen stehe ich zur Verfügung.\n\nMit freundlichen Grüßen\n[Name]\n\n*[Der Betreff ist 33 Wörter lang - viel zu lang! Wird in Posteingang abgeschnitten]*",
+                explanation: "Katastrophe! Aufgabe war NUR die Betreff-Zeile, nicht die ganze Mail! Der Betreff hat 33 Wörter, wird nach 10 abgeschnitten. Teilnehmer sehen nur 'Wichtige Terminänderung...' Total am Ziel vorbei!"
             }
         ],
         hint: "Bei E-Mail Betreff-Zeilen: Maximal 10 Wörter! Wichtigste Infos zuerst, klar und scanbar. Empfänger sollen ohne Öffnen der Mail wissen, worum es geht!"
@@ -655,21 +740,21 @@ const challenges = [
                 quality: "poor",
                 score: 0,
                 response: "Das Meeting behandelte verschiedene Themen zur E-Mobilität. Es wurden mehrere Punkte diskutiert und Entscheidungen getroffen. Die Teilnehmer sprachen über Strategie und Umsetzung. Es gab verschiedene Meinungen zu den vorgestellten Maßnahmen.\n\n*[Viel zu vage - keine konkreten Inhalte, keine Entscheidungen, keine Struktur]*",
-                explanation: "Viel zu vage! 'Verschiedene Themen' und 'mehrere Punkte' hilft niemandem. WELCHE Entscheidungen wurden getroffen? WAS ist wichtig? Die Geschäftsführung weiß nach dieser Zusammenfassung genauso viel wie vorher - nämlich nichts! Der Prompt gibt kein Ziel vor (Länge? Fokus?)."
+                explanation: "Viel zu vage! 'Verschiedene Themen' hilft niemandem. WELCHE Entscheidungen? WAS ist wichtig? Die Geschäftsführung weiß nach dieser Zusammenfassung nichts! Kein Ziel vorgegeben."
             },
             {
                 text: "Fasse das 8-seitige Protokoll vom E-Mobilität Strategie-Meeting im Werk Berlin zusammen für die Geschäftsführung. Sie brauchen maximal 5 Bullet Points mit den wichtigsten Entscheidungen.",
                 quality: "excellent",
                 score: 10,
                 response: "**Meeting-Zusammenfassung: E-Mobilität Strategie (8-seitiges Protokoll)**\n\n• **Investitionsentscheidung:** 45 Mio. € Budget für Ausbau Ladeinfrastruktur am Standort Berlin bis Q2 2025 genehmigt\n\n• **Produktionsziel:** Ab Januar 2025 Umstellung auf 60% E-Antriebssysteme-Produktion (aktuell 35%), neue Schichtmodelle erforderlich\n\n• **Lieferanten-Verträge:** Drei neue Batterie-Lieferanten qualifiziert, Vertragsabschluss bis 15. Dezember (kritische Deadline!)\n\n• **Schulungsbedarf:** 1.200 Mitarbeiter benötigen Hochvolt-Schulung bis März 2025, externes Trainingsunternehmen wird beauftragt (Budget: 2,8 Mio. €)\n\n• **Risiko identifiziert:** Engpass bei Elektromotoren-Komponenten aus China - Alternative Lieferanten werden bis Januar evaluiert\n\n*[Perfekt: 5 konkrete Punkte, Entscheidungen klar, Budget/Deadlines genannt]*",
-                explanation: "Perfekt! In 5 Bullet Points alle geschäftsrelevanten Infos: Konkrete Entscheidungen mit Zahlen (45 Mio. €), messbare Ziele (60% E-Antriebe), kritische Deadlines (15. Dezember), Budget-Impacts (2,8 Mio. €), und identifizierte Risiken. Die Geschäftsführung weiß sofort: Was wurde entschieden? Was kostet es? Was ist kritisch? Keine unnötigen Details, nur Ergebnisse!"
+                explanation: "Perfekt! 5 Bullet Points mit allen geschäftsrelevanten Infos: Entscheidungen mit Zahlen (45 Mio. €), Ziele (60% E-Antriebe), Deadlines (15. Dez), Budget (2,8 Mio. €), Risiken. Geschäftsführung weiß sofort alles Wichtige!"
             },
             {
                 text: "Fasse das Meeting-Protokoll professionell zusammen. Erstelle eine strukturierte Zusammenfassung mit Executive Summary, detailliertem Hauptteil gegliedert nach Themenblöcken, Teilnehmer-Statements mit Zitaten und Hintergrundinformationen zum Kontext",
                 quality: "good",
                 score: 0,
-                response: "**EXECUTIVE SUMMARY**\n\nDas am gestrigen Tage abgehaltene Strategie-Meeting zur Elektromobilität im Mercedes-Benz Werk Berlin umfasste ein breites Spektrum an Diskussionspunkten...\n\n**HAUPTTEIL**\n\n**1. Einführung und Kontextualisierung**\nBereits im vorherigen Quartal wurde die strategische Ausrichtung... Im Vergleich zum Meeting vom September zeigt sich eine Verschiebung...\n\n**2. Themenblock A: Investitionsplanung**\nDie Diskussion begann mit dem Vorschlag der Finanzabteilung... Herr Müller argumentierte, dass... Frau Schmidt hingegen vertrat die Position... Nach intensiver Debatte über Für und Wider...\n\n**2.1 Detailanalyse Investitionsvolumen**\nDas vorgeschlagene Budget von 45 Millionen Euro setzt sich zusammen aus... Im Detail betrachtet umfasst dies... Historisch gesehen entspricht dies einer Steigerung von...\n\n**2.2 Risikobewertung**\nAus finanzwirtschaftlicher Perspektive ergeben sich folgende Risiken... Unter Berücksichtigung makroökonomischer Faktoren...\n\n**3. Themenblock B: Produktionsumstellung**\nDie Produktionsleitung präsentierte einen mehrstufigen Plan... In der anschließenden Diskussion wurden verschiedene Implementierungsstrategien erörtert...\n\n[...Die Zusammenfassung geht noch 4 weitere Seiten so weiter...]\n\n**GLOSSAR**\n- E-Mobilität: Elektrische Mobilität bezeichnet...\n\n**KRITISCHE WÜRDIGUNG**\nBei objektiver Betrachtung der getroffenen Entscheidungen lässt sich feststellen...\n\n*[Viel zu lang - aus 8 Seiten wurden 6 Seiten! Keine echte Zusammenfassung]*",
-                explanation: "Totaler Overkill! Die Aufgabe war 'zusammenfassen für Geschäftsführung, maximal 5 Bullet Points' - stattdessen wurden aus 8 Seiten 6 Seiten gemacht! Mit Executive Summary, Glossar, kritischer Würdigung... Das ist keine Zusammenfassung, das ist ein zweites Dokument! Der Prompt hat die klare Anforderung ('5 Bullet Points') völlig ignoriert und stattdessen eine wissenschaftliche Arbeit produziert. Die Geschäftsführung hat immer noch keine Zeit, das zu lesen!"
+                response: "**EXECUTIVE SUMMARY**\n\nDas gestrige Strategie-Meeting zur Elektromobilität im Mercedes-Benz Werk Berlin umfasste ein breites Spektrum an Diskussionspunkten.\n\n**HAUPTTEIL**\n\n**1. Einführung und Kontextualisierung**\nBereits im vorherigen Quartal wurde die strategische Ausrichtung definiert. Im Vergleich zum Meeting vom September zeigt sich eine Verschiebung der Prioritäten.\n\n**2. Themenblock A: Investitionsplanung**\nDie Diskussion begann mit dem Vorschlag der Finanzabteilung. Herr Müller und Frau Schmidt vertraten unterschiedliche Positionen zur Budgetallokation. Nach intensiver Debatte wurde ein Kompromiss gefunden.\n\n**3. Themenblock B: Produktionsumstellung**\nDie Produktionsleitung präsentierte einen mehrstufigen Plan. Verschiedene Implementierungsstrategien wurden diskutiert.\n\n[...Die Zusammenfassung geht noch weitere Seiten mit Details zu Lieferanten, Schulungen, Risikobewertung und kritischer Würdigung...]\n\n*[Viel zu lang - aus 8 Seiten wurden 6 Seiten! Keine echte Zusammenfassung]*",
+                explanation: "Totaler Overkill! Aufgabe: 5 Bullet Points. Ergebnis: 6 Seiten mit Executive Summary, Glossar, Würdigung. Keine Zusammenfassung, sondern ein zweites Dokument! Anforderung komplett ignoriert."
             }
         ],
         hint: "Bei KI-Zusammenfassungen: Definiere KLAR die Länge (z.B. 5 Bullet Points) und den Fokus (nur Entscheidungen? nur Zahlen?). Ohne klare Vorgaben produziert KI oft zu viel Text!"
@@ -692,14 +777,14 @@ const challenges = [
                 quality: "good",
                 score: 3,
                 response: "**Schulungskonzept: KI-Assistenzsystem E-Antriebe-Montage**\n**Mercedes-Benz Werk Berlin**\n\n**Tag 1 - Grundlagen (7 Stunden):**\n- Vormittag: Was ist KI? Wie funktioniert das neue System?\n- Nachmittag: Sicherheitseinweisung und erste Bedienung am Tablet\n\n**Tag 2 - Praxistraining (7 Stunden):**\n- Vormittag: Montageabläufe mit KI-Unterstützung durchführen\n- Nachmittag: Übungen an echten Bauteilen\n\n**Tag 3 - Vertiefung (7 Stunden):**\n- Vormittag: Fehlererkennung und Qualitätskontrolle\n- Nachmittag: Abschlusstest (Theorie + Praxis)\n\n**Durchführung:**\nGruppen à 25 Personen, 10 Durchgänge über 2 Monate\n\n*[Okay, aber zu simpel - keine Differenzierung nach Vorkenntnissen, keine Methodenvielfalt]*",
-                explanation: "Schon besser! Die Basics sind da. Aber: Was ist mit den unterschiedlichen Vorkenntnissen (22-Jährige vs. 62-Jährige)? Wie lernen die verschiedenen Altersgruppen am besten? Wie wird Erfolg gemessen? Für eine Geschäftsführungspräsentation fehlen wichtige strategische Antworten!"
+                explanation: "Schon besser! Aber: Was ist mit unterschiedlichen Vorkenntnissen (22 vs. 62 Jahre)? Wie lernen verschiedene Altersgruppen? Wie wird Erfolg gemessen? Für GF-Präsentation fehlen strategische Antworten!"
             },
             {
                 text: "Erstelle ein professionelles Schulungskonzept für die Geschäftsführung Mercedes-Benz Werk Berlin. 250 Produktionsmitarbeiter (Alter 22-62 Jahre, sehr unterschiedliche digitale Vorkenntnisse) müssen das neue KI-Assistenzsystem für E-Antriebe-Montage lernen. Das System führt Schritt-für-Schritt durch Montage und erkennt Fehler automatisch.",
                 quality: "excellent",
                 score: 10,
-                response: "**SCHULUNGSKONZEPT: KI-ASSISTENZSYSTEM E-ANTRIEBE-MONTAGE**\n**Mercedes-Benz Werk Berlin | Geschäftsführungspräsentation**\n\n**1. UMGANG MIT UNTERSCHIEDLICHEN VORKENNTNISSEN:**\n✓ Einstufungstest vor Schulung (10 Min)\n✓ 3 Lerngruppen:\n  - Gruppe A (Digital Natives): 2,5 Tage\n  - Gruppe B (Standard): 3,5 Tage\n  - Gruppe C (Intensiv-Betreuung): 4,5 Tage\n\n**2. SCHULUNGSMETHODEN:**\n- 25% Theorie (kurze Vorträge, Videos)\n- 50% Hands-on Praxis (am echten System)\n- 15% Peer-Learning (Jüngere helfen Älteren)\n- 10% E-Learning (Videos zur Vor-/Nachbereitung)\n\n**3. ZEITPLAN (Gruppe B - 3,5 Tage):**\nTag 1: System verstehen (Theorie + erste Übungen)\nTag 2-3: Praxis-Training (Montage mit KI durchführen)\nTag 4: Prüfung & Zertifizierung\n\n**4. ERFOLGSMESSUNG:**\n✓ Praktische Prüfung: Montageablauf fehlerfrei (70%)\n✓ Theorietest: 15 Fragen (60%)\n✓ Zertifikat + Nachschulung bei Bedarf\n\n**5. TRAINER-BEDARF:**\n- 6 Haupttrainer + 4 Assistenztrainer\n- Trainer-Vorbereitung: 1 Woche\n\n**6. ZEITRAHMEN:**\nKleingruppen à 20 Personen = 13 Durchgänge\nGesamtdauer: 3 Monate\n\n**7. BUDGET:**\nca. 350.000€ (1.400€ pro Person)\n- Trainerkosten: 180.000€\n- Materialien: 90.000€\n- Produktionsausfall: 80.000€\n\n*[Perfekt: Alle Fragen beantwortet, strategisch durchdacht, präsentationsreif]*",
-                explanation: "Exzellent! DAS ist ein Konzept für die Geschäftsführung! Du hast alle kritischen Fragen beantwortet: Unterschiedliche Altersgruppen (3 Gruppen), vielfältige Methoden (Peer-Learning!), konkreter Zeitplan, klare Erfolgsmessung, Trainer-Bedarf, Zeitrahmen UND Budget. Der lange Prompt war nötig, um all diese Details abzufragen - das Ergebnis ist ein strategisch durchdachtes, sofort präsentierbares Konzept. Lektion: Bei komplexen Business-Konzepten führen nur detaillierte Prompts zu professionellen Ergebnissen!"
+                response: "**SCHULUNGSKONZEPT: KI-ASSISTENZSYSTEM E-ANTRIEBE-MONTAGE**\n**Mercedes-Benz Werk Berlin | Geschäftsführungspräsentation**\n\n**1. VORKENNTNISSE:**\n✓ Einstufungstest (10 Min)\n✓ 3 Gruppen: Digital Natives (2,5 Tage), Standard (3,5 Tage), Intensiv (4,5 Tage)\n\n**2. METHODEN:**\n25% Theorie • 50% Praxis • 15% Peer-Learning • 10% E-Learning\n\n**3. ZEITPLAN (3,5 Tage):**\nTag 1: System verstehen | Tag 2-3: Praxis-Training | Tag 4: Prüfung\n\n**4. ERFOLGSMESSUNG:**\nPraktische Prüfung (70%) + Theorietest (60%)\n\n**5. RESSOURCEN:**\n6 Haupttrainer + 4 Assistenten | 13 Durchgänge über 3 Monate\n\n**6. BUDGET:** 350.000€ (1.400€/Person)\nTrainer: 180.000€ | Material: 90.000€ | Ausfall: 80.000€\n\n*[Perfekt: Alle Fragen beantwortet, strategisch durchdacht, präsentationsreif]*",
+                explanation: "Exzellent! DAS ist ein GF-Konzept! Alle kritischen Fragen beantwortet: 3 Altersgruppen, vielfältige Methoden (Peer-Learning!), Zeitplan, Erfolgsmessung, Trainer-Bedarf UND Budget. Lektion: Bei komplexen Business-Konzepten führen nur detaillierte Prompts zu professionellen Ergebnissen!"
             }
         ],
         hint: "Bei Schulungs- und Strategiekonzepten für Management: Je detaillierter dein Prompt die W-Fragen beantwortet (WER? WIE? WIE VIELE? WIE LANGE? WAS KOSTET'S?), desto professioneller und präsentationsreifer das Ergebnis!"
@@ -722,14 +807,14 @@ const challenges = [
                 quality: "excellent",
                 score: 10,
                 response: "**Innovation Lab**\nKreativ-Raum für Workshops, Brainstorming & agile Meetings\nWhiteboards • Flexible Möbel • Moderne Technik\n\n*[Perfekt: 3 Zeilen, alle wichtigen Infos, sofort erfassbar]*",
-                explanation: "Perfekt! In 3 kompakten Zeilen steht alles Wichtige: Name, Zweck (kreative Workshops, Brainstorming, agile Meetings) und Ausstattung. Mitarbeiter sehen auf einen Blick: 'Ah, hier kann ich kreativ arbeiten!' - genau richtig für ein Türschild!"
+                explanation: "Perfekt! In 3 kompakten Zeilen alles Wichtige: Name, Zweck (Workshops, Brainstorming, agile Meetings) und Ausstattung. Auf einen Blick erfassbar!"
             },
             {
                 text: "Du bist ein professioneller Workplace Experience Spezialist mit 20 Jahren Erfahrung in modernen Office-Konzepten. Erstelle einen umfassenden, detaillierten Türschild-Text für das neue Innovation Lab im Mercedes-Benz Werk Berlin. Ausstattung: 6 Whiteboards, höhenverstellbare Tische, 75-Zoll-Touchscreen, Videokonferenz-System, Sticky Notes. Ton: Professionell, inspirierend, einladend.",
                 quality: "good",
                 score: 3,
-                response: "**Innovation Lab – Ihr Raum für kreative Exzellenz**\n\nWillkommen im Innovation Lab, dem Herzstück kreativer Kollaboration im Mercedes-Benz Werk Berlin!\n\n**Raum-Philosophie:**\nDieser speziell konzipierte Kreativraum wurde entwickelt, um innovative Denkprozesse zu fördern und interdisziplinäre Zusammenarbeit auf höchstem Niveau zu ermöglichen.\n\n**Zielgruppe & Einsatzbereiche:**\nIdeal für Entwicklungsteams, Produktmanagement, Marketing, HR und alle innovationsgetriebenen Abteilungen. Perfekt für Design Thinking Sessions, agile Sprint Plannings, Brainstorming-Workshops, Innovations-Hackathons und kreative Problemlösungs-Sessions.\n\n**Premium-Ausstattung:**\n• 6 großformatige Whiteboards für unbegrenzte Ideenentwicklung\n• Höhenverstellbare Tische (Sit-Stand-Funktion)\n• Modulare Sitzmöbel für flexible Raumkonfiguration\n• 75-Zoll interaktiver Touchscreen mit 4K-Auflösung\n• Professionelles Videokonferenz-System (Zoom/Teams-kompatibel)\n• Umfangreiches Creative-Supply-Kit (Sticky Notes, Marker, Moderationsmaterial)\n\n**Buchungsprozess:**\nReservierung über Outlook-Raumkalender oder Workplace-App. Maximale Buchungsdauer: 4 Stunden. Bitte 24h im Voraus buchen.\n\n**Verhaltensregeln:**\n• Whiteboards nach Nutzung löschen\n• Möbel in Ausgangsposition zurückstellen\n• Material-Kits wieder auffüllen\n• Keine Speisen (Getränke erlaubt)\n\n**Kontakt bei Fragen:**\nFacility Management, Durchwahl 4856 oder facility@mercedes-berlin.de\n\n**Unsere Vision:**\nJede großartige Innovation beginnt mit einem mutigen Gedanken in einem inspirierenden Raum. Lassen Sie Ihrer Kreativität freien Lauf!\n\n*[Viel zu lang - das ist ein A4-Blatt, kein Türschild!]*",
-                explanation: "Katastrophe! Das ist kein Türschild, das ist ein Handbuch! Die wichtigste Info ('Raum für Workshops') geht in einem Wortschwall unter. Ein Türschild muss in 3 Sekunden erfassbar sein - hier braucht man 3 Minuten! Viel zu viel Detail am falschen Ort!"
+                response: "**Innovation Lab – Ihr Raum für kreative Exzellenz**\n\nWillkommen im Innovation Lab, dem Herzstück kreativer Kollaboration im Mercedes-Benz Werk Berlin!\n\n**Raum-Philosophie:**\nSpeziell konzipiert, um innovative Denkprozesse und interdisziplinäre Zusammenarbeit zu fördern.\n\n**Zielgruppe:**\nIdeal für Entwicklungsteams, Marketing, HR. Perfekt für Design Thinking, Sprint Plannings, Brainstorming-Workshops und Hackathons.\n\n**Premium-Ausstattung:**\n• 6 Whiteboards • Höhenverstellbare Tische • Flexible Möbel\n• 75-Zoll Touchscreen • Videokonferenz-System • Creative-Supply-Kit\n\n**Buchung:**\nOutlook-Kalender oder Workplace-App. Max. 4h, 24h Vorlauf.\n\n**Regeln:**\nWhiteboards löschen • Möbel zurückstellen • Kits auffüllen\n\n**Kontakt:** Facility Management, 4856\n\n*[Viel zu lang - das ist ein A4-Blatt, kein Türschild!]*",
+                explanation: "Katastrophe! Das ist kein Türschild, das ist ein Handbuch! Die wichtigste Info geht im Wortschwall unter. Ein Türschild muss in 3 Sekunden erfassbar sein - hier braucht man 3 Minuten!"
             }
         ],
         hint: "Bei Türschildern, Aushängen und Beschilderungen gilt: Kurz und knackig, auf einen Blick erfassbar! Kerninfo rein, fertig!"
@@ -810,11 +895,19 @@ function createTutorialExamples(tutorial) {
                     <div class="prompt-label">❌ Schlechter Prompt:</div>
                     <div class="prompt-text">"${example.badPrompt}"</div>
                     <div class="prompt-explanation">${example.whyBad}</div>
+                    <div class="prompt-points">${example.badPoints}</div>
+                </div>
+                <div class="medium-prompt">
+                    <div class="prompt-label">⚠️ Mittlerer Prompt:</div>
+                    <div class="prompt-text">"${example.mediumPrompt}"</div>
+                    <div class="prompt-explanation">${example.whyMedium}</div>
+                    <div class="prompt-points">${example.mediumPoints}</div>
                 </div>
                 <div class="good-prompt">
                     <div class="prompt-label">✅ Guter Prompt:</div>
                     <div class="prompt-text">"${example.goodPrompt}"</div>
                     <div class="prompt-explanation">${example.whyGood}</div>
+                    <div class="prompt-points">${example.goodPoints}</div>
                 </div>
             </div>
         `;
@@ -920,6 +1013,13 @@ function showChallenge() {
         submitButton.style.opacity = '1';
         submitButton.style.cursor = 'pointer';
         disableSubmitButton();
+    }
+
+    // Show tutorial for first challenge (always)
+    if (currentChallenge === 0) {
+        setTimeout(() => {
+            startChallengeTutorial();
+        }, 500);
     }
 
 }
@@ -1427,3 +1527,116 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// ===============================
+// Challenge Tutorial System
+// ===============================
+
+let tutorialStep = 0;
+let tutorialActive = false;
+
+function startChallengeTutorial() {
+    tutorialActive = true;
+    tutorialStep = 0;
+
+    const overlay = document.getElementById('tutorialOverlay');
+    const spotlight = document.getElementById('tutorialSpotlight');
+    const instruction = document.getElementById('tutorialInstruction');
+
+    // Show overlay
+    overlay.classList.add('active');
+
+    // Setup next button
+    const nextButton = document.getElementById('tutorialNextButton');
+    nextButton.onclick = onTutorialNextClick;
+
+    // Start step 1
+    showTutorialStep1();
+}
+
+function showTutorialStep1() {
+    tutorialStep = 1;
+
+    const spotlight = document.getElementById('tutorialSpotlight');
+    const instruction = document.getElementById('tutorialInstruction');
+    const arrow = instruction.querySelector('.instruction-arrow');
+    const nextButton = document.getElementById('tutorialNextButton');
+
+    // Update instruction text
+    document.getElementById('instructionStep').textContent = 'Schritt 1/2';
+    document.getElementById('instructionText').textContent = 'Wähle einen der drei Prompts aus!';
+    nextButton.textContent = 'Weiter';
+
+    // Get prompt options container position (viewport coordinates)
+    const promptOptions = document.getElementById('promptOptions');
+    const rect = promptOptions.getBoundingClientRect();
+
+    // Position spotlight on prompt options (absolute viewport position)
+    spotlight.style.left = (rect.left - 20) + 'px';
+    spotlight.style.top = (rect.top - 20) + 'px';
+    spotlight.style.width = (rect.width + 40) + 'px';
+    spotlight.style.height = (rect.height + 40) + 'px';
+
+    // Position instruction above prompts
+    arrow.className = 'instruction-arrow arrow-down';
+    instruction.style.left = (rect.left + rect.width / 2) + 'px';
+    instruction.style.top = (rect.top - 180) + 'px';
+    instruction.style.transform = 'translateX(-50%)';
+}
+
+function onTutorialNextClick() {
+    if (tutorialStep === 1) {
+        // Move to step 2
+        showTutorialStep2();
+    } else if (tutorialStep === 2) {
+        // End tutorial
+        endTutorial();
+    }
+}
+
+function showTutorialStep2() {
+    tutorialStep = 2;
+
+    const spotlight = document.getElementById('tutorialSpotlight');
+    const instruction = document.getElementById('tutorialInstruction');
+    const arrow = instruction.querySelector('.instruction-arrow');
+    const nextButton = document.getElementById('tutorialNextButton');
+
+    // Update instruction text
+    document.getElementById('instructionStep').textContent = 'Schritt 2/2';
+    document.getElementById('instructionText').textContent = 'Klicke danach auf "Prompt senden"!';
+    nextButton.textContent = 'Tutorial beenden';
+
+    // Get submit button position (viewport coordinates)
+    const submitButton = document.getElementById('submitButton');
+    const rect = submitButton.getBoundingClientRect();
+
+    // Position spotlight on submit button (absolute viewport position)
+    spotlight.style.left = (rect.left - 20) + 'px';
+    spotlight.style.top = (rect.top - 20) + 'px';
+    spotlight.style.width = (rect.width + 40) + 'px';
+    spotlight.style.height = (rect.height + 40) + 'px';
+
+    // Position instruction to the left of button
+    arrow.className = 'instruction-arrow arrow-right';
+    instruction.style.left = (rect.left - 430) + 'px';
+    instruction.style.top = (rect.top + rect.height / 2) + 'px';
+    instruction.style.transform = 'translateY(-50%)';
+
+    // Make submit button clickable through spotlight
+    submitButton.style.position = 'relative';
+    submitButton.style.zIndex = '10000';
+}
+
+function endTutorial() {
+    tutorialActive = false;
+
+    const overlay = document.getElementById('tutorialOverlay');
+    overlay.classList.remove('active');
+
+    // Reset submit button z-index
+    const submitButton = document.getElementById('submitButton');
+    if (submitButton) {
+        submitButton.style.zIndex = '';
+    }
+}
