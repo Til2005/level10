@@ -36,10 +36,25 @@ class MoManHost {
         this.totalAttempts = 0;
         this.hasSpokenRecently = false;
 
+        // Preload running animation images
+        this.preloadedRunImages = [];
+        this.preloadRunningImages();
+
         this.startIdleAnimation();
         this.setupUnderstoodButton();
         this.startAutoSpeech();
         this.setupEasterEgg(); // Easter egg click handler
+    }
+
+    preloadRunningImages() {
+        // Preload all 48 running animation frames
+        for (let i = 0; i < this.runFrames; i++) {
+            const frameNumber = String(i).padStart(5, '0');
+            const img = new Image();
+            img.src = `./Mo%20man%20Lauf%202s%2024fps%2048%20frames/Mo%20man%20Lauf%20Pose_${frameNumber}.png`;
+            this.preloadedRunImages.push(img);
+        }
+        console.log('Preloaded', this.runFrames, 'running animation frames');
     }
 
     startIdleAnimation() {
@@ -358,11 +373,13 @@ class MoManHost {
         this.currentDirection = direction;
         this.stopAnimation();
 
-        // Start run animation
+        // Start run animation using preloaded images
         this.animationInterval = setInterval(() => {
             this.currentFrame = (this.currentFrame + 1) % this.runFrames;
-            const frameNumber = String(this.currentFrame).padStart(5, '0');
-            this.img.src = `./Mo%20man%20Lauf%202s%2024fps%2048%20frames/Mo%20man%20Lauf%20Pose_${frameNumber}.png`;
+            // Use preloaded image for instant display
+            if (this.preloadedRunImages[this.currentFrame]) {
+                this.img.src = this.preloadedRunImages[this.currentFrame].src;
+            }
         }, this.runAnimationSpeed);
 
         // Flip horizontally for left direction
