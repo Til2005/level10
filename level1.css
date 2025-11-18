@@ -657,12 +657,11 @@ html {
     height: 100vh;
     z-index: 9999;
     pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.5s ease;
+    display: none;
 }
 
 .tutorial-overlay.active {
-    opacity: 1;
+    display: block;
     pointer-events: auto;
 }
 
