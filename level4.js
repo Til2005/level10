@@ -1,885 +1,1387 @@
-// ===============================
-//   LEVEL 4: VISION CHALLENGE
-//   AI Image Understanding
-// ===============================
+// Level 4 - Bild-KI Puzzle Lauf Game Logic
 
-// Game State
-const Level4State = {
-    currentChallengeIndex: 0,
-    score: 0,
-    challengeResults: [false, false, false, false], // Track correct/incorrect for each challenge
-    challenges: [
+// ===== CONSTANTS =====
+const GAME_CONFIG = {
+    playerSpeed: 12, // Increased from 8 for faster movement
+    playerWidth: 150,
+    playerHeight: 150,
+    jumpForce: -20,
+    gravity: 0.8,
+    groundLevel: 50,
+    cardSpeed: 2,
+    cardSpawnInterval: 2000,
+    cardWidth: 180,
+    cardHeight: 220, // Image container + caption
+    lives: 3,
+    debugHitboxes: false // Toggle with 'H' key during gameplay
+};
+
+// ===== ANIMATION PATHS =====
+const ANIMATIONS = {
+    stand: {
+        path: 'Mo_man_Stand_Pose/Mo man Stand Pose_',
+        frames: 24,
+        speed: 40
+    },
+    run: {
+        path: 'Mo man Lauf 2s 24fps 48 frames/Mo man Lauf Pose_',
+        frames: 48,
+        speed: 18
+    },
+    jump: {
+        path: 'Mo_man_Sprung_Pose/Mo man Sprung_',
+        frames: 42,
+        speed: 25,
+        peakFrames: [27, 28] // Peak of jump at frames 27_a and 28_b
+    },
+    speech: {
+        path: 'Moman_speech_animation/Moman Rede_',
+        frames: 12,
+        speed: 80
+    }
+};
+
+// ===== TXP ANIMATIONS =====
+const TXP_ANIMATIONS = {
+    stand: {
+        path: 'TXP/TXP_Stand_Pose/TXP Stand Pose_',
+        frames: 24,
+        speed: 40
+    },
+    talk: {
+        path: 'TXP/TXP_Talk_Pose/TXP_Talk Pose_',
+        frames: 24,
+        speed: 60
+    }
+};
+
+// ===== IMAGE PROMPTS - GOOD AND BAD =====
+// 10 Themen-Paare: jeweils guter und schlechter Prompt zum selben Thema
+const IMAGE_PROMPTS = {
+    good: [
         {
-            id: 1,
-            type: 'promptComparison',
-            completed: false,
-            correct: false
+            description: "Industrieroboter schweißt Metallteile, Funkenflug, dramatische Beleuchtung, Weitwinkel",
+            caption: "✓ Guter Prompt",
+            icon: "🤖",
+            image: "assets/level4/01_roboter_good.png"
         },
         {
-            id: 2,
-            type: 'promptToImage',
-            completed: false,
-            correct: false
+            description: "Produktfotografie-Studio, weißer Infinity-Hintergrund, Softboxen, Hasselblad Kamera, minimalistisch",
+            caption: "✓ Guter Prompt",
+            icon: "📸",
+            image: "assets/level4/02_fotostudio_good.png"
         },
         {
-            id: 3,
-            type: 'imageMatching',
-            completed: false,
-            correct: false
+            description: "Qualitätskontrolle: Prüfstand mit LED-Ringlicht, Kabelbaum, Monitor zeigt KI-Analyse, technisch",
+            caption: "✓ Guter Prompt",
+            icon: "🔍",
+            image: "assets/level4/03_qualitaetskontrolle_good.png"
         },
         {
-            id: 4,
-            type: 'realVsAI',
-            completed: false,
-            correct: false
+            description: "KI-Trainings-Interface: Split-Screen, 3D-Grid mit Trainingsbildern, Datenströme, futuristisch",
+            caption: "✓ Guter Prompt",
+            icon: "🧠",
+            image: "assets/level4/04_ki-training_good.png"
+        },
+        {
+            description: "Nachhaltige Produktionshalle, große Fenster, natürliches Licht, Solarpanels, grüne Architektur",
+            caption: "✓ Guter Prompt",
+            icon: "🌱",
+            image: "assets/level4/05_green-fabric_good.png"
+        },
+        {
+            description: "Content-Studio: Greenscreen-Wand, Softbox-Setup, Sony Alpha Kamera auf Stativ, professionell",
+            caption: "✓ Guter Prompt",
+            icon: "🎬",
+            image: "assets/level4/06_content_studio_good.png"
+        },
+        {
+            description: "Inspektionsarbeitsplatz: Lupe, LED-Panel, Mikrokamera, Monitor mit Fehleranalyse, präzise Beleuchtung",
+            caption: "✓ Guter Prompt",
+            icon: "🔬",
+            image: "assets/level4/07_arbeitsplatz_good.png"
+        },
+        {
+            description: "Automatisierte Montage: Roboterarme montieren Elektronik-Platinen, sterile Umgebung, blaues Licht",
+            caption: "✓ Guter Prompt",
+            icon: "⚡",
+            image: "assets/level4/08_montage_good.png"
+        },
+        {
+            description: "Datenanalyse-Dashboard: 4K Monitor, Grid aus 100 Fehlerbildern, Server-Racks im Hintergrund, LEDs blinken",
+            caption: "✓ Guter Prompt",
+            icon: "💾",
+            image: "assets/level4/09_datenanalyse_good.png"
+        },
+        {
+            description: "Moderne Lagerhalle: Hochregale, fahrerlose Transportsysteme, Drohnen, strukturierte LED-Beleuchtung",
+            caption: "✓ Guter Prompt",
+            icon: "📦",
+            image: "assets/level4/10_lagerhalle_good.png"
+        }
+    ],
+    bad: [
+        {
+            description: "Roboter schweißt",
+            caption: "✗ Schlechter Prompt",
+            icon: "🤖",
+            image: "assets/level4/01_roboter_bad.png"
+        },
+        {
+            description: "Studio mit Kamera",
+            caption: "✗ Schlechter Prompt",
+            icon: "📸",
+            image: "assets/level4/02_fotostudio_bad.png"
+        },
+        {
+            description: "Qualitätskontrolle",
+            caption: "✗ Schlechter Prompt",
+            icon: "🔍",
+            image: "assets/level4/03_qualitaetskontrolle_bad.png"
+        },
+        {
+            description: "KI Training",
+            caption: "✗ Schlechter Prompt",
+            icon: "🧠",
+            image: "assets/level4/04_ki-training_bad.png"
+        },
+        {
+            description: "Grüne Fabrik",
+            caption: "✗ Schlechter Prompt",
+            icon: "🌱",
+            image: "assets/level4/05_green-fabric_bad.png"
+        },
+        {
+            description: "Irgendein Studio",
+            caption: "✗ Schlechter Prompt",
+            icon: "🎬",
+            image: "assets/level4/06_content_studio_bad.png"
+        },
+        {
+            description: "Arbeitsplatz mit Licht",
+            caption: "✗ Schlechter Prompt",
+            icon: "🔬",
+            image: "assets/level4/07_arbeitsplatz_bad.png"
+        },
+        {
+            description: "Roboter bauen Sachen",
+            caption: "✗ Schlechter Prompt",
+            icon: "⚡",
+            image: "assets/level4/08_montage_bad.png"
+        },
+        {
+            description: "Computer mit Daten",
+            caption: "✗ Schlechter Prompt",
+            icon: "💾",
+            image: "assets/level4/09_datenanalyse_bad.png"
+        },
+        {
+            description: "Lagerhalle",
+            caption: "✗ Schlechter Prompt",
+            icon: "📦",
+            image: "assets/level4/10_lagerhalle_bad.png"
         }
     ]
 };
 
-// Challenge Data Configuration
-// IMPORTANT: Update these with correct answers after adding real images
-const ChallengeData = {
-    challenge1: {
-        imageUrl: 'assets/level4/placeholder_target.png',
-        caption: 'Ein futuristisches Mercedes-Konzeptauto',
-        promptA: 'Ein Auto',
-        promptB: 'Futuristisches Mercedes Vision AVTR Konzeptauto, silberne Lackierung, in modernem Showroom mit LED-Beleuchtung, Studiofotografie, Weitwinkel-Aufnahme, 4K hochauflösend',
-        correctAnswer: 'B' // Change this to 'A' or 'B' based on your images
-    },
-    challenge2: {
-        imageUrl: 'assets/level4/placeholder_generated.png',
-        options: [
-            'Mercedes EQS auf einer Landstraße, sonniger Tag',
-            'Mercedes EQS in Cyberpunk-Stadt bei Nacht, Neonlichter, futuristisch, Regen auf Straße, kinoreifer Look',
-            'Schwarzes Auto in der Stadt'
-        ],
-        correctAnswer: 2 // Index 0, 1, or 2 - UPDATE THIS
-    },
-    challenge3: {
-        prompt: 'Mercedes G-Klasse in der Wüste, goldene Stunde, Sanddünen im Hintergrund, dramatische Beleuchtung, professionelle Fotografie',
-        images: [
-            'assets/level4/placeholder_option1.png',
-            'assets/level4/placeholder_option2.png',
-            'assets/level4/placeholder_option3.png'
-        ],
-        correctAnswer: 1 // Index 0, 1, or 2 - UPDATE THIS
-    },
-    challenge4: {
-        images: [
-            'assets/level4/placeholder_real1.png',
-            'assets/level4/placeholder_real2.png',
-            'assets/level4/placeholder_real3.png'
-        ],
-        correctAnswer: 2 // Index 0, 1, or 2 (which one is the REAL photo) - UPDATE THIS
+// ===== TXP HOST CLASS =====
+class TXPHost {
+    constructor() {
+        this.element = document.getElementById('txpHost');
+        this.img = document.getElementById('txpHostImg');
+        this.currentAnimation = null;
+        this.currentFrame = 0;
+        this.animationInterval = null;
+        this.canTalk = false; // Only allow talk animation when game starts
+
+        // Start with stand animation
+        this.startAnimation('stand');
     }
-};
 
-// Character Animation State
-const CharacterState = {
-    moMan: {
-        totalRunFrames: 48, // Lauf-Animation hat 48 Frames
-        runAnimationSpeed: 8, // Sehr schnelle Animation
-        runInterval: null // Interval für wiederkehrende Läufe
-    },
-    txp: {
-        currentFrame: 0,
-        totalStandFrames: 24,
-        totalTalkFrames: 24,
-        animationSpeed: 50,
-        animationInterval: null,
-        currentAnimation: 'stand' // stand, talk
-    },
-    runningMoMans: [] // Array für aktive laufende MoMans
-};
+    startAnimation(animName) {
+        if (this.currentAnimation === animName && this.animationInterval) return;
 
-// ===============================
-//   INITIALIZATION
-// ===============================
-document.addEventListener('DOMContentLoaded', function() {
-    initializeLevel4();
-    initializeCharacterAnimations();
-    setupEventListeners();
-    loadProgress();
-});
+        this.stopAnimation();
+        this.currentAnimation = animName;
+        this.currentFrame = 0;
+        const anim = TXP_ANIMATIONS[animName];
 
-function initializeLevel4() {
-    console.log('Level 4: Vision Challenge initialized');
+        this.animationInterval = setInterval(() => {
+            this.currentFrame = (this.currentFrame + 1) % anim.frames;
+            this.updateFrame();
+        }, anim.speed);
+    }
 
-    // Load challenge data into HTML
-    loadChallengeData();
+    stopAnimation() {
+        if (this.animationInterval) {
+            clearInterval(this.animationInterval);
+            this.animationInterval = null;
+        }
+    }
 
-    // Show intro screen
-    showScreen('introScreen');
+    updateFrame() {
+        const anim = TXP_ANIMATIONS[this.currentAnimation];
+        const frameStr = String(this.currentFrame).padStart(5, '0');
+        this.img.src = `${anim.path}${frameStr}.png`;
+    }
 
-    // Initialize character speech
-    showMoManSpeech('Hey! Bereit für die Welt der KI-Bilder? Ich zeig dir, wie\'s geht!', true);
+    enableTalking() {
+        // Enable talk animation (called when game starts)
+        this.canTalk = true;
+    }
+
+    talk(duration = 3000) {
+        if (!this.canTalk) return; // Don't talk if game hasn't started
+
+        this.startAnimation('talk');
+        setTimeout(() => {
+            this.startAnimation('stand');
+        }, duration);
+    }
+
+    destroy() {
+        this.stopAnimation();
+    }
 }
 
-function loadChallengeData() {
-    // Challenge 1
-    document.getElementById('challenge1Image').src = ChallengeData.challenge1.imageUrl;
-    document.getElementById('challenge1Caption').textContent = 'Beschreibung: ' + ChallengeData.challenge1.caption;
-    document.getElementById('challenge1PromptA').textContent = ChallengeData.challenge1.promptA;
-    document.getElementById('challenge1PromptB').textContent = ChallengeData.challenge1.promptB;
+// ===== MO MAN PLAYER CLASS =====
+class MoManPlayer {
+    constructor(gameArea) {
+        this.gameArea = gameArea;
+        this.element = document.getElementById('moPlayer');
+        this.img = document.getElementById('moPlayerImg');
 
-    // Challenge 2
-    document.getElementById('challenge2Image').src = ChallengeData.challenge2.imageUrl;
-    document.getElementById('challenge2Option1').textContent = ChallengeData.challenge2.options[0];
-    document.getElementById('challenge2Option2').textContent = ChallengeData.challenge2.options[1];
-    document.getElementById('challenge2Option3').textContent = ChallengeData.challenge2.options[2];
+        // Position and physics - start in center of game area
+        this.x = this.gameArea.offsetWidth / 2;
+        this.y = 0; // Relative to bottom
+        this.velocityX = 0;
+        this.velocityY = 0;
+        this.isJumping = false;
+        this.isGrounded = true;
 
-    // Challenge 3
-    document.getElementById('challenge3Prompt').textContent = ChallengeData.challenge3.prompt;
-    const imageOptions = document.querySelectorAll('#challenge3Screen .option-image');
-    imageOptions.forEach((img, index) => {
-        img.src = ChallengeData.challenge3.images[index];
-    });
+        // Animation state
+        this.currentAnimation = 'stand';
+        this.currentFrame = 0;
+        this.animationInterval = null;
+        this.frameAccumulator = 0;
 
-    // Challenge 4
-    const realImages = document.querySelectorAll('#challenge4Screen .option-image');
-    realImages.forEach((img, index) => {
-        img.src = ChallengeData.challenge4.images[index];
-    });
+        // Movement state
+        this.isMovingLeft = false;
+        this.isMovingRight = false;
+        this.lastDirection = null; // Track last pressed direction for priority
+        this.facingRight = true;
+
+        // Debug hitbox - always create, but hide/show based on config
+        this.debugHitbox = null;
+        this.createDebugHitbox();
+
+        this.startAnimation('stand');
+        this.updatePosition();
+    }
+
+    createDebugHitbox() {
+        this.debugHitbox = document.createElement('div');
+        this.debugHitbox.className = 'debug-hitbox player';
+        this.debugHitbox.style.display = GAME_CONFIG.debugHitboxes ? 'block' : 'none';
+
+        const label = document.createElement('div');
+        label.className = 'debug-hitbox-label';
+        label.textContent = 'Mo Man';
+        this.debugHitbox.appendChild(label);
+
+        // Add to game area, not body, so it scales with container
+        this.gameArea.appendChild(this.debugHitbox);
+    }
+
+    startAnimation(animName) {
+        if (this.currentAnimation === animName && this.animationInterval) return;
+
+        this.stopAnimation();
+        this.currentAnimation = animName;
+        this.currentFrame = 0;
+        const anim = ANIMATIONS[animName];
+
+        this.animationInterval = setInterval(() => {
+            this.currentFrame = (this.currentFrame + 1) % anim.frames;
+            this.updateFrame();
+        }, anim.speed);
+    }
+
+    stopAnimation() {
+        if (this.animationInterval) {
+            clearInterval(this.animationInterval);
+            this.animationInterval = null;
+        }
+    }
+
+    updateFrame() {
+        const anim = ANIMATIONS[this.currentAnimation];
+        let frameStr = String(this.currentFrame).padStart(5, '0');
+
+        // Handle special jump frames (27_a and 28_b)
+        if (this.currentAnimation === 'jump') {
+            if (this.currentFrame === 27) frameStr = '00027_a';
+            else if (this.currentFrame === 28) frameStr = '00028_b';
+        }
+
+        this.img.src = `${anim.path}${frameStr}.png`;
+    }
+
+    jump() {
+        if (this.isGrounded) {
+            this.velocityY = GAME_CONFIG.jumpForce;
+            this.isJumping = true;
+            this.isGrounded = false;
+            this.startAnimation('jump');
+        }
+    }
+
+    update(deltaTime) {
+        // Horizontal movement - prioritize most recent input for instant direction change
+        if (this.isMovingLeft && this.isMovingRight) {
+            // Both keys pressed - use last pressed direction for priority
+            if (this.lastDirection === 'left') {
+                this.velocityX = -GAME_CONFIG.playerSpeed;
+                if (this.facingRight) {
+                    this.facingRight = false;
+                    this.element.style.transform = `translateX(-50%) scaleX(-1)`;
+                }
+            } else if (this.lastDirection === 'right') {
+                this.velocityX = GAME_CONFIG.playerSpeed;
+                if (!this.facingRight) {
+                    this.facingRight = true;
+                    this.element.style.transform = `translateX(-50%) scaleX(1)`;
+                }
+            }
+        } else if (this.isMovingLeft) {
+            this.velocityX = -GAME_CONFIG.playerSpeed;
+            if (this.facingRight) {
+                this.facingRight = false;
+                this.element.style.transform = `translateX(-50%) scaleX(-1)`;
+            }
+        } else if (this.isMovingRight) {
+            this.velocityX = GAME_CONFIG.playerSpeed;
+            if (!this.facingRight) {
+                this.facingRight = true;
+                this.element.style.transform = `translateX(-50%) scaleX(1)`;
+            }
+        } else {
+            this.velocityX = 0;
+            this.lastDirection = null; // Reset when no keys pressed
+        }
+
+        // Update animation based on movement
+        if (this.isGrounded) {
+            if (this.velocityX !== 0 && this.currentAnimation !== 'run') {
+                this.startAnimation('run');
+            } else if (this.velocityX === 0 && this.currentAnimation === 'run') {
+                this.startAnimation('stand');
+            }
+        }
+
+        this.x += this.velocityX;
+
+        // Boundary checking - keep player within game area
+        const gameAreaWidth = this.gameArea.offsetWidth;
+        const minX = GAME_CONFIG.playerWidth / 2;
+        const maxX = gameAreaWidth - GAME_CONFIG.playerWidth / 2;
+        this.x = Math.max(minX, Math.min(maxX, this.x));
+
+        // Vertical movement (jumping)
+        if (!this.isGrounded) {
+            this.velocityY += GAME_CONFIG.gravity; // Gravity pulls DOWN
+            this.y -= this.velocityY; // Subtract to move UP (since y=0 is ground, higher y = higher position)
+
+            // Landing
+            if (this.y <= 0) {
+                this.y = 0;
+                this.velocityY = 0;
+                this.isGrounded = true;
+                this.isJumping = false;
+
+                // Return to appropriate animation
+                if (this.velocityX !== 0) {
+                    this.startAnimation('run');
+                } else {
+                    this.startAnimation('stand');
+                }
+            }
+        }
+
+        this.updatePosition();
+    }
+
+    updatePosition() {
+        this.element.style.left = `${this.x}px`;
+        this.element.style.bottom = `${GAME_CONFIG.groundLevel + this.y}px`;
+
+        // Update debug hitbox
+        if (GAME_CONFIG.debugHitboxes && this.debugHitbox) {
+            const hitbox = this.getHitbox();
+
+            // Position debug box using same method as player element (bottom-based)
+            this.debugHitbox.style.left = `${hitbox.left}px`;
+            this.debugHitbox.style.bottom = `${GAME_CONFIG.groundLevel + this.y}px`;
+            this.debugHitbox.style.width = `${hitbox.right - hitbox.left}px`;
+            this.debugHitbox.style.height = `${GAME_CONFIG.playerHeight}px`;
+        }
+    }
+
+    getHitbox() {
+        // Return hitbox in screen coordinates (using bottom as reference like CSS)
+        // top and bottom are distances from BOTTOM of screen
+        const screenBottom = GAME_CONFIG.groundLevel + this.y;
+        const screenTop = screenBottom + GAME_CONFIG.playerHeight;
+
+        // Narrower hitbox - reduce width by 40% for more forgiving gameplay
+        const hitboxWidth = GAME_CONFIG.playerWidth * 0.6;
+
+        return {
+            left: this.x - hitboxWidth / 2,
+            right: this.x + hitboxWidth / 2,
+            bottomDist: screenBottom, // Distance from bottom of screen
+            topDist: screenTop, // Distance from bottom of screen
+            centerX: this.x,
+            centerY: screenBottom + GAME_CONFIG.playerHeight / 2
+        };
+    }
+
+    destroy() {
+        this.stopAnimation();
+        if (this.debugHitbox) {
+            this.debugHitbox.remove();
+        }
+    }
 }
 
-// ===============================
-//   EVENT LISTENERS
-// ===============================
-function setupEventListeners() {
-    // Start button
-    const startBtn = document.getElementById('startLevel');
-    if (startBtn) {
-        startBtn.addEventListener('click', startLevel);
+// ===== FALLING CARD CLASS =====
+class FallingCard {
+    constructor(gameArea, imageData, quality, difficultyMultiplier = 1.0) {
+        this.gameArea = gameArea;
+        this.imageData = imageData; // { description, caption, icon }
+        this.quality = quality; // 'good' or 'bad'
+        this.collected = false;
+
+        // Random spawn position - keep within game area boundaries
+        const gameAreaWidth = this.gameArea.offsetWidth;
+        this.x = Math.random() * (gameAreaWidth - GAME_CONFIG.cardWidth);
+        this.y = -GAME_CONFIG.cardHeight; // Start above screen
+
+        // Speed varies slightly and increases with difficulty
+        this.speed = (GAME_CONFIG.cardSpeed + (Math.random() * 1.5)) * difficultyMultiplier;
+
+        // Debug hitbox - always create, but hide/show based on config
+        this.debugHitbox = null;
+
+        this.createElement();
+        this.createDebugHitbox();
     }
 
-    // Back to home
-    const backBtn = document.getElementById('backToHome');
-    if (backBtn) {
-        backBtn.addEventListener('click', () => {
-            window.location.href = 'index.html';
-        });
+    createDebugHitbox() {
+        this.debugHitbox = document.createElement('div');
+        this.debugHitbox.className = 'debug-hitbox card';
+        this.debugHitbox.style.display = GAME_CONFIG.debugHitboxes ? 'block' : 'none';
+
+        const label = document.createElement('div');
+        label.className = 'debug-hitbox-label';
+        label.textContent = `Card (${this.quality})`;
+        this.debugHitbox.appendChild(label);
+
+        // Add to game area, not body, so it scales with container
+        this.gameArea.appendChild(this.debugHitbox);
     }
 
-    // Results buttons
-    const retryBtn = document.getElementById('retryLevel');
-    if (retryBtn) {
-        retryBtn.addEventListener('click', retryLevel);
+    createElement() {
+        this.element = document.createElement('div');
+        this.element.className = `falling-card quality-${this.quality}`;
+
+        // Image container
+        const imageContainer = document.createElement('div');
+        imageContainer.className = 'card-image-container';
+
+        // Quality badge (overlays image)
+        const badge = document.createElement('span');
+        badge.className = 'card-quality-badge';
+        badge.textContent = this.getQualityLabel();
+
+        // Real image
+        const img = document.createElement('img');
+        img.className = 'card-image';
+        img.src = this.imageData.image;
+        img.alt = this.imageData.description;
+
+        imageContainer.appendChild(img);
+        imageContainer.appendChild(badge);
+
+        // Caption below image (shows the actual prompt text)
+        const caption = document.createElement('div');
+        caption.className = 'card-caption';
+        caption.textContent = this.imageData.description;
+
+        this.element.appendChild(imageContainer);
+        this.element.appendChild(caption);
+
+        this.updatePosition();
+        document.getElementById('cardsContainer').appendChild(this.element);
     }
 
-    const backToLevelsBtn = document.getElementById('backToLevels');
-    if (backToLevelsBtn) {
-        backToLevelsBtn.addEventListener('click', () => {
-            window.location.href = 'index.html';
-        });
+    getQualityLabel() {
+        const labels = {
+            good: '+10',
+            bad: '-1 ❤️'
+        };
+        return labels[this.quality] || '?';
     }
 
-    // Mo Man understood button
-    const understoodBtn = document.getElementById('understoodButton');
-    if (understoodBtn) {
-        understoodBtn.addEventListener('click', () => {
-            hideMoManSpeech();
-        });
+    update(deltaTime) {
+        this.y += this.speed;
+        this.updatePosition();
+
+        // Check if off screen (use actual element height)
+        const gameAreaHeight = this.gameArea.offsetHeight;
+        const actualHeight = this.element ? this.element.offsetHeight : GAME_CONFIG.cardHeight;
+        return this.y > gameAreaHeight + actualHeight;
     }
 
-    // Character click handlers
-    // MoMan ist nicht mehr sichtbar, also nur TXP
-    const txpHost = document.getElementById('txpHost');
-    if (txpHost) {
-        txpHost.addEventListener('click', () => {
-            const messages = [
-                'Beep boop! Als KI-Roboter kenne ich mich mit Bildern aus! 🤖',
-                'Tipp: Achte auf Farben, Beleuchtung und Komposition!',
-                'KI-Bilder können täuschend echt aussehen! 👀',
-                'Analysiere jedes Detail sorgfältig!',
-                'Du bist auf dem richtigen Weg! 🎯'
-            ];
-            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-            showTXPSpeech(randomMsg);
-        });
+    updatePosition() {
+        this.element.style.left = `${this.x}px`;
+        this.element.style.top = `${this.y}px`;
+
+        // Update debug hitbox
+        if (GAME_CONFIG.debugHitboxes && this.debugHitbox) {
+            const hitbox = this.getHitbox();
+            this.debugHitbox.style.left = `${hitbox.left}px`;
+            this.debugHitbox.style.top = `${hitbox.top}px`;
+            this.debugHitbox.style.width = `${hitbox.right - hitbox.left}px`;
+            this.debugHitbox.style.height = `${hitbox.bottom - hitbox.top}px`;
+        }
     }
 
-    // Image load handlers
-    setupImageLoadHandlers();
-}
+    getHitbox() {
+        // Use actual element height instead of fixed cardHeight to account for varying caption lengths
+        const actualHeight = this.element ? this.element.offsetHeight : GAME_CONFIG.cardHeight;
 
-function setupImageLoadHandlers() {
-    const allImages = document.querySelectorAll('.challenge-image, .option-image');
-    allImages.forEach(img => {
-        img.addEventListener('load', function() {
-            this.classList.add('loaded');
-            const placeholder = this.nextElementSibling;
-            if (placeholder && placeholder.classList.contains('image-placeholder')) {
-                placeholder.style.display = 'none';
+        return {
+            left: this.x,
+            right: this.x + GAME_CONFIG.cardWidth,
+            top: this.y,
+            bottom: this.y + actualHeight,
+            centerX: this.x + GAME_CONFIG.cardWidth / 2,
+            centerY: this.y + actualHeight / 2
+        };
+    }
+
+    collect() {
+        this.collected = true;
+
+        // Use will-change to optimize animation
+        this.element.style.willChange = 'transform, opacity';
+        this.element.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+
+        // Use requestAnimationFrame for smoother animation
+        requestAnimationFrame(() => {
+            this.element.style.transform = 'scale(1.2)';
+            this.element.style.opacity = '0';
+
+            if (this.debugHitbox) {
+                this.debugHitbox.style.opacity = '0';
             }
         });
 
-        img.addEventListener('error', function() {
-            console.warn('Image failed to load:', this.src);
-            // Keep placeholder visible on error
-        });
-    });
-}
-
-// ===============================
-//   GAME FLOW
-// ===============================
-function startLevel() {
-    Level4State.currentChallengeIndex = 0;
-    Level4State.score = 0;
-    Level4State.challengeResults = [false, false, false, false];
-
-    showMoManSpeech('Los geht\'s! Erste Challenge: Erkenne den besseren Prompt!', false);
-
-    setTimeout(() => {
-        showChallenge(1);
-        updateProgressDisplay();
-    }, 2000);
-}
-
-function showChallenge(challengeNumber) {
-    const screens = ['challenge1Screen', 'challenge2Screen', 'challenge3Screen', 'challenge4Screen'];
-    showScreen(screens[challengeNumber - 1]);
-
-    Level4State.currentChallengeIndex = challengeNumber - 1;
-    updateProgressDisplay();
-
-    // Character feedback
-    const messages = [
-        'Challenge 1: Welcher Prompt ist besser?',
-        'Challenge 2: Welcher Prompt passt zum Bild?',
-        'Challenge 3: Welches Bild passt zum Prompt?',
-        'Challenge 4: Finde das echte Foto!'
-    ];
-    showMoManSpeech(messages[challengeNumber - 1], false);
-
-    // TXP hints
-    const txpHints = [
-        'Tipp: Gute Prompts sind detailliert und spezifisch!',
-        'Schau dir das Bild genau an! Was siehst du alles?',
-        'Vergleiche den Prompt mit jedem Detail im Bild!',
-        'Achte auf Unrealistische Details bei KI-Bildern!'
-    ];
-    setTimeout(() => {
-        showTXPSpeech(txpHints[challengeNumber - 1]);
-    }, 3000);
-}
-
-function nextChallenge() {
-    const nextIndex = Level4State.currentChallengeIndex + 1;
-
-    if (nextIndex < 4) {
         setTimeout(() => {
-            showChallenge(nextIndex + 1);
-        }, 1500);
-    } else {
-        // All challenges completed
-        setTimeout(() => {
-            showResults();
-        }, 1500);
-    }
-}
-
-function showResults() {
-    showScreen('resultsScreen');
-
-    // Calculate final score
-    const finalScore = Level4State.score;
-    const rank = getRank(finalScore);
-
-    // Animate score display
-    animateScore(finalScore);
-
-    // Display rank
-    displayRank(rank);
-
-    // Update challenge breakdown
-    updateChallengeBreakdown();
-
-    // Save progress
-    saveProgress(finalScore, rank);
-
-    // Character celebration
-    if (finalScore >= 40) {
-        showMoManSpeech('🎉 PERFEKT! Du bist ein KI-Bild-Meister!', true);
-        showTXPSpeech('Beep boop! Gold-Rang erreicht! Unglaublich! 🏆');
-    } else if (finalScore >= 30) {
-        showMoManSpeech('Super gemacht! Silber-Rang! 🥈', true);
-        showTXPSpeech('Tolle Leistung! Fast perfekt! 👏');
-    } else if (finalScore >= 20) {
-        showMoManSpeech('Gut gemacht! Bronze-Rang! 🥉', true);
-        showTXPSpeech('Guter Start! Mit mehr Übung wird\'s noch besser! 💪');
-    } else {
-        showMoManSpeech('Nicht aufgeben! Versuch\'s nochmal! 💪', true);
-        showTXPSpeech('Übung macht den Meister! Du schaffst das! 🤖');
-    }
-}
-
-function retryLevel() {
-    // Reset state
-    Level4State.score = 0;
-    Level4State.currentChallengeIndex = 0;
-    Level4State.challengeResults = [false, false, false, false];
-    Level4State.challenges.forEach(c => {
-        c.completed = false;
-        c.correct = false;
-    });
-
-    // Reset UI
-    resetAllChallenges();
-
-    // Start again
-    startLevel();
-}
-
-function resetAllChallenges() {
-    // Remove all selection/result classes
-    document.querySelectorAll('.prompt-card, .prompt-option, .image-option').forEach(el => {
-        el.classList.remove('selected', 'correct', 'incorrect');
-    });
-
-    // Re-enable all buttons
-    document.querySelectorAll('.select-prompt-btn').forEach(btn => {
-        btn.disabled = false;
-    });
-}
-
-// ===============================
-//   CHALLENGE 1: PROMPT COMPARISON
-// ===============================
-function selectPrompt(challengeNum, promptLetter) {
-    if (Level4State.challenges[challengeNum - 1].completed) return;
-
-    const isCorrect = promptLetter === ChallengeData.challenge1.correctAnswer;
-
-    // Mark as completed
-    Level4State.challenges[challengeNum - 1].completed = true;
-    Level4State.challenges[challengeNum - 1].correct = isCorrect;
-
-    // Update score
-    if (isCorrect) {
-        Level4State.score += 10;
-        Level4State.challengeResults[challengeNum - 1] = true;
+            if (this.element && this.element.parentNode) {
+                this.element.style.willChange = 'auto';
+                this.element.parentNode.removeChild(this.element);
+            }
+        }, 300);
     }
 
-    // Visual feedback
-    const cards = document.querySelectorAll('#challenge1Screen .prompt-card');
-    const selectedCard = promptLetter === 'A' ? cards[0] : cards[1];
-    const correctCard = ChallengeData.challenge1.correctAnswer === 'A' ? cards[0] : cards[1];
-
-    selectedCard.classList.add('selected');
-
-    setTimeout(() => {
-        correctCard.classList.add('correct');
-        if (!isCorrect) {
-            selectedCard.classList.add('incorrect');
+    destroy() {
+        if (this.element && this.element.parentNode) {
+            this.element.parentNode.removeChild(this.element);
         }
+        if (this.debugHitbox) {
+            this.debugHitbox.remove();
+        }
+    }
+}
 
-        // Disable buttons
-        document.querySelectorAll('#challenge1Screen .select-prompt-btn').forEach(btn => {
-            btn.disabled = true;
+// ===== MAIN GAME CLASS =====
+class BildPuzzleGame {
+    constructor() {
+        this.gameArea = document.getElementById('gameArea');
+        this.cardsContainer = document.getElementById('cardsContainer');
+
+        // Game state
+        this.isRunning = false;
+        this.isPaused = false;
+        this.gameTime = 0; // Time in seconds, counts up
+
+        // Player & Cards
+        this.player = null;
+        this.cards = [];
+        this.cardSpawnTimer = 0;
+
+        // Score & Stats
+        this.score = 0;
+        this.lives = GAME_CONFIG.lives;
+        this.collected = 0;
+        this.avoided = 0;
+        this.mistakes = 0;
+
+        // Easter Eggs
+        this.jumpHistory = []; // Track jumps for spam detection
+        this.lastActivityTime = Date.now();
+        this.idleWarningShown = false;
+        this.celebratedScores = new Set(); // Track which milestone scores we've celebrated
+        this.speechTimeout = null; // Track speech bubble timeout
+
+        // Difficulty scaling
+        this.difficultyMultiplier = 1.0; // Increases over time
+
+        // Input handling
+        this.keys = {};
+        this.setupInputHandlers();
+
+        // Game loop
+        this.lastTime = 0;
+        this.gameLoopId = null;
+
+        // Speech bubble
+        this.speechBubble = document.getElementById('moSpeech');
+        this.speechText = document.getElementById('moSpeechText');
+    }
+
+    setupInputHandlers() {
+        document.addEventListener('keydown', (e) => {
+            this.keys[e.key] = true;
+
+            // Toggle hitboxes with 'H' key (works anytime)
+            if (e.key === 'h' || e.key === 'H') {
+                this.toggleHitboxes();
+                return;
+            }
+
+            // Pause/Resume with ESC (works anytime when game is running)
+            if (e.key === 'Escape' && this.isRunning) {
+                this.togglePause();
+                return;
+            }
+
+            if (!this.isRunning || this.isPaused) return;
+
+            // Movement - track last direction for priority
+            if (e.key === 'ArrowLeft') {
+                this.player.isMovingLeft = true;
+                this.player.lastDirection = 'left';
+                this.resetIdleTimer(); // Track activity
+            } else if (e.key === 'ArrowRight') {
+                this.player.isMovingRight = true;
+                this.player.lastDirection = 'right';
+                this.resetIdleTimer(); // Track activity
+            }
+
+            // Jump
+            if (e.key === 'ArrowUp' || e.key === ' ') {
+                this.onPlayerJump(); // Easter egg: spam jump detection (count all attempts)
+
+                if (this.player.isGrounded) {
+                    this.player.jump();
+                }
+                e.preventDefault();
+            }
         });
 
-        // Character feedback
-        if (isCorrect) {
-            showMoManSpeech('✓ Richtig! Gute Prompts sind detailliert und spezifisch! +10 Punkte', false);
-            showTXPSpeech('Beep boop! Korrekt! Der bessere Prompt enthält alle wichtigen Details! 🎯');
+        document.addEventListener('keyup', (e) => {
+            this.keys[e.key] = false;
+
+            if (!this.isRunning || this.isPaused) return;
+
+            // Stop movement - update flags directly
+            if (e.key === 'ArrowLeft') {
+                this.player.isMovingLeft = false;
+            } else if (e.key === 'ArrowRight') {
+                this.player.isMovingRight = false;
+            }
+        });
+    }
+
+    toggleHitboxes() {
+        GAME_CONFIG.debugHitboxes = !GAME_CONFIG.debugHitboxes;
+
+        // Show/hide player hitbox
+        if (this.player && this.player.debugHitbox) {
+            this.player.debugHitbox.style.display = GAME_CONFIG.debugHitboxes ? 'block' : 'none';
+        }
+
+        // Show/hide card hitboxes
+        this.cards.forEach(card => {
+            if (card.debugHitbox) {
+                card.debugHitbox.style.display = GAME_CONFIG.debugHitboxes ? 'block' : 'none';
+            }
+        });
+
+        console.log('Hitboxes:', GAME_CONFIG.debugHitboxes ? 'ON' : 'OFF');
+    }
+
+    startGame() {
+        // Reset everything
+        this.score = 0;
+        this.lives = GAME_CONFIG.lives;
+        this.collected = 0;
+        this.avoided = 0;
+        this.mistakes = 0;
+        this.gameTime = 0;
+
+        // Clear any existing cards
+        this.cards.forEach(card => card.destroy());
+        this.cards = [];
+
+        // Show game screen
+        this.showScreen('gameScreen');
+
+        // Enable TXP talking when game starts
+        if (txpHost) txpHost.enableTalking();
+
+        // Create player
+        this.player = new MoManPlayer(this.gameArea);
+
+        // Update UI
+        this.updateUI();
+
+        // Start game loop
+        this.isRunning = true;
+        this.lastTime = performance.now();
+        this.gameLoop();
+
+        // Initial speech
+        this.showSpeech("Los geht's! Sammle die guten Prompts!");
+    }
+
+
+    gameLoop(currentTime = performance.now()) {
+        if (!this.isRunning) return;
+
+        const deltaTime = (currentTime - this.lastTime) / 16.67; // Normalize to 60fps
+        this.lastTime = currentTime;
+
+        if (!this.isPaused) {
+            // Update game time
+            this.gameTime += deltaTime / 60; // Convert to seconds (60fps)
+            this.updateTimeDisplay();
+
+            // Progressive difficulty - increases speed by 4% every second
+            // Caps at 10x speed (after 225 seconds / 3.75 minutes)
+            this.difficultyMultiplier = Math.min(10.0, 1.0 + this.gameTime * 0.04);
+
+            // Update player
+            this.player.update(deltaTime);
+
+            // Update cards
+            for (let i = this.cards.length - 1; i >= 0; i--) {
+                const card = this.cards[i];
+                const isOffScreen = card.update(deltaTime);
+
+                if (isOffScreen) {
+                    // Card missed
+                    if (card.quality === 'good') {
+                        // Good card missed - no penalty
+                        this.avoided++;
+                    }
+                    card.destroy();
+                    this.cards.splice(i, 1);
+                } else if (!card.collected) {
+                    // Check collision
+                    this.checkCollision(card);
+                }
+            }
+
+            // Spawn cards continuously - spawn rate increases with difficulty
+            // Higher difficulty = shorter interval between spawns
+            this.cardSpawnTimer += deltaTime;
+            const adjustedSpawnInterval = GAME_CONFIG.cardSpawnInterval / this.difficultyMultiplier;
+            if (this.cardSpawnTimer >= adjustedSpawnInterval / 16.67) {
+                this.spawnCard();
+                this.cardSpawnTimer = 0;
+            }
+
+            // Easter egg: Check for idle player
+            this.checkIdleState();
+
+            // Check game over
+            if (this.lives <= 0) {
+                this.gameOver();
+            }
+        }
+
+        this.gameLoopId = requestAnimationFrame((time) => this.gameLoop(time));
+    }
+
+    spawnCard() {
+        // Random quality distribution - 50% good, 50% bad
+        const rand = Math.random();
+        let quality, imageData;
+
+        if (rand < 0.5) {
+            // 50% bad
+            quality = 'bad';
+            imageData = IMAGE_PROMPTS.bad[Math.floor(Math.random() * IMAGE_PROMPTS.bad.length)];
         } else {
-            showMoManSpeech('✗ Nicht ganz. Der bessere Prompt ist detaillierter und spezifischer!', false);
-            showTXPSpeech('Merke dir: Je mehr relevante Details, desto besser das Ergebnis! 📝');
+            // 50% good
+            quality = 'good';
+            imageData = IMAGE_PROMPTS.good[Math.floor(Math.random() * IMAGE_PROMPTS.good.length)];
         }
 
-        updateProgressDisplay();
-
-        // Move to next challenge
-        nextChallenge();
-    }, 800);
-}
-
-// ===============================
-//   CHALLENGE 2: PROMPT TO IMAGE
-// ===============================
-function selectPromptOption(challengeNum, optionNum) {
-    if (Level4State.challenges[challengeNum - 1].completed) return;
-
-    const isCorrect = (optionNum - 1) === ChallengeData.challenge2.correctAnswer;
-
-    // Mark as completed
-    Level4State.challenges[challengeNum - 1].completed = true;
-    Level4State.challenges[challengeNum - 1].correct = isCorrect;
-
-    // Update score
-    if (isCorrect) {
-        Level4State.score += 10;
-        Level4State.challengeResults[challengeNum - 1] = true;
+        const card = new FallingCard(this.gameArea, imageData, quality, this.difficultyMultiplier);
+        this.cards.push(card);
     }
 
-    // Visual feedback
-    const options = document.querySelectorAll('#challenge2Screen .prompt-option');
-    const selectedOption = options[optionNum - 1];
-    const correctOption = options[ChallengeData.challenge2.correctAnswer];
+    checkCollision(card) {
+        const playerBox = this.player.getHitbox();
+        const cardBox = card.getHitbox();
 
-    selectedOption.classList.add('selected');
+        // Get game area height for proper conversion
+        const gameAreaHeight = this.gameArea.offsetHeight;
 
-    setTimeout(() => {
-        correctOption.classList.add('correct');
-        if (!isCorrect) {
-            selectedOption.classList.add('incorrect');
+        // Convert player's bottom-based coordinates to top-based (like cards)
+        const playerTopPos = gameAreaHeight - playerBox.topDist;
+        const playerBottomPos = gameAreaHeight - playerBox.bottomDist;
+
+        // Simple AABB collision (both in top-based coordinates now)
+        const collision = !(
+            playerBox.right < cardBox.left ||
+            playerBox.left > cardBox.right ||
+            playerBottomPos < cardBox.top ||
+            playerTopPos > cardBox.bottom
+        );
+
+        if (collision) {
+            this.handleCardCollected(card);
+        }
+    }
+
+    handleCardCollected(card) {
+        // Mark as collected immediately to prevent double-collection
+        card.collected = true;
+
+        // Visual collection effect
+        card.collect();
+
+        // Update score based on quality
+        if (card.quality === 'good') {
+            this.score += 10;
+            this.collected++;
+            this.checkScoreMilestone(this.score); // Easter egg: milestone celebration
+            this.showSpeech("Richtig! +10 Punkte!", 1500);
+        } else if (card.quality === 'bad') {
+            this.lives--;
+            this.mistakes++;
+            this.showSpeech("Falsch! Schlechter Prompt! -1 Leben", 1500);
+            this.updateLivesDisplay();
         }
 
-        // Character feedback
-        if (isCorrect) {
-            showMoManSpeech('✓ Perfekt! Du hast den richtigen Prompt erkannt! +10 Punkte', false);
-            showTXPSpeech('Excellent analysis! Alle Details stimmen überein! 🎨');
+        // Remove from cards array immediately
+        const index = this.cards.indexOf(card);
+        if (index > -1) {
+            this.cards.splice(index, 1);
+        }
+
+        this.updateUI();
+    }
+
+
+    gameOver() {
+        this.isRunning = false;
+        if (this.gameLoopId) {
+            cancelAnimationFrame(this.gameLoopId);
+        }
+
+        this.showResults();
+    }
+
+    showResults() {
+        // Clean up
+        if (this.player) {
+            this.player.destroy();
+        }
+        this.cards.forEach(card => card.destroy());
+        this.cards = [];
+
+        // Calculate rank
+        let rank, rankName;
+        if (this.score >= 500) {
+            rank = 'gold';
+            rankName = 'Gold';
+        } else if (this.score >= 300) {
+            rank = 'silver';
+            rankName = 'Silber';
+        } else if (this.score >= 150) {
+            rank = 'bronze';
+            rankName = 'Bronze';
         } else {
-            showMoManSpeech('✗ Leider falsch. Vergleiche die Bilddetails genau mit dem Prompt!', false);
-            showTXPSpeech('Tipp: Achte auf Farben, Setting und Stimmung! 🔍');
+            rank = 'none';
+            rankName = 'Kein Rang';
         }
 
-        updateProgressDisplay();
+        // Save progress
+        saveProgress(this.score, rankName);
 
-        // Move to next challenge
-        nextChallenge();
-    }, 800);
-}
+        // Update HUD rank badge
+        displayRankBadge();
 
-// ===============================
-//   CHALLENGE 3: IMAGE MATCHING
-// ===============================
-function selectImageOption(challengeNum, imageNum) {
-    if (Level4State.challenges[challengeNum - 1].completed) return;
+        // Calculate accuracy
+        const totalCards = this.collected + this.mistakes;
+        const accuracy = totalCards > 0 ? Math.round((this.collected / totalCards) * 100) : 0;
 
-    const isCorrect = (imageNum - 1) === ChallengeData.challenge3.correctAnswer;
+        // Update results screen
+        document.getElementById('resultsTitle').textContent = '💔 Game Over!';
+        document.getElementById('finalScoreValue').textContent = this.score;
+        document.getElementById('rankName').textContent = rankName;
 
-    // Mark as completed
-    Level4State.challenges[challengeNum - 1].completed = true;
-    Level4State.challenges[challengeNum - 1].correct = isCorrect;
+        // Update the rank display in results (not the HUD badge)
+        const resultRankBadge = document.querySelector('#resultsScreen .rank-badge');
+        if (resultRankBadge) {
+            resultRankBadge.className = `rank-badge ${rank}`;
+        }
 
-    // Update score
-    if (isCorrect) {
-        Level4State.score += 10;
-        Level4State.challengeResults[challengeNum - 1] = true;
+        // Stats
+        document.getElementById('statCollected').textContent = this.collected;
+        document.getElementById('statAvoided').textContent = this.avoided;
+        document.getElementById('statAccuracy').textContent = `${accuracy}%`;
+
+        this.showScreen('resultsScreen');
     }
 
-    // Visual feedback
-    const options = document.querySelectorAll('#challenge3Screen .image-option');
-    const selectedOption = options[imageNum - 1];
-    const correctOption = options[ChallengeData.challenge3.correctAnswer];
-
-    selectedOption.classList.add('selected');
-
-    setTimeout(() => {
-        correctOption.classList.add('correct');
-        if (!isCorrect) {
-            selectedOption.classList.add('incorrect');
-        }
-
-        // Character feedback
-        if (isCorrect) {
-            showMoManSpeech('✓ Exzellent! Das ist das richtige Bild! +10 Punkte', false);
-            showTXPSpeech('Beep boop! Perfekte Übereinstimmung! Alle Elemente passen! 🖼️');
-        } else {
-            showMoManSpeech('✗ Nicht das richtige Bild. Lies den Prompt nochmal genau!', false);
-            showTXPSpeech('Vergleiche jedes Element: Objekt, Setting, Licht, Stil! 🎯');
-        }
-
-        updateProgressDisplay();
-
-        // Move to next challenge
-        nextChallenge();
-    }, 800);
-}
-
-// ===============================
-//   CHALLENGE 4: REAL VS AI
-// ===============================
-function selectRealImage(challengeNum, imageNum) {
-    if (Level4State.challenges[challengeNum - 1].completed) return;
-
-    const isCorrect = (imageNum - 1) === ChallengeData.challenge4.correctAnswer;
-
-    // Mark as completed
-    Level4State.challenges[challengeNum - 1].completed = true;
-    Level4State.challenges[challengeNum - 1].correct = isCorrect;
-
-    // Update score
-    if (isCorrect) {
-        Level4State.score += 10;
-        Level4State.challengeResults[challengeNum - 1] = true;
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        const pauseOverlay = document.getElementById('pauseOverlay');
+        pauseOverlay.style.display = this.isPaused ? 'flex' : 'none';
     }
 
-    // Visual feedback
-    const options = document.querySelectorAll('#challenge4Screen .image-option');
-    const selectedOption = options[imageNum - 1];
-    const correctOption = options[ChallengeData.challenge4.correctAnswer];
-
-    selectedOption.classList.add('selected');
-
-    setTimeout(() => {
-        correctOption.classList.add('correct');
-        if (!isCorrect) {
-            selectedOption.classList.add('incorrect');
-        }
-
-        // Character feedback
-        if (isCorrect) {
-            showMoManSpeech('✓ Richtig erkannt! Das ist ein echtes Foto! +10 Punkte 📸', false);
-            showTXPSpeech('Wow! Gutes Auge für Details! Du hast das echte Bild gefunden! ✨');
-        } else {
-            showMoManSpeech('✗ Das war KI-generiert! Achte auf kleine Ungereimtheiten!', false);
-            showTXPSpeech('KI-Bilder haben oft Fehler bei Händen, Text oder Schatten! 🤖');
-        }
-
-        updateProgressDisplay();
-
-        // Move to results
-        nextChallenge();
-    }, 800);
-}
-
-// ===============================
-//   UI UPDATES
-// ===============================
-function updateProgressDisplay() {
-    const challengeDisplay = document.getElementById('currentChallenge');
-    const scoreDisplay = document.getElementById('totalScore');
-
-    if (challengeDisplay) {
-        challengeDisplay.textContent = `${Level4State.currentChallengeIndex + 1}/4`;
+    showScreen(screenId) {
+        const screens = document.querySelectorAll('.game-screen');
+        screens.forEach(screen => screen.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
     }
 
-    if (scoreDisplay) {
-        scoreDisplay.textContent = Level4State.score;
+    showSpeech(text, duration = 3000) {
+        // Clear any existing speech timeout
+        if (this.speechTimeout) {
+            clearTimeout(this.speechTimeout);
+        }
+
+        this.speechText.textContent = text;
+        this.speechBubble.style.display = 'block';
+
+        // Animate TXP talking
+        if (txpHost) txpHost.talk(duration);
+
+        // Auto-hide after duration
+        this.speechTimeout = setTimeout(() => {
+            this.speechBubble.style.display = 'none';
+            this.speechTimeout = null;
+        }, duration);
+    }
+
+    updateUI() {
+        document.getElementById('scoreValue').textContent = this.score;
+        this.updateLivesDisplay();
+    }
+
+    updateTimeDisplay() {
+        const seconds = Math.floor(this.gameTime);
+        document.getElementById('timeValue').textContent = `${seconds}s`;
+    }
+
+    updateLivesDisplay() {
+        const hearts = '❤️'.repeat(Math.max(0, this.lives));
+        const emptyHearts = '🖤'.repeat(Math.max(0, GAME_CONFIG.lives - this.lives));
+        document.getElementById('livesValue').textContent = hearts + emptyHearts;
+    }
+
+    // ===== EASTER EGGS =====
+
+    // Spam Jump Easter Egg - detect rapid jumping
+    onPlayerJump() {
+        const now = Date.now();
+        this.jumpHistory.push(now);
+
+        // Keep only jumps from last 1 second
+        this.jumpHistory = this.jumpHistory.filter(time => now - time < 1000);
+
+        // If 6+ jumps in 1 second, trigger special animation
+        if (this.jumpHistory.length >= 6) {
+            this.triggerSpamJumpAnimation();
+            this.jumpHistory = []; // Reset to prevent spam
+        }
+
+        this.resetIdleTimer();
+    }
+
+    triggerSpamJumpAnimation() {
+        // Create particle explosion effect
+        const playerEl = this.player.element;
+        const rect = playerEl.getBoundingClientRect();
+
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.style.position = 'fixed';
+            particle.style.left = `${rect.left + rect.width / 2}px`;
+            particle.style.top = `${rect.top + rect.height / 2}px`;
+            particle.style.width = '8px';
+            particle.style.height = '8px';
+            particle.style.borderRadius = '50%';
+            particle.style.backgroundColor = ['#67C7FF', '#A86AFF', '#F5C03B'][Math.floor(Math.random() * 3)];
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '999';
+
+            const angle = (Math.PI * 2 * i) / 20;
+            const velocity = 100 + Math.random() * 100;
+            const vx = Math.cos(angle) * velocity;
+            const vy = Math.sin(angle) * velocity;
+
+            document.body.appendChild(particle);
+
+            let px = rect.left + rect.width / 2;
+            let py = rect.top + rect.height / 2;
+            let life = 1;
+
+            const animateParticle = () => {
+                px += vx * 0.016;
+                py += vy * 0.016;
+                life -= 0.02;
+
+                particle.style.left = `${px}px`;
+                particle.style.top = `${py}px`;
+                particle.style.opacity = life;
+
+                if (life > 0) {
+                    requestAnimationFrame(animateParticle);
+                } else {
+                    particle.remove();
+                }
+            };
+
+            animateParticle();
+        }
+
+        this.showSpeech("Wow! So viel Energie! 🎉", 2000);
+    }
+
+    // Perfect Score Celebration
+    checkScoreMilestone(newScore) {
+        const milestones = [100, 200, 300];
+
+        for (const milestone of milestones) {
+            if (newScore >= milestone && !this.celebratedScores.has(milestone)) {
+                this.celebratedScores.add(milestone);
+                this.celebrateScoreMilestone(milestone);
+                break; // Only celebrate one at a time
+            }
+        }
+    }
+
+    celebrateScoreMilestone(score) {
+        // Show celebration message
+        const messages = {
+            100: "🎉 100 Punkte! Fantastisch!",
+            200: "🌟 200 Punkte! Du bist ein Profi!",
+            300: "🏆 300 Punkte! Unglaublich!"
+        };
+
+        this.showSpeech(messages[score], 3000);
+
+        // Visual celebration effect
+        const scoreEl = document.getElementById('scoreValue');
+        scoreEl.style.animation = 'none';
+        setTimeout(() => {
+            scoreEl.style.animation = 'scoreClickCelebrate 1s ease';
+        }, 10);
+    }
+
+    // Idle Detection
+    resetIdleTimer() {
+        this.lastActivityTime = Date.now();
+        this.idleWarningShown = false;
+    }
+
+    checkIdleState() {
+        if (this.isPaused || !this.isRunning) return;
+
+        const idleTime = Date.now() - this.lastActivityTime;
+
+        // After 15 seconds of no input, show reminder
+        if (idleTime > 15000 && !this.idleWarningShown) {
+            this.idleWarningShown = true;
+            this.showSpeech("Du musst dich mit den Pfeiltasten bewegen! ⬅️➡️", 4000);
+        }
     }
 }
 
-function showScreen(screenId) {
-    // Hide all screens
-    document.querySelectorAll('.game-screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
+// ===== GLOBAL FUNCTIONS (Called from HTML) =====
+let game;
+let txpHost; // Global TXP instance
 
-    // Show target screen
-    const targetScreen = document.getElementById(screenId);
-    if (targetScreen) {
-        targetScreen.classList.add('active');
+function showTutorial() {
+    const screens = document.querySelectorAll('.game-screen');
+    screens.forEach(screen => screen.classList.remove('active'));
+    document.getElementById('tutorialScreen').classList.add('active');
+}
+
+function startGame() {
+    if (!game) {
+        game = new BildPuzzleGame();
+    }
+    game.startGame();
+}
+
+function resumeGame() {
+    if (game) {
+        game.togglePause();
     }
 }
 
-function getRank(score) {
-    if (score >= 40) return { name: 'Gold 🥇', icon: '🥇', message: 'Perfekt! Du bist ein KI-Bild-Meister!' };
-    if (score >= 30) return { name: 'Silber 🥈', icon: '🥈', message: 'Sehr gut! Du verstehst KI-Bilder!' };
-    if (score >= 20) return { name: 'Bronze 🥉', icon: '🥉', message: 'Gut gemacht! Du bist auf dem richtigen Weg!' };
-    return { name: 'Kein Rang', icon: '📝', message: 'Weiter üben! Du schaffst das!' };
-}
-
-function displayRank(rank) {
-    const rankBadge = document.querySelector('.rank-icon-large');
-    const rankName = document.querySelector('.rank-name-large');
-    const rankMessage = document.getElementById('rankMessage');
-
-    if (rankBadge) rankBadge.textContent = rank.icon;
-    if (rankName) rankName.textContent = rank.name;
-    if (rankMessage) rankMessage.textContent = rank.message;
-}
-
-function animateScore(finalScore) {
-    const scoreElement = document.getElementById('finalScore');
-    if (!scoreElement) return;
-
-    let currentScore = 0;
-    const increment = finalScore / 30; // 30 frames
-
-    const interval = setInterval(() => {
-        currentScore += increment;
-        if (currentScore >= finalScore) {
-            currentScore = finalScore;
-            clearInterval(interval);
+function quitGame() {
+    if (game) {
+        game.isRunning = false;
+        if (game.gameLoopId) {
+            cancelAnimationFrame(game.gameLoopId);
         }
-        scoreElement.textContent = Math.floor(currentScore);
-    }, 30);
+    }
+
+    const screens = document.querySelectorAll('.game-screen');
+    screens.forEach(screen => screen.classList.remove('active'));
+    document.getElementById('introScreen').classList.add('active');
 }
 
-function updateChallengeBreakdown() {
-    const breakdownItems = [
-        document.getElementById('breakdown1'),
-        document.getElementById('breakdown2'),
-        document.getElementById('breakdown3'),
-        document.getElementById('breakdown4')
-    ];
-
-    breakdownItems.forEach((item, index) => {
-        if (!item) return;
-
-        const isCorrect = Level4State.challengeResults[index];
-        const scoreElement = item.querySelector('.breakdown-score');
-
-        if (isCorrect) {
-            item.classList.add('correct');
-            scoreElement.textContent = '✓ 10/10';
-            scoreElement.style.color = '#22c55e';
-        } else {
-            item.classList.add('incorrect');
-            scoreElement.textContent = '✗ 0/10';
-            scoreElement.style.color = '#ef4444';
-        }
-    });
-}
-
-// ===============================
-//   CHARACTER ANIMATIONS
-// ===============================
-function initializeCharacterAnimations() {
-    // Nur TXP Animation starten
-    startTXPAnimation();
-
-    // Laufenden MoMan alle 20 Sekunden spawnen
-    startRunningMoManInterval();
-
-    // Ersten MoMan sofort spawnen (für sofortiges Feedback)
-    setTimeout(() => spawnRunningMoMan(), 1000);
-}
-
-function startRunningMoManInterval() {
-    // Alle 20 Sekunden einen laufenden MoMan spawnen
-    CharacterState.moMan.runInterval = setInterval(() => {
-        spawnRunningMoMan();
-    }, 20000); // 20 Sekunden
-}
-
-function spawnRunningMoMan() {
-    // Random Richtung wählen
-    const goingRight = Math.random() > 0.5;
-
-    // Zufällige Höhe wählen (zwischen 50px und 400px vom unteren Rand)
-    const randomBottom = Math.floor(Math.random() * 350) + 50; // 50-400px
-
-    // MoMan Element erstellen
-    const moManDiv = document.createElement('div');
-    moManDiv.className = 'running-moman';
-    moManDiv.style.bottom = randomBottom + 'px'; // Zufällige Höhe setzen
-
-    const moManImg = document.createElement('img');
-    moManImg.className = 'running-moman-img';
-    moManDiv.appendChild(moManImg);
-
-    // Startposition setzen
-    if (goingRight) {
-        moManDiv.style.left = '-150px'; // Start außerhalb links
+function restartGame() {
+    if (game) {
+        game.startGame();
     } else {
-        moManDiv.style.right = '-150px'; // Start außerhalb rechts
-        moManImg.style.transform = 'scaleX(-1)'; // Spiegeln für links-Richtung
+        game = new BildPuzzleGame();
+        game.startGame();
     }
+}
 
-    document.body.appendChild(moManDiv);
+function goToMenu() {
+    window.location.href = 'index.html';
+}
 
-    // Animation State für diesen MoMan
-    const runState = {
-        element: moManDiv,
-        img: moManImg,
-        currentFrame: 0,
-        direction: goingRight ? 'right' : 'left',
-        position: goingRight ? -150 : window.innerWidth + 150,
-        animationInterval: null,
-        animationFrame: null
+// ===== PROGRESS MANAGEMENT =====
+function saveProgress(score, rankName) {
+    const existingProgress = loadProgress();
+
+    // Define rank hierarchy (higher number = better rank)
+    const rankValues = {
+        "Kein Rang": 0,
+        "Bronze": 1,
+        "Silber": 2,
+        "Gold": 3
     };
 
-    CharacterState.runningMoMans.push(runState);
+    let rankToSave = rankName;
+    let scoreToSave = score;
 
-    // Click-Handler für Achievement
-    moManDiv.addEventListener('click', function(e) {
-        e.stopPropagation();
-        e.preventDefault();
+    // If there's existing progress, only upgrade rank if new one is better
+    if (existingProgress && existingProgress.rank) {
+        const existingRankValue = rankValues[existingProgress.rank] || 0;
+        const currentRankValue = rankValues[rankName] || 0;
 
-        console.log('MoMan clicked!'); // Debug
-        alert('MoMan wurde angeklickt!'); // Sichtbare Bestätigung
-
-        // Achievement freischalten
-        if (typeof achievements !== 'undefined') {
-            const speedhunterAchievement = achievements.normal.find(a => a.id === 'speedhunter');
-            console.log('Achievement found:', speedhunterAchievement); // Debug
-
-            if (speedhunterAchievement && !speedhunterAchievement.unlocked) {
-                speedhunterAchievement.progress = 1;
-
-                if (typeof saveAchievements === 'function') {
-                    saveAchievements();
-                }
-
-                if (typeof checkAchievement === 'function') {
-                    checkAchievement('speedhunter');
-                }
-            }
+        // Keep the better rank
+        if (existingRankValue > currentRankValue) {
+            rankToSave = existingProgress.rank;
         }
 
-        // MoMan entfernen mit Animation
-        moManDiv.style.transform = 'scale(1.3) rotate(360deg)';
-        setTimeout(() => {
-            removeRunningMoMan(runState);
-        }, 300);
-    });
-
-    // Test: Auch mousedown probieren
-    moManDiv.addEventListener('mousedown', function(e) {
-        console.log('MoMan mousedown!');
-    });
-
-    // Frame-Animation starten
-    runState.animationInterval = setInterval(() => {
-        const frame = String(runState.currentFrame).padStart(5, '0');
-        runState.img.src = `Mo man Lauf 2s 24fps 48 frames/Mo man Lauf Pose_${frame}.png`;
-        runState.currentFrame = (runState.currentFrame + 1) % CharacterState.moMan.totalRunFrames;
-    }, CharacterState.moMan.runAnimationSpeed);
-
-    // Position-Animation starten (mit requestAnimationFrame für flüssige Bewegung)
-    const speed = 22; // Pixel pro Frame
-
-    function animatePosition() {
-        if (goingRight) {
-            runState.position += speed;
-            moManDiv.style.left = runState.position + 'px';
-
-            // Wenn komplett rechts raus, entfernen
-            if (runState.position > window.innerWidth + 150) {
-                removeRunningMoMan(runState);
-                return;
-            }
-        } else {
-            runState.position -= speed;
-            moManDiv.style.left = runState.position + 'px';
-
-            // Wenn komplett links raus, entfernen
-            if (runState.position < -150) {
-                removeRunningMoMan(runState);
-                return;
-            }
+        // Always keep the higher score
+        if (existingProgress.score > score) {
+            scoreToSave = existingProgress.score;
         }
-
-        // Weiter animieren
-        runState.animationFrame = requestAnimationFrame(animatePosition);
     }
 
-    // Animation starten
-    runState.animationFrame = requestAnimationFrame(animatePosition);
-}
-
-function removeRunningMoMan(runState) {
-    // Animations stoppen
-    if (runState.animationInterval) clearInterval(runState.animationInterval);
-    if (runState.animationFrame) cancelAnimationFrame(runState.animationFrame);
-
-    // Element entfernen
-    if (runState.element && runState.element.parentNode) {
-        runState.element.parentNode.removeChild(runState.element);
-    }
-
-    // Aus Array entfernen
-    const index = CharacterState.runningMoMans.indexOf(runState);
-    if (index > -1) {
-        CharacterState.runningMoMans.splice(index, 1);
-    }
-}
-
-function startTXPAnimation() {
-    const txpImg = document.querySelector('.txp-host-img');
-    if (!txpImg) return;
-
-    CharacterState.txp.animationInterval = setInterval(() => {
-        const frame = String(CharacterState.txp.currentFrame).padStart(5, '0');
-
-        if (CharacterState.txp.currentAnimation === 'talk') {
-            // TXP Talk Animation (24 frames - Note: filename has space!)
-            txpImg.src = `TXP/TXP_Talk_Pose/TXP_Talk Pose_${frame}.png`;
-            CharacterState.txp.currentFrame = (CharacterState.txp.currentFrame + 1) % CharacterState.txp.totalTalkFrames;
-        } else {
-            // TXP Stand Animation (24 frames)
-            txpImg.src = `TXP/TXP_Stand_Pose/TXP Stand Pose_${frame}.png`;
-            CharacterState.txp.currentFrame = (CharacterState.txp.currentFrame + 1) % CharacterState.txp.totalStandFrames;
-        }
-    }, CharacterState.txp.animationSpeed);
-}
-
-function showMoManSpeech(message, showButton = false) {
-    // MoMan hat keine feste Position mehr, also keine Sprechblase
-    // Stattdessen TXP sprechen lassen
-    showTXPSpeech(message);
-}
-
-function hideMoManSpeech() {
-    // Nicht mehr benötigt, da MoMan keine feste Position hat
-    hideTXPSpeech();
-}
-
-function showTXPSpeech(message) {
-    const bubble = document.getElementById('txpSpeech');
-
-    if (bubble) {
-        bubble.querySelector('p').textContent = message;
-        bubble.style.display = 'block';
-
-        // Switch to talk animation
-        CharacterState.txp.currentAnimation = 'talk';
-        CharacterState.txp.currentFrame = 0;
-
-        // Auto-hide after 5 seconds
-        setTimeout(() => {
-            hideTXPSpeech();
-        }, 5000);
-    }
-}
-
-function hideTXPSpeech() {
-    const bubble = document.getElementById('txpSpeech');
-    if (bubble) {
-        bubble.style.display = 'none';
-        CharacterState.txp.currentAnimation = 'stand';
-        CharacterState.txp.currentFrame = 0;
-    }
-}
-
-// ===============================
-//   PROGRESS SAVE/LOAD
-// ===============================
-function saveProgress(score, rank) {
     const progress = {
+        level: 'level4',
         completed: true,
-        score: score,
-        rank: rank.name,
-        timestamp: new Date().toISOString(),
-        challengeResults: Level4State.challengeResults
+        score: scoreToSave,
+        rank: rankToSave,
+        timestamp: new Date().toISOString()
     };
 
     localStorage.setItem('aiBytes_level4_progress', JSON.stringify(progress));
-    console.log('Level 4 progress saved:', progress);
 }
 
 function loadProgress() {
     const saved = localStorage.getItem('aiBytes_level4_progress');
     if (saved) {
-        const progress = JSON.parse(saved);
-        console.log('Level 4 progress loaded:', progress);
-        // Progress is loaded but we don't restore the game state
-        // Just use it for displaying rank on main menu
+        return JSON.parse(saved);
+    }
+    return null;
+}
+
+// Function to display rank badge in HUD
+function displayRankBadge() {
+    const progress = loadProgress();
+    const rankBadge = document.getElementById('rankBadge');
+
+    if (!rankBadge) return;
+
+    if (progress && progress.rank && progress.rank !== "Kein Rang") {
+        // Show the rank badge
+        rankBadge.style.display = 'inline-block';
+
+        // Set rank text
+        rankBadge.textContent = progress.rank;
+
+        // Remove all rank classes first
+        rankBadge.classList.remove('bronze', 'silver', 'gold');
+
+        // Add appropriate class based on rank
+        if (progress.rank.includes('Bronze')) {
+            rankBadge.classList.add('bronze');
+        } else if (progress.rank.includes('Silber')) {
+            rankBadge.classList.add('silver');
+        } else if (progress.rank.includes('Gold')) {
+            rankBadge.classList.add('gold');
+        }
+    } else {
+        // Hide the badge if no rank
+        rankBadge.style.display = 'none';
     }
 }
 
-// ===============================
-//   CLEANUP
-// ===============================
-window.addEventListener('beforeunload', () => {
-    // Clear running MoMan interval
-    if (CharacterState.moMan.runInterval) {
-        clearInterval(CharacterState.moMan.runInterval);
-    }
+// ===== TXP CLICK EASTER EGG =====
+let txpClickTimeout = null; // Track TXP click speech timeout
 
-    // Clear all active running MoMans
-    CharacterState.runningMoMans.forEach(runState => {
-        removeRunningMoMan(runState);
+function setupTXPClickHandler() {
+    const txpElement = document.getElementById('txpHost');
+    if (!txpElement) return;
+
+    const aiJokes = [
+        "Warum ging die KI zum Arzt? Sie hatte einen Bug! 🐛",
+        "Was sagt eine KI beim Aufwachen? 'Guten Mor-gen!' 🌅",
+        "Wie nennt man eine faule KI? Artificial Unintelligence! 😴",
+        "Warum mag die KI keine Cookies? Sie bevorzugt Cache! 🍪",
+        "Was ist der Lieblingssport einer KI? Neural Networking! 🏐",
+        "Warum wurde die KI zum Lehrer? Sie hatte zu viele Trainings-Daten! 📚",
+        "Was trinkt eine KI? Java-Script! ☕",
+        "Warum ist die KI so ordentlich? Sie sortiert ihre Arrays! 📊",
+        "Was macht eine KI im Winter? Sie friert ihre Weights ein! ❄️",
+        "Warum ging die KI zum Psychologen? Sie hatte zu viele Layer! 🧠",
+        "Wie flirtet eine KI? 'Hey Baby, willst du meine Loss-Function minimieren?' 💕",
+        "Was ist das Lieblingsessen einer Bild-KI? Pixel-Pizza! 🍕",
+        "Warum wurde DALL-E zum Künstler? Es hatte viel Imagination! 🎨",
+        "Was sagt eine KI zu ihrem Trainer? 'Danke für das Feedback!' 🙏"
+    ];
+
+    let lastJokeIndex = -1;
+
+    txpElement.addEventListener('click', () => {
+        // Don't interrupt if TXP is already talking
+        if (!txpHost || !txpHost.canTalk) return;
+
+        // Get a random joke (different from last one)
+        let jokeIndex;
+        do {
+            jokeIndex = Math.floor(Math.random() * aiJokes.length);
+        } while (jokeIndex === lastJokeIndex && aiJokes.length > 1);
+
+        lastJokeIndex = jokeIndex;
+
+        // Show the joke
+        const speechBubble = document.getElementById('moSpeech');
+        const speechText = document.getElementById('moSpeechText');
+
+        if (speechBubble && speechText) {
+            // Clear any existing timeout
+            if (txpClickTimeout) {
+                clearTimeout(txpClickTimeout);
+            }
+
+            // If game is running, use game's showSpeech method
+            if (game && game.isRunning) {
+                game.showSpeech(aiJokes[jokeIndex], 5000);
+            } else {
+                // Otherwise handle manually
+                speechText.textContent = aiJokes[jokeIndex];
+                speechBubble.style.display = 'block';
+
+                // Animate TXP talking
+                txpHost.talk(4000);
+
+                // Hide after 5 seconds
+                txpClickTimeout = setTimeout(() => {
+                    speechBubble.style.display = 'none';
+                    txpClickTimeout = null;
+                }, 5000);
+            }
+        }
     });
 
-    // Clear TXP animation interval
-    if (CharacterState.txp.animationInterval) {
-        clearInterval(CharacterState.txp.animationInterval);
-    }
-});
+    // Add cursor pointer to show it's clickable
+    txpElement.style.cursor = 'pointer';
+}
 
-console.log('Level 4: Vision Challenge loaded successfully! 🎨');
+// Setup Intro Screen - Press any key or click to continue
+function setupIntroScreen() {
+    const introScreen = document.getElementById('introScreen');
+    let introActive = true;
+
+    const startFromIntro = () => {
+        if (!introActive || !introScreen.classList.contains('active')) return;
+
+        introActive = false;
+        showTutorial();
+
+        // Remove event listeners after use
+        document.removeEventListener('keydown', handleKeyPress);
+        introScreen.removeEventListener('click', handleClick);
+    };
+
+    const handleKeyPress = (e) => {
+        // Ignore modifier keys
+        if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(e.key)) return;
+
+        startFromIntro();
+    };
+
+    const handleClick = () => {
+        startFromIntro();
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    introScreen.addEventListener('click', handleClick);
+}
+
+// Starfield is now pure CSS - no JS generation needed
+
+// ===== INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Bild-KI Puzzle Lauf initialized!');
+
+    // Initialize TXP Host (independent of game)
+    txpHost = new TXPHost();
+
+    // Display rank badge if there's a saved rank
+    displayRankBadge();
+
+    // Easter Egg: TXP Click for AI jokes
+    setupTXPClickHandler();
+
+    // Intro Screen: Press any key to start
+    setupIntroScreen();
+
+    // Preload some animations for smoother gameplay
+    const preloadImages = [];
+
+    // Preload first frame of each animation
+    Object.keys(ANIMATIONS).forEach(animName => {
+        const anim = ANIMATIONS[animName];
+        for (let i = 0; i < Math.min(5, anim.frames); i++) {
+            const img = new Image();
+            const frameStr = String(i).padStart(5, '0');
+            img.src = `${anim.path}${frameStr}.png`;
+            preloadImages.push(img);
+        }
+    });
+
+    console.log('Preloaded animation frames:', preloadImages.length);
+});
