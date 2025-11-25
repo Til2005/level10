@@ -8,8 +8,8 @@ const GAME_CONFIG = {
     jumpForce: -20,
     gravity: 0.8,
     groundLevel: 50,
-    cardSpeed: 2,
-    cardSpawnInterval: 2000,
+    cardSpeed: 0.8, // Base speed - very slow start for easier beginning
+    cardSpawnInterval: 4000, // Spawn interval - very slow start for easier beginning
     cardWidth: 180,
     cardHeight: 220, // Image container + caption
     lives: 3,
@@ -929,6 +929,9 @@ class BildPuzzleGame {
         // Update HUD rank badge
         displayRankBadge();
 
+        // Check and update Level 4 survival achievement
+        this.checkSurvivalAchievement();
+
         // Calculate accuracy
         const totalCards = this.collected + this.mistakes;
         const accuracy = totalCards > 0 ? Math.round((this.collected / totalCards) * 100) : 0;
@@ -956,6 +959,25 @@ class BildPuzzleGame {
         this.isPaused = !this.isPaused;
         const pauseOverlay = document.getElementById('pauseOverlay');
         pauseOverlay.style.display = this.isPaused ? 'flex' : 'none';
+
+        // When pausing, reset all player movement states to prevent bugs
+        if (this.isPaused) {
+            // Clear all key states
+            this.keys = {};
+
+            // Reset player movement flags
+            if (this.player) {
+                this.player.isMovingLeft = false;
+                this.player.isMovingRight = false;
+                this.player.lastDirection = null;
+                this.player.velocityX = 0;
+
+                // If player is jumping, let them finish the jump but reset to stand animation when grounded
+                if (this.player.isGrounded) {
+                    this.player.startAnimation('stand');
+                }
+            }
+        }
     }
 
     showScreen(screenId) {
@@ -1097,6 +1119,69 @@ class BildPuzzleGame {
         setTimeout(() => {
             scoreEl.style.animation = 'scoreClickCelebrate 1s ease';
         }, 10);
+    }
+
+    // Check and update survival achievement
+    checkSurvivalAchievement() {
+        // Get current time in seconds
+        const currentTime = Math.floor(this.gameTime);
+
+        // Load achievement data from localStorage
+        const savedData = localStorage.getItem('aiBytes_achievementData');
+        let achievementData = savedData ? JSON.parse(savedData) : {};
+
+        // Initialize level4MaxTime if it doesn't exist
+        if (!achievementData.level4MaxTime) {
+            achievementData.level4MaxTime = 0;
+        }
+
+        // Update max time if current time is higher
+        if (currentTime > achievementData.level4MaxTime) {
+            achievementData.level4MaxTime = currentTime;
+
+            // Save updated achievement data
+            localStorage.setItem('aiBytes_achievementData', JSON.stringify(achievementData));
+
+            console.log('Level 4 Survival Time:', achievementData.level4MaxTime, 'seconds');
+
+            // Load and update achievements
+            const savedAchievements = localStorage.getItem('aiBytes_achievements');
+            let achievements = savedAchievements ? JSON.parse(savedAchievements) : { easy: [], normal: [], hard: [] };
+
+            // Ensure hard category exists
+            if (!achievements.hard) {
+                achievements.hard = [];
+            }
+
+            // Find or create survivor achievement
+            let survivorIndex = achievements.hard.findIndex(a => a.id === 'survivor');
+
+            if (survivorIndex === -1) {
+                // Create achievement if it doesn't exist
+                achievements.hard.push({
+                    id: 'survivor',
+                    name: 'Überlebenskünstler',
+                    description: 'Überlebe 180 Sekunden in Level 4',
+                    icon: '⏱️',
+                    progress: achievementData.level4MaxTime,
+                    target: 180,
+                    unlocked: achievementData.level4MaxTime >= 180
+                });
+            } else {
+                // Update existing achievement
+                achievements.hard[survivorIndex].progress = achievementData.level4MaxTime;
+
+                // Check if unlocked (180 seconds or more)
+                if (achievementData.level4MaxTime >= 180 && !achievements.hard[survivorIndex].unlocked) {
+                    achievements.hard[survivorIndex].unlocked = true;
+                }
+            }
+
+            // Save updated achievements
+            localStorage.setItem('aiBytes_achievements', JSON.stringify(achievements));
+
+            console.log('Achievement Progress Updated:', achievementData.level4MaxTime, '/180');
+        }
     }
 
     // Idle Detection
@@ -1369,7 +1454,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Intro Screen: Press any key to start
     setupIntroScreen();
 
-    // Preload some animations for smoother gameplay
+    // Preload all game images for instant display
     const preloadImages = [];
 
     // Preload first frame of each animation
@@ -1383,5 +1468,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    console.log('Preloaded animation frames:', preloadImages.length);
+    // Preload all card images (good and bad prompts)
+    IMAGE_PROMPTS.good.forEach(prompt => {
+        const img = new Image();
+        img.src = prompt.image;
+        preloadImages.push(img);
+    });
+
+    IMAGE_PROMPTS.bad.forEach(prompt => {
+        const img = new Image();
+        img.src = prompt.image;
+        preloadImages.push(img);
+    });
+
+    console.log('Preloaded images:', preloadImages.length);
 });
