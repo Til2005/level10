@@ -13,7 +13,36 @@ const GAME_CONFIG = {
     cardWidth: 180,
     cardHeight: 220, // Image container + caption
     lives: 3,
-    debugHitboxes: false // Toggle with 'H' key during gameplay
+    debugHitboxes: false, // Toggle with 'H' key during gameplay
+    powerUpSpawnChance: 0.05, // 5% chance to spawn power-up instead of card
+    powerUpStartTime: 30, // Power-ups start spawning after 30 seconds
+    powerUpDuration: 8000, // Power-up effect duration in ms (slow-motion)
+    shieldDuration: 10000 // Shield duration in ms
+};
+
+// ===== POWER-UP TYPES =====
+const POWER_UP_TYPES = {
+    shield: {
+        name: 'Schild',
+        icon: '🛡️',
+        color: '#4169E1',
+        glowColor: 'rgba(65, 105, 225, 0.6)',
+        description: 'Schützt vor dem nächsten schlechten Prompt'
+    },
+    slowMotion: {
+        name: 'Slow-Motion',
+        icon: '⏱️',
+        color: '#9370DB',
+        glowColor: 'rgba(147, 112, 219, 0.6)',
+        description: 'Verlangsamt alle Karten für 8 Sekunden'
+    },
+    extraLife: {
+        name: 'Extra-Leben',
+        icon: '💖',
+        color: '#FF1493',
+        glowColor: 'rgba(255, 20, 147, 0.6)',
+        description: 'Gibt dir ein zusätzliches Leben'
+    }
 };
 
 // ===== ANIMATION PATHS =====
@@ -454,6 +483,137 @@ class MoManPlayer {
     }
 }
 
+// ===== POWER-UP CLASS =====
+class PowerUp {
+    constructor(gameArea, type, difficultyMultiplier = 1.0) {
+        this.gameArea = gameArea;
+        this.type = type; // 'shield', 'slowMotion', or 'extraLife'
+        this.powerUpData = POWER_UP_TYPES[type];
+        this.collected = false;
+
+        // Random spawn position
+        const gameAreaWidth = this.gameArea.offsetWidth;
+        this.width = 120;
+        this.height = 120;
+        this.x = Math.random() * (gameAreaWidth - this.width);
+        this.y = -this.height;
+
+        // Speed slightly slower than cards
+        this.speed = (GAME_CONFIG.cardSpeed * 0.8 + (Math.random() * 1.2)) * difficultyMultiplier;
+
+        this.debugHitbox = null;
+        this.createElement();
+        this.createDebugHitbox();
+    }
+
+    createDebugHitbox() {
+        this.debugHitbox = document.createElement('div');
+        this.debugHitbox.className = 'debug-hitbox card';
+        this.debugHitbox.style.display = GAME_CONFIG.debugHitboxes ? 'block' : 'none';
+
+        const label = document.createElement('div');
+        label.className = 'debug-hitbox-label';
+        label.textContent = `PowerUp (${this.type})`;
+        this.debugHitbox.appendChild(label);
+
+        this.gameArea.appendChild(this.debugHitbox);
+    }
+
+    createElement() {
+        this.element = document.createElement('div');
+        this.element.className = `power-up power-up-${this.type}`;
+
+        // Icon container with glow
+        const iconContainer = document.createElement('div');
+        iconContainer.className = 'power-up-icon-container';
+
+        const icon = document.createElement('div');
+        icon.className = 'power-up-icon';
+        icon.textContent = this.powerUpData.icon;
+
+        iconContainer.appendChild(icon);
+
+        // Name label
+        const nameLabel = document.createElement('div');
+        nameLabel.className = 'power-up-name';
+        nameLabel.textContent = this.powerUpData.name;
+
+        this.element.appendChild(iconContainer);
+        this.element.appendChild(nameLabel);
+
+        // Set custom colors
+        this.element.style.setProperty('--power-up-color', this.powerUpData.color);
+        this.element.style.setProperty('--power-up-glow', this.powerUpData.glowColor);
+
+        this.updatePosition();
+        document.getElementById('cardsContainer').appendChild(this.element);
+    }
+
+    update(deltaTime) {
+        this.y += this.speed * deltaTime;
+        this.updatePosition();
+
+        const gameAreaHeight = this.gameArea.offsetHeight;
+        return this.y > gameAreaHeight + this.height;
+    }
+
+    updatePosition() {
+        this.element.style.left = `${this.x}px`;
+        this.element.style.top = `${this.y}px`;
+
+        if (GAME_CONFIG.debugHitboxes && this.debugHitbox) {
+            const hitbox = this.getHitbox();
+            this.debugHitbox.style.left = `${hitbox.left}px`;
+            this.debugHitbox.style.top = `${hitbox.top}px`;
+            this.debugHitbox.style.width = `${hitbox.right - hitbox.left}px`;
+            this.debugHitbox.style.height = `${hitbox.bottom - hitbox.top}px`;
+        }
+    }
+
+    getHitbox() {
+        return {
+            left: this.x,
+            right: this.x + this.width,
+            top: this.y,
+            bottom: this.y + this.height,
+            centerX: this.x + this.width / 2,
+            centerY: this.y + this.height / 2
+        };
+    }
+
+    collect() {
+        this.collected = true;
+
+        this.element.style.willChange = 'transform, opacity';
+        this.element.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+
+        requestAnimationFrame(() => {
+            this.element.style.transform = 'scale(1.5) rotate(360deg)';
+            this.element.style.opacity = '0';
+
+            if (this.debugHitbox) {
+                this.debugHitbox.style.opacity = '0';
+            }
+        });
+
+        setTimeout(() => {
+            if (this.element && this.element.parentNode) {
+                this.element.style.willChange = 'auto';
+                this.element.parentNode.removeChild(this.element);
+            }
+        }, 400);
+    }
+
+    destroy() {
+        if (this.element && this.element.parentNode) {
+            this.element.parentNode.removeChild(this.element);
+        }
+        if (this.debugHitbox) {
+            this.debugHitbox.remove();
+        }
+    }
+}
+
 // ===== FALLING CARD CLASS =====
 class FallingCard {
     constructor(gameArea, imageData, quality, difficultyMultiplier = 1.0) {
@@ -534,7 +694,7 @@ class FallingCard {
     }
 
     update(deltaTime) {
-        this.y += this.speed;
+        this.y += this.speed * deltaTime;
         this.updatePosition();
 
         // Check if off screen (use actual element height)
@@ -620,7 +780,16 @@ class BildPuzzleGame {
         // Player & Cards
         this.player = null;
         this.cards = [];
+        this.powerUps = [];
         this.cardSpawnTimer = 0;
+
+        // Power-Up States
+        this.activePowerUps = {
+            shield: false,
+            slowMotion: false
+        };
+        this.powerUpTimers = {};
+        this.powerUpStatusContainer = document.getElementById('powerUpStatus');
 
         // Score & Stats
         this.score = 0;
@@ -736,6 +905,13 @@ class BildPuzzleGame {
             }
         });
 
+        // Show/hide power-up hitboxes
+        this.powerUps.forEach(powerUp => {
+            if (powerUp.debugHitbox) {
+                powerUp.debugHitbox.style.display = GAME_CONFIG.debugHitboxes ? 'block' : 'none';
+            }
+        });
+
         console.log('Hitboxes:', GAME_CONFIG.debugHitboxes ? 'ON' : 'OFF');
     }
 
@@ -778,11 +954,15 @@ class BildPuzzleGame {
     gameLoop(currentTime = performance.now()) {
         if (!this.isRunning) return;
 
-        const deltaTime = (currentTime - this.lastTime) / 16.67; // Normalize to 60fps
+        let deltaTime = (currentTime - this.lastTime) / 16.67; // Normalize to 60fps
         this.lastTime = currentTime;
 
         if (!this.isPaused) {
-            // Update game time
+            // Calculate slow-motion multiplier for the entire game
+            const slowMotionMultiplier = this.activePowerUps.slowMotion ? 0.35 : 1.0;
+            const gameDeltaTime = deltaTime * slowMotionMultiplier;
+
+            // Update game time (always normal speed, NOT affected by slow-motion)
             this.gameTime += deltaTime / 60; // Convert to seconds (60fps)
             this.updateTimeDisplay();
 
@@ -790,13 +970,13 @@ class BildPuzzleGame {
             // Caps at 10x speed (after 225 seconds / 3.75 minutes)
             this.difficultyMultiplier = Math.min(10.0, 1.0 + this.gameTime * 0.04);
 
-            // Update player
+            // Update player (NOT affected by slow-motion - always full speed)
             this.player.update(deltaTime);
 
-            // Update cards
+            // Update cards (affected by slow-motion)
             for (let i = this.cards.length - 1; i >= 0; i--) {
                 const card = this.cards[i];
-                const isOffScreen = card.update(deltaTime);
+                const isOffScreen = card.update(gameDeltaTime);
 
                 if (isOffScreen) {
                     // Card missed
@@ -812,14 +992,31 @@ class BildPuzzleGame {
                 }
             }
 
+            // Update power-ups (affected by slow-motion)
+            for (let i = this.powerUps.length - 1; i >= 0; i--) {
+                const powerUp = this.powerUps[i];
+                const isOffScreen = powerUp.update(gameDeltaTime);
+
+                if (isOffScreen) {
+                    powerUp.destroy();
+                    this.powerUps.splice(i, 1);
+                } else if (!powerUp.collected) {
+                    this.checkPowerUpCollision(powerUp);
+                }
+            }
+
             // Spawn cards continuously - spawn rate increases with difficulty
             // Higher difficulty = shorter interval between spawns
-            this.cardSpawnTimer += deltaTime;
+            // Affected by slow-motion
+            this.cardSpawnTimer += gameDeltaTime;
             const adjustedSpawnInterval = GAME_CONFIG.cardSpawnInterval / this.difficultyMultiplier;
             if (this.cardSpawnTimer >= adjustedSpawnInterval / 16.67) {
-                this.spawnCard();
+                this.spawnCardOrPowerUp();
                 this.cardSpawnTimer = 0;
             }
+
+            // Update power-up timers (NOT affected by slow-motion - real time)
+            this.updatePowerUpTimers();
 
             // Easter egg: Check for idle player
             this.checkIdleState();
@@ -839,6 +1036,18 @@ class BildPuzzleGame {
         this.gameLoopId = requestAnimationFrame((time) => this.gameLoop(time));
     }
 
+    spawnCardOrPowerUp() {
+        // Check if power-ups should be available yet (after 30 seconds)
+        const canSpawnPowerUp = this.gameTime >= GAME_CONFIG.powerUpStartTime;
+
+        // Chance to spawn power-up instead of card (only after 30s and with 5% chance)
+        if (canSpawnPowerUp && Math.random() < GAME_CONFIG.powerUpSpawnChance) {
+            this.spawnPowerUp();
+        } else {
+            this.spawnCard();
+        }
+    }
+
     spawnCard() {
         // Random quality distribution - 50% good, 50% bad
         const rand = Math.random();
@@ -856,6 +1065,24 @@ class BildPuzzleGame {
 
         const card = new FallingCard(this.gameArea, imageData, quality, this.difficultyMultiplier);
         this.cards.push(card);
+    }
+
+    spawnPowerUp() {
+        // Weighted random power-up type
+        // Shield: 40%, Slow-Motion: 40%, Extra-Life: 20%
+        const rand = Math.random();
+        let randomType;
+
+        if (rand < 0.4) {
+            randomType = 'shield';
+        } else if (rand < 0.8) {
+            randomType = 'slowMotion';
+        } else {
+            randomType = 'extraLife';
+        }
+
+        const powerUp = new PowerUp(this.gameArea, randomType, this.difficultyMultiplier);
+        this.powerUps.push(powerUp);
     }
 
     checkCollision(card) {
@@ -896,10 +1123,19 @@ class BildPuzzleGame {
             this.checkScoreMilestone(this.score); // Easter egg: milestone celebration
             this.showSpeech("Richtig! +10 Punkte!", 1500);
         } else if (card.quality === 'bad') {
-            this.lives--;
-            this.mistakes++;
-            this.showSpeech("Falsch! Schlechter Prompt! -1 Leben", 1500);
-            this.updateLivesDisplay();
+            // Check if shield is active
+            if (this.activePowerUps.shield) {
+                // Shield blocks the damage
+                this.deactivatePowerUp('shield');
+                this.showSpeech("Schild hat dich geschützt! 🛡️", 1500);
+            } else {
+                // Take damage
+                this.lives--;
+                this.mistakes++;
+                this.showSpeech("Falsch! Schlechter Prompt! -1 Leben", 1500);
+                this.updateLivesDisplay();
+                this.triggerScreenShake();
+            }
         }
 
         // Remove from cards array immediately
@@ -909,6 +1145,230 @@ class BildPuzzleGame {
         }
 
         this.updateUI();
+    }
+
+    triggerScreenShake() {
+        const gameArea = this.gameArea;
+        gameArea.classList.add('shake');
+
+        setTimeout(() => {
+            gameArea.classList.remove('shake');
+        }, 400);
+    }
+
+    checkPowerUpCollision(powerUp) {
+        const playerBox = this.player.getHitbox();
+        const powerUpBox = powerUp.getHitbox();
+
+        const gameAreaHeight = this.gameArea.offsetHeight;
+        const playerTopPos = gameAreaHeight - playerBox.topDist;
+        const playerBottomPos = gameAreaHeight - playerBox.bottomDist;
+
+        const collision = !(
+            playerBox.right < powerUpBox.left ||
+            playerBox.left > powerUpBox.right ||
+            playerBottomPos < powerUpBox.top ||
+            playerTopPos > powerUpBox.bottom
+        );
+
+        if (collision) {
+            this.handlePowerUpCollected(powerUp);
+        }
+    }
+
+    handlePowerUpCollected(powerUp) {
+        powerUp.collected = true;
+        powerUp.collect();
+
+        // Apply power-up effect
+        this.activatePowerUp(powerUp.type);
+
+        // Remove from array
+        const index = this.powerUps.indexOf(powerUp);
+        if (index > -1) {
+            this.powerUps.splice(index, 1);
+        }
+    }
+
+    activatePowerUp(type) {
+        const powerUpData = POWER_UP_TYPES[type];
+
+        if (type === 'shield') {
+            // Check if shield is already active
+            if (this.activePowerUps.shield) {
+                // Reset timer to 10 seconds
+                this.powerUpTimers.shield = {
+                    startTime: Date.now(),
+                    duration: GAME_CONFIG.shieldDuration
+                };
+                this.showSpeech(`${powerUpData.icon} Schild aufgefrischt!`, 2000);
+            } else {
+                // Activate new shield
+                this.activePowerUps.shield = true;
+                this.showSpeech(`${powerUpData.icon} Schild aktiv!`, 2000);
+                this.showPowerUpStatus(type, GAME_CONFIG.shieldDuration);
+                this.addShieldVisual();
+
+                // Set timer to deactivate shield after 10 seconds
+                this.powerUpTimers.shield = {
+                    startTime: Date.now(),
+                    duration: GAME_CONFIG.shieldDuration
+                };
+            }
+
+        } else if (type === 'slowMotion') {
+            // Check if slow-motion is already active
+            if (this.activePowerUps.slowMotion) {
+                // Reset timer to 8 seconds
+                this.powerUpTimers.slowMotion = {
+                    startTime: Date.now(),
+                    duration: GAME_CONFIG.powerUpDuration
+                };
+                this.showSpeech(`${powerUpData.icon} Slow-Motion verlängert!`, 2000);
+            } else {
+                // Activate new slow-motion
+                this.activePowerUps.slowMotion = true;
+                this.showSpeech(`${powerUpData.icon} Slow-Motion aktiv!`, 2000);
+                this.showPowerUpStatus(type, GAME_CONFIG.powerUpDuration);
+
+                // Set timer to deactivate
+                this.powerUpTimers.slowMotion = {
+                    startTime: Date.now(),
+                    duration: GAME_CONFIG.powerUpDuration
+                };
+            }
+
+        } else if (type === 'extraLife') {
+            this.lives = Math.min(this.lives + 1, 5); // Max 5 lives
+            this.updateLivesDisplay();
+            this.showSpeech(`${powerUpData.icon} +1 Leben!`, 2000);
+        }
+    }
+
+    deactivatePowerUp(type) {
+        if (type === 'shield') {
+            this.activePowerUps.shield = false;
+            delete this.powerUpTimers.shield;
+            this.removePowerUpStatus('shield');
+            this.removeShieldVisual();
+
+        } else if (type === 'slowMotion') {
+            this.activePowerUps.slowMotion = false;
+            delete this.powerUpTimers.slowMotion;
+            this.removePowerUpStatus('slowMotion');
+        }
+    }
+
+    updatePowerUpTimers() {
+        // Update shield timer
+        if (this.powerUpTimers.shield) {
+            const elapsed = Date.now() - this.powerUpTimers.shield.startTime;
+            const remaining = this.powerUpTimers.shield.duration - elapsed;
+
+            if (remaining <= 0) {
+                this.deactivatePowerUp('shield');
+            } else {
+                this.updatePowerUpStatusTimer('shield', remaining, GAME_CONFIG.shieldDuration);
+            }
+        }
+
+        // Update slow-motion timer
+        if (this.powerUpTimers.slowMotion) {
+            const elapsed = Date.now() - this.powerUpTimers.slowMotion.startTime;
+            const remaining = this.powerUpTimers.slowMotion.duration - elapsed;
+
+            if (remaining <= 0) {
+                this.deactivatePowerUp('slowMotion');
+            } else {
+                this.updatePowerUpStatusTimer('slowMotion', remaining, GAME_CONFIG.powerUpDuration);
+            }
+        }
+    }
+
+    showPowerUpStatus(type, duration = null) {
+        const powerUpData = POWER_UP_TYPES[type];
+        const statusElement = document.createElement('div');
+        statusElement.className = 'power-up-active';
+        statusElement.id = `power-up-status-${type}`;
+        statusElement.style.setProperty('--power-up-color', powerUpData.color);
+        statusElement.style.setProperty('--power-up-glow', powerUpData.glowColor);
+
+        const icon = document.createElement('div');
+        icon.className = 'power-up-active-icon';
+        icon.textContent = powerUpData.icon;
+
+        const info = document.createElement('div');
+        info.className = 'power-up-active-info';
+
+        const name = document.createElement('div');
+        name.className = 'power-up-active-name';
+        name.textContent = powerUpData.name;
+
+        info.appendChild(name);
+
+        if (duration !== null) {
+            const timer = document.createElement('div');
+            timer.className = 'power-up-active-timer';
+            timer.id = `power-up-timer-${type}`;
+            timer.textContent = `${Math.ceil(duration / 1000)}s`;
+
+            const bar = document.createElement('div');
+            bar.className = 'power-up-active-bar';
+
+            const barFill = document.createElement('div');
+            barFill.className = 'power-up-active-bar-fill';
+            barFill.id = `power-up-bar-${type}`;
+            barFill.style.width = '100%';
+
+            bar.appendChild(barFill);
+            info.appendChild(timer);
+            info.appendChild(bar);
+        }
+
+        statusElement.appendChild(icon);
+        statusElement.appendChild(info);
+
+        this.powerUpStatusContainer.appendChild(statusElement);
+    }
+
+    updatePowerUpStatusTimer(type, remaining, totalDuration) {
+        const timerElement = document.getElementById(`power-up-timer-${type}`);
+        const barElement = document.getElementById(`power-up-bar-${type}`);
+
+        if (timerElement) {
+            timerElement.textContent = `${Math.ceil(remaining / 1000)}s`;
+        }
+
+        if (barElement) {
+            const percentage = (remaining / totalDuration) * 100;
+            barElement.style.width = `${percentage}%`;
+        }
+    }
+
+    removePowerUpStatus(type) {
+        const statusElement = document.getElementById(`power-up-status-${type}`);
+        if (statusElement) {
+            statusElement.style.opacity = '0';
+            setTimeout(() => {
+                if (statusElement.parentNode) {
+                    statusElement.parentNode.removeChild(statusElement);
+                }
+            }, 300);
+        }
+    }
+
+    addShieldVisual() {
+        const shield = document.createElement('div');
+        shield.className = 'player-shield';
+        shield.id = 'player-shield';
+        this.player.element.appendChild(shield);
+    }
+
+    removeShieldVisual() {
+        const shield = document.getElementById('player-shield');
+        if (shield) {
+            shield.remove();
+        }
     }
 
 
