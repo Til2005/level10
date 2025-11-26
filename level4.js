@@ -705,6 +705,20 @@ class BildPuzzleGame {
                 this.player.isMovingRight = false;
             }
         });
+
+        // Auto-pause when page/tab loses focus
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && this.isRunning && !this.isPaused) {
+                this.togglePause();
+            }
+        });
+
+        // Also listen to blur event as fallback
+        window.addEventListener('blur', () => {
+            if (this.isRunning && !this.isPaused) {
+                this.togglePause();
+            }
+        });
     }
 
     toggleHitboxes() {
@@ -931,6 +945,11 @@ class BildPuzzleGame {
             rankName = 'Kein Rang';
         }
 
+        // Get previous highscore
+        const previousProgress = loadProgress();
+        const previousHighscore = previousProgress ? previousProgress.score : 0;
+        const isNewHighscore = this.score > previousHighscore;
+
         // Save progress
         saveProgress(this.score, rankName);
 
@@ -944,10 +963,19 @@ class BildPuzzleGame {
         const totalCards = this.collected + this.mistakes;
         const accuracy = totalCards > 0 ? Math.round((this.collected / totalCards) * 100) : 0;
 
-        // Update results screen
-        document.getElementById('resultsTitle').textContent = '💔 Game Over!';
+        // Update results screen - change title if new highscore
+        if (isNewHighscore) {
+            document.getElementById('resultsTitle').textContent = '🎉 Neuer Highscore!';
+        } else {
+            document.getElementById('resultsTitle').textContent = '💔 Game Over!';
+        }
+
         document.getElementById('finalScoreValue').textContent = this.score;
         document.getElementById('rankName').textContent = rankName;
+
+        // Display highscore
+        const highscoreValue = Math.max(this.score, previousHighscore);
+        document.getElementById('highscoreValue').textContent = highscoreValue;
 
         // Update the rank display in results (not the HUD badge)
         const resultRankBadge = document.querySelector('#resultsScreen .rank-badge');
