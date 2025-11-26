@@ -362,6 +362,11 @@ body:has(#introScreen.active) .hud-wrapper {
     flex-direction: column;
     gap: 10px;
     animation: titleAppear 2s ease-out;
+    transition: all 0.3s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 @keyframes titleAppear {
@@ -401,11 +406,98 @@ body:has(#introScreen.active) .hud-wrapper {
             drop-shadow(0 0 60px rgba(255, 140, 0, 0.4))
             drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.8));
     animation: titlePulse 3s ease-in-out infinite;
+    transition: all 0.5s ease;
+    position: relative;
 }
 
 .title-line-2 {
     font-size: 64px;
     letter-spacing: 6px;
+}
+
+/* Retro Hover Effect - Multi-layered 80s/90s Style */
+.game-title:hover .title-line-1,
+.game-title:hover .title-line-2 {
+    animation: titlePulse 3s ease-in-out infinite, retroGlitch 0.3s ease infinite, chromaShift 0.8s ease-in-out infinite;
+    letter-spacing: 12px;
+    background: linear-gradient(90deg,
+        #FF00FF 0%,
+        #00FFFF 25%,
+        #FFFF00 50%,
+        #FF00FF 75%,
+        #00FFFF 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 30px rgba(255, 0, 255, 1))
+            drop-shadow(0 0 50px rgba(0, 255, 255, 1))
+            drop-shadow(0 0 70px rgba(255, 255, 0, 0.8))
+            drop-shadow(-3px -3px 0px rgba(255, 0, 255, 0.7))
+            drop-shadow(3px 3px 0px rgba(0, 255, 255, 0.7))
+            drop-shadow(6px 6px 0px rgba(0, 0, 0, 0.9));
+    text-shadow:
+        2px 2px 0px rgba(255, 0, 255, 0.5),
+        -2px -2px 0px rgba(0, 255, 255, 0.5);
+    transform: scale(1.05) perspective(500px) rotateX(2deg);
+}
+
+/* Retro Glitch Effect */
+@keyframes retroGlitch {
+    0%, 100% {
+        transform: translate(0, 0) skew(0deg);
+    }
+    25% {
+        transform: translate(-2px, 1px) skew(0.5deg);
+    }
+    50% {
+        transform: translate(2px, -1px) skew(-0.5deg);
+    }
+    75% {
+        transform: translate(-1px, 2px) skew(0.3deg);
+    }
+}
+
+/* Chromatic Aberration / RGB Split Effect */
+@keyframes chromaShift {
+    0%, 100% {
+        text-shadow:
+            2px 2px 0px rgba(255, 0, 255, 0.5),
+            -2px -2px 0px rgba(0, 255, 255, 0.5);
+    }
+    25% {
+        text-shadow:
+            3px 0px 0px rgba(255, 0, 0, 0.7),
+            -3px 0px 0px rgba(0, 255, 255, 0.7);
+    }
+    50% {
+        text-shadow:
+            0px 3px 0px rgba(255, 0, 255, 0.7),
+            0px -3px 0px rgba(0, 255, 0, 0.7);
+    }
+    75% {
+        text-shadow:
+            -3px 0px 0px rgba(255, 255, 0, 0.7),
+            3px 0px 0px rgba(0, 0, 255, 0.7);
+    }
+}
+
+/* Animated Background Gradient on Hover */
+.game-title:hover .title-line-1 {
+    animation: titlePulse 3s ease-in-out infinite, retroGlitch 0.3s ease infinite, chromaShift 0.8s ease-in-out infinite, rainbowSlide 2s linear infinite;
+}
+
+.game-title:hover .title-line-2 {
+    animation: titlePulse 3s ease-in-out infinite, retroGlitch 0.3s ease infinite, chromaShift 0.8s ease-in-out infinite, rainbowSlide 2s linear infinite 0.5s;
+}
+
+@keyframes rainbowSlide {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 200% 50%;
+    }
 }
 
 @keyframes titlePulse {

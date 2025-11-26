@@ -635,6 +635,7 @@ class BildPuzzleGame {
         this.idleWarningShown = false;
         this.celebratedScores = new Set(); // Track which milestone scores we've celebrated
         this.speechTimeout = null; // Track speech bubble timeout
+        this.achievementShownThisRun = false; // Track if achievement was shown this game session
 
         // Difficulty scaling
         this.difficultyMultiplier = 1.0; // Increases over time
@@ -732,6 +733,7 @@ class BildPuzzleGame {
         this.avoided = 0;
         this.mistakes = 0;
         this.gameTime = 0;
+        this.achievementShownThisRun = false;
 
         // Clear any existing cards
         this.cards.forEach(card => card.destroy());
@@ -807,6 +809,12 @@ class BildPuzzleGame {
 
             // Easter egg: Check for idle player
             this.checkIdleState();
+
+            // Check survival achievement during gameplay (only once when reaching 250s)
+            if (!this.achievementShownThisRun && Math.floor(this.gameTime) >= 250) {
+                this.checkSurvivalAchievement();
+                this.achievementShownThisRun = true;
+            }
 
             // Check game over
             if (this.lives <= 0) {
@@ -1142,8 +1150,6 @@ class BildPuzzleGame {
             // Save updated achievement data
             localStorage.setItem('aiBytes_achievementData', JSON.stringify(achievementData));
 
-            console.log('Level 4 Survival Time:', achievementData.level4MaxTime, 'seconds');
-
             // Load and update achievements
             const savedAchievements = localStorage.getItem('aiBytes_achievements');
             let achievements = savedAchievements ? JSON.parse(savedAchievements) : { easy: [], normal: [], hard: [] };
@@ -1162,11 +1168,11 @@ class BildPuzzleGame {
                 const newAchievement = {
                     id: 'survivor',
                     name: 'Überlebenskünstler',
-                    description: 'Überlebe 180 Sekunden in Level 4',
+                    description: 'Überlebe 250 Sekunden in Level 4',
                     icon: '⏱️',
                     progress: achievementData.level4MaxTime,
-                    target: 180,
-                    unlocked: achievementData.level4MaxTime >= 180
+                    target: 250,
+                    unlocked: achievementData.level4MaxTime >= 250
                 };
                 achievements.hard.push(newAchievement);
 
@@ -1180,9 +1186,11 @@ class BildPuzzleGame {
 
                 // Update existing achievement
                 achievements.hard[survivorIndex].progress = achievementData.level4MaxTime;
+                achievements.hard[survivorIndex].target = 250;
+                achievements.hard[survivorIndex].description = 'Überlebe 250 Sekunden in Level 4';
 
-                // Check if unlocked (180 seconds or more)
-                if (achievementData.level4MaxTime >= 180 && !wasUnlocked) {
+                // Check if unlocked (250 seconds or more)
+                if (achievementData.level4MaxTime >= 250 && !wasUnlocked) {
                     achievements.hard[survivorIndex].unlocked = true;
                     wasJustUnlocked = true;
                 }
@@ -1190,8 +1198,6 @@ class BildPuzzleGame {
 
             // Save updated achievements
             localStorage.setItem('aiBytes_achievements', JSON.stringify(achievements));
-
-            console.log('Achievement Progress Updated:', achievementData.level4MaxTime, '/180');
 
             // Show achievement unlock animation if just unlocked
             if (wasJustUnlocked) {
@@ -1225,6 +1231,8 @@ class BildPuzzleGame {
 // ===== ACHIEVEMENT UNLOCK ANIMATION =====
 // Show achievement unlock animation (same as index.html)
 function showAchievementUnlock(achievement, category) {
+    if (!achievement) return;
+
     const notification = document.createElement('div');
     notification.style.cssText = `
         position: fixed;
@@ -1246,11 +1254,11 @@ function showAchievementUnlock(achievement, category) {
     `;
 
     notification.innerHTML = `
-        <div style="font-size: 3rem; margin-bottom: 15px;">${achievement.icon}</div>
+        <div style="font-size: 3rem; margin-bottom: 15px;">${achievement.icon || '🏆'}</div>
         <div style="font-size: 1.5rem; color: #F5C03B; margin-bottom: 10px;">Achievement Unlocked!</div>
-        <div style="font-size: 1.2rem; margin-bottom: 8px;">${achievement.name}</div>
-        <div style="color: #67C7FF; font-size: 0.9rem; text-transform: uppercase;">${category}</div>
-        <div style="color: #67C7FF; font-size: 0.9rem; margin-top: 5px;">${achievement.description}</div>
+        <div style="font-size: 1.2rem; margin-bottom: 8px;">${achievement.name || 'Achievement'}</div>
+        <div style="color: #67C7FF; font-size: 0.9rem; text-transform: uppercase;">${category || ''}</div>
+        <div style="color: #67C7FF; font-size: 0.9rem; margin-top: 5px;">${achievement.description || ''}</div>
     `;
 
     document.body.appendChild(notification);
@@ -1539,14 +1547,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Preload all game images for instant display
     const preloadImages = [];
+    let loadedCount = 0;
+    let totalImages = 0;
 
-    // Preload first frame of each animation
+    // Calculate total images
+    Object.keys(ANIMATIONS).forEach(animName => {
+        totalImages += ANIMATIONS[animName].frames;
+    });
+    Object.keys(TXP_ANIMATIONS).forEach(animName => {
+        totalImages += TXP_ANIMATIONS[animName].frames;
+    });
+    totalImages += IMAGE_PROMPTS.good.length + IMAGE_PROMPTS.bad.length;
+
+    console.log(`Preloading ${totalImages} images...`);
+
+    // Preload ALL frames of Mo Man animations (not just first 5)
     Object.keys(ANIMATIONS).forEach(animName => {
         const anim = ANIMATIONS[animName];
-        for (let i = 0; i < Math.min(5, anim.frames); i++) {
+        for (let i = 0; i < anim.frames; i++) {
+            const img = new Image();
+            let frameStr = String(i).padStart(5, '0');
+
+            // Handle special jump frames (27_a and 28_b)
+            if (animName === 'jump') {
+                if (i === 27) frameStr = '00027_a';
+                else if (i === 28) frameStr = '00028_b';
+            }
+
+            img.src = `${anim.path}${frameStr}.png`;
+            img.onload = () => {
+                loadedCount++;
+                if (loadedCount === totalImages) {
+                    console.log('✅ All images preloaded successfully!');
+                }
+            };
+            img.onerror = () => {
+                console.warn(`⚠️ Failed to load: ${img.src}`);
+                loadedCount++;
+            };
+            preloadImages.push(img);
+        }
+    });
+
+    // Preload ALL frames of TXP animations
+    Object.keys(TXP_ANIMATIONS).forEach(animName => {
+        const anim = TXP_ANIMATIONS[animName];
+        for (let i = 0; i < anim.frames; i++) {
             const img = new Image();
             const frameStr = String(i).padStart(5, '0');
             img.src = `${anim.path}${frameStr}.png`;
+            img.onload = () => {
+                loadedCount++;
+                if (loadedCount === totalImages) {
+                    console.log('✅ All images preloaded successfully!');
+                }
+            };
+            img.onerror = () => {
+                console.warn(`⚠️ Failed to load: ${img.src}`);
+                loadedCount++;
+            };
             preloadImages.push(img);
         }
     });
@@ -1555,14 +1614,32 @@ document.addEventListener('DOMContentLoaded', () => {
     IMAGE_PROMPTS.good.forEach(prompt => {
         const img = new Image();
         img.src = prompt.image;
+        img.onload = () => {
+            loadedCount++;
+            if (loadedCount === totalImages) {
+                console.log('✅ All images preloaded successfully!');
+            }
+        };
+        img.onerror = () => {
+            console.warn(`⚠️ Failed to load: ${img.src}`);
+            loadedCount++;
+        };
         preloadImages.push(img);
     });
 
     IMAGE_PROMPTS.bad.forEach(prompt => {
         const img = new Image();
         img.src = prompt.image;
+        img.onload = () => {
+            loadedCount++;
+            if (loadedCount === totalImages) {
+                console.log('✅ All images preloaded successfully!');
+            }
+        };
+        img.onerror = () => {
+            console.warn(`⚠️ Failed to load: ${img.src}`);
+            loadedCount++;
+        };
         preloadImages.push(img);
     });
-
-    console.log('Preloaded images:', preloadImages.length);
 });
