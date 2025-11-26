@@ -1451,8 +1451,8 @@ function setupTXPClickHandler() {
     let lastJokeIndex = -1;
 
     txpElement.addEventListener('click', () => {
-        // Don't interrupt if TXP is already talking
-        if (!txpHost || !txpHost.canTalk) return;
+        // Check if TXP exists
+        if (!txpHost) return;
 
         // Get a random joke (different from last one)
         let jokeIndex;
@@ -1476,12 +1476,15 @@ function setupTXPClickHandler() {
             if (game && game.isRunning) {
                 game.showSpeech(aiJokes[jokeIndex], 5000);
             } else {
-                // Otherwise handle manually
+                // Otherwise handle manually (tutorial, results screen, etc.)
                 speechText.textContent = aiJokes[jokeIndex];
                 speechBubble.style.display = 'block';
 
-                // Animate TXP talking
-                txpHost.talk(4000);
+                // Animate TXP talking (works in all screens)
+                txpHost.startAnimation('talk');
+                setTimeout(() => {
+                    txpHost.startAnimation('stand');
+                }, 4000);
 
                 // Hide after 5 seconds
                 txpClickTimeout = setTimeout(() => {
