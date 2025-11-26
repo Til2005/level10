@@ -1322,6 +1322,232 @@ function createConfettiEffect() {
     }
 }
 
+// ===== TUTORIAL DEMO ANIMATION =====
+class TutorialDemo {
+    constructor() {
+        this.demoPlayer = document.getElementById('demoPlayer');
+        this.demoPlayerImg = document.getElementById('demoPlayerImg');
+        this.demoCardsContainer = document.getElementById('demoCardsContainer');
+        this.demoHint = document.getElementById('demoHint');
+        this.isRunning = false;
+        this.animationInterval = null;
+        this.currentAnimation = 'stand';
+        this.currentFrame = 0;
+        this.frameInterval = null;
+    }
+
+    start() {
+        if (this.isRunning) return;
+        this.isRunning = true;
+        this.startAnimation('stand');
+        this.runDemo();
+    }
+
+    stop() {
+        this.isRunning = false;
+        if (this.animationInterval) {
+            clearInterval(this.animationInterval);
+        }
+        if (this.frameInterval) {
+            clearInterval(this.frameInterval);
+        }
+        // Clear all demo cards
+        if (this.demoCardsContainer) {
+            this.demoCardsContainer.innerHTML = '';
+        }
+    }
+
+    startAnimation(animName) {
+        if (this.currentAnimation === animName && this.frameInterval) return;
+
+        this.stopAnimation();
+        this.currentAnimation = animName;
+        this.currentFrame = 0;
+        const anim = ANIMATIONS[animName];
+
+        this.frameInterval = setInterval(() => {
+            this.currentFrame = (this.currentFrame + 1) % anim.frames;
+            this.updateFrame();
+        }, anim.speed);
+    }
+
+    stopAnimation() {
+        if (this.frameInterval) {
+            clearInterval(this.frameInterval);
+            this.frameInterval = null;
+        }
+    }
+
+    updateFrame() {
+        const anim = ANIMATIONS[this.currentAnimation];
+        let frameStr = String(this.currentFrame).padStart(5, '0');
+
+        // Handle special jump frames (if needed)
+        if (this.currentAnimation === 'jump') {
+            if (this.currentFrame === 27) frameStr = '00027_a';
+            else if (this.currentFrame === 28) frameStr = '00028_b';
+        }
+
+        this.demoPlayerImg.src = `${anim.path}${frameStr}.png`;
+    }
+
+    showHint(text) {
+        this.demoHint.textContent = text;
+        this.demoHint.classList.add('show');
+    }
+
+    hideHint() {
+        this.demoHint.classList.remove('show');
+    }
+
+    async runDemo() {
+        // Clear any existing cards
+        this.demoCardsContainer.innerHTML = '';
+        this.hideHint();
+
+        // Wait a bit before starting
+        await this.sleep(500);
+
+        // Phase 1: Good card falls from left, Mo Man moves left to catch it
+        await this.showCardFalling('good', 30, async (card) => {
+            await this.sleep(400);
+            this.showHint('Sammel die guten Prompts ein');
+            await this.sleep(400);
+            await this.moveDemoPlayer(30, 50); // Move from 50% to 30% (left)
+            await this.sleep(400);
+            this.collectCard(card);
+        });
+
+        await this.sleep(1000);
+        this.hideHint();
+
+        // Phase 2: Bad card falls from right, Mo Man stays still and lets it pass
+        await this.showCardFalling('bad', 70, async (card) => {
+            await this.sleep(400);
+            this.showHint('Weiche den schlechten Prompts aus');
+            await this.sleep(1600);
+            this.removeCard(card);
+        });
+
+        await this.sleep(1000);
+        this.hideHint();
+
+        // Reset player position
+        await this.moveDemoPlayer(50, 30); // Move from 30% to 50% (right)
+
+        // Loop the demo
+        if (this.isRunning) {
+            this.runDemo();
+        }
+    }
+
+    async showCardFalling(quality, xPercent, callback) {
+        const card = document.createElement('div');
+        card.className = `demo-card quality-${quality}`;
+
+        const imageContainer = document.createElement('div');
+        imageContainer.className = 'demo-card-image';
+
+        const badge = document.createElement('span');
+        badge.className = 'demo-card-badge';
+        badge.textContent = quality === 'good' ? '+10' : '-1 ❤️';
+
+        const img = document.createElement('img');
+        const promptData = quality === 'good' ? IMAGE_PROMPTS.good[0] : IMAGE_PROMPTS.bad[0];
+        img.src = promptData.image;
+        img.alt = promptData.description;
+
+        imageContainer.appendChild(img);
+        imageContainer.appendChild(badge);
+
+        const caption = document.createElement('div');
+        caption.className = 'demo-card-caption';
+        caption.textContent = promptData.description.substring(0, 50) + '...';
+
+        card.appendChild(imageContainer);
+        card.appendChild(caption);
+
+        card.style.left = `${xPercent}%`;
+        card.style.top = '-150px';
+        card.style.transform = 'translateX(-50%)';
+
+        this.demoCardsContainer.appendChild(card);
+
+        // Animate card falling
+        let currentTop = -150;
+        const targetTop = 120;
+        const fallInterval = setInterval(() => {
+            currentTop += 2;
+            card.style.top = `${currentTop}px`;
+
+            if (currentTop >= targetTop) {
+                clearInterval(fallInterval);
+            }
+        }, 16);
+
+        // Execute callback when card reaches player
+        await this.sleep(1200);
+        if (callback) await callback(card);
+    }
+
+    async moveDemoPlayer(xPercent, fromPercent = null) {
+        // Determine direction (if fromPercent is provided)
+        if (fromPercent !== null) {
+            if (xPercent < fromPercent) {
+                // Moving left - flip
+                this.demoPlayer.style.transform = 'translateX(-50%) scaleX(-1)';
+            } else if (xPercent > fromPercent) {
+                // Moving right - normal
+                this.demoPlayer.style.transform = 'translateX(-50%) scaleX(1)';
+            }
+        }
+
+        // Start run animation
+        this.startAnimation('run');
+
+        this.demoPlayer.style.left = `${xPercent}%`;
+        await this.sleep(500);
+
+        // Return to stand animation
+        this.startAnimation('stand');
+    }
+
+    collectCard(card) {
+        // Animate collection
+        card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        card.style.transform = 'translateX(-50%) scale(1.3)';
+        card.style.opacity = '0';
+
+        setTimeout(() => {
+            if (card.parentNode) {
+                card.parentNode.removeChild(card);
+            }
+        }, 300);
+    }
+
+    removeCard(card) {
+        // Card continues falling off screen
+        let currentTop = parseFloat(card.style.top);
+        const removeInterval = setInterval(() => {
+            currentTop += 3;
+            card.style.top = `${currentTop}px`;
+
+            if (currentTop > 300) {
+                clearInterval(removeInterval);
+                if (card.parentNode) {
+                    card.parentNode.removeChild(card);
+                }
+            }
+        }, 16);
+    }
+
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+}
+
+let tutorialDemo = null;
+
 // ===== GLOBAL FUNCTIONS (Called from HTML) =====
 let game;
 let txpHost; // Global TXP instance
@@ -1330,9 +1556,20 @@ function showTutorial() {
     const screens = document.querySelectorAll('.game-screen');
     screens.forEach(screen => screen.classList.remove('active'));
     document.getElementById('tutorialScreen').classList.add('active');
+
+    // Start tutorial demo
+    if (!tutorialDemo) {
+        tutorialDemo = new TutorialDemo();
+    }
+    tutorialDemo.start();
 }
 
 function startGame() {
+    // Stop tutorial demo
+    if (tutorialDemo) {
+        tutorialDemo.stop();
+    }
+
     if (!game) {
         game = new BildPuzzleGame();
     }

@@ -699,6 +699,144 @@ body:has(#introScreen.active) .hud-wrapper {
     animation: fadeIn 0.6s ease-out;
 }
 
+/* Tutorial Demo Scene */
+.tutorial-demo {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--maya-blue);
+    border-radius: 15px;
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.demo-hint {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-darker);
+    border: 2px solid var(--saffron);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: var(--saffron);
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.demo-hint.show {
+    opacity: 1;
+}
+
+.demo-player {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 80px;
+    z-index: 10;
+    transition: left 0.5s ease-in-out;
+}
+
+.demo-player img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: crisp-edges;
+}
+
+#demoCardsContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.demo-card {
+    position: absolute;
+    width: 100px;
+    border-radius: 8px;
+    border: 3px solid;
+    background: var(--bg-darker);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    z-index: 5;
+    overflow: hidden;
+}
+
+.demo-card.quality-good {
+    border-color: var(--success-color);
+    box-shadow: 0 4px 12px rgba(50, 205, 50, 0.6);
+}
+
+.demo-card.quality-bad {
+    border-color: var(--danger-color);
+    box-shadow: 0 4px 12px rgba(255, 68, 68, 0.6);
+}
+
+.demo-card-image {
+    width: 100%;
+    height: 100px;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.demo-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.demo-card-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.demo-card.quality-good .demo-card-badge {
+    background: var(--success-color);
+    color: white;
+}
+
+.demo-card.quality-bad .demo-card-badge {
+    background: var(--danger-color);
+    color: white;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.9),
+                 0 0 6px rgba(0, 0, 0, 0.8),
+                 1px 1px 2px rgba(0, 0, 0, 1);
+}
+
+.demo-card-caption {
+    padding: 6px 8px;
+    background: rgba(0, 0, 0, 0.6);
+    color: var(--text-light);
+    font-size: 8px;
+    line-height: 1.2;
+    text-align: center;
+    min-height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .tutorial-title {
     color: var(--primary-color);
     font-size: 42px;
@@ -726,37 +864,43 @@ body:has(#introScreen.active) .hud-wrapper {
 
 .controls-guide {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
 }
 
 .control-item {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 15px 20px;
+    gap: 8px;
+    padding: 10px 15px;
     background: rgba(245, 192, 59, 0.1);
     border: 2px solid var(--saffron);
     border-radius: 12px;
+    flex: 0 1 auto;
+    white-space: nowrap;
+    font-size: 15px;
 }
 
 .key {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 6px 12px;
     background: var(--bg-dark);
     border: 2px solid var(--saffron);
-    border-radius: 8px;
+    border-radius: 6px;
     color: var(--saffron);
     font-weight: 700;
-    font-size: 16px;
-    min-width: 45px;
+    font-size: 14px;
+    min-width: 35px;
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .control-item span:last-child {
     color: var(--text-light);
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .prompt-tips {

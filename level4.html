@@ -87,7 +87,7 @@
                             <div class="control-item">
                                 <span class="key">←</span>
                                 <span class="key">→</span>
-                                <span>Pfeiltasten Links/Rechts - Bewegen</span>
+                                <span>Pfeiltasten - Bewegen</span>
                             </div>
                             <div class="control-item">
                                 <span class="key">↑</span>
@@ -102,11 +102,13 @@
                         </div>
                     </div>
 
-                    <div class="tutorial-section">
-                        <h3>🎯 Ziel:</h3>
-                        <p>Sammle <strong>gute KI-Prompts</strong> ein und weiche <strong>schlechten Prompts</strong> aus!</p>
-                        <p>Du hast <strong>3 Leben</strong>. Jeder schlechte Prompt kostet dich ein Leben!</p>
-                        <p>Sammle so viele Punkte wie möglich bevor deine Leben aufgebraucht sind!</p>
+                    <!-- Tutorial Demo Scene -->
+                    <div class="tutorial-demo">
+                        <div class="demo-hint" id="demoHint"></div>
+                        <div class="demo-player" id="demoPlayer">
+                            <img id="demoPlayerImg" src="Mo_man_Stand_Pose/Mo man Stand Pose_00000.png" alt="Mo Man Demo">
+                        </div>
+                        <div id="demoCardsContainer"></div>
                     </div>
 
                     <button class="start-button" onclick="startGame()"><span>Spiel starten</span></button>
