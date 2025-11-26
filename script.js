@@ -1436,24 +1436,26 @@ const achievements = {
             target: CONFIG.ACHIEVEMENTS.GOLD_RANK_TARGET,
             unlocked: false
         },
+    ],
+    hard: [
         {
-            id: 'speedhunter',
-            name: 'Blitzfänger',
-            description: 'Fange den rennenden MoMan in Level 4',
-            icon: '⚡',
+            id: 'survivor',
+            name: 'Überlebenskünstler',
+            description: 'Überlebe 180 Sekunden in Level 4',
+            icon: '⏱️',
             progress: 0,
-            target: 1,
+            target: 180,
             unlocked: false
         }
-    ],
-    hard: []
+    ]
 };
 
 let achievementData = {
     mKeyPresses: 0,
     viewedAnimations: new Set(),
     coinsThisRun: 0,
-    hasGoldRank: false
+    hasGoldRank: false,
+    level4MaxTime: 0
 };
 
 // Load achievements from localStorage
@@ -1484,6 +1486,7 @@ function loadAchievements() {
         achievementData.viewedAnimations = new Set(data.viewedAnimations || []);
         achievementData.coinsThisRun = data.coinsThisRun || 0;
         achievementData.hasGoldRank = data.hasGoldRank || false;
+        achievementData.level4MaxTime = data.level4MaxTime || 0;
     }
 }
 
@@ -1504,7 +1507,8 @@ function saveAchievements() {
         mKeyPresses: achievementData.mKeyPresses,
         viewedAnimations: Array.from(achievementData.viewedAnimations),
         coinsThisRun: achievementData.coinsThisRun,
-        hasGoldRank: achievementData.hasGoldRank
+        hasGoldRank: achievementData.hasGoldRank,
+        level4MaxTime: achievementData.level4MaxTime
     }));
 }
 
@@ -1654,6 +1658,7 @@ function resetAllAchievements() {
         achievementData.viewedAnimations.clear();
         achievementData.coinsThisRun = 0;
         achievementData.hasGoldRank = false;
+        achievementData.level4MaxTime = 0;
 
         // Save reset achievements
         saveAchievements();

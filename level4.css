@@ -315,7 +315,7 @@ body:has(#introScreen.active) .hud-wrapper {
     overflow: hidden;
 }
 
-/* Starfield Background - Retro Style (Optimized) */
+/* Starfield Background - Disabled */
 .starfield {
     position: absolute;
     top: 0;
@@ -324,31 +324,6 @@ body:has(#introScreen.active) .hud-wrapper {
     height: 100%;
     overflow: hidden;
     z-index: 1;
-    background-color: transparent;
-    background-image:
-        radial-gradient(1px 1px at 20px 30px, white, transparent),
-        radial-gradient(1px 1px at 90px 80px, white, transparent),
-        radial-gradient(2px 2px at 200px 180px, #67C7FF, transparent),
-        radial-gradient(1px 1px at 280px 60px, white, transparent),
-        radial-gradient(1px 1px at 70px 250px, white, transparent),
-        radial-gradient(2px 2px at 150px 320px, #F5C03B, transparent),
-        radial-gradient(1px 1px at 240px 280px, white, transparent),
-        radial-gradient(2px 2px at 320px 400px, #67C7FF, transparent),
-        radial-gradient(1px 1px at 40px 450px, white, transparent),
-        radial-gradient(2px 2px at 180px 500px, #F5C03B, transparent),
-        radial-gradient(1px 1px at 300px 520px, white, transparent);
-    background-repeat: repeat;
-    background-size: 350px 550px;
-    animation: starsScroll 20s linear infinite;
-}
-
-@keyframes starsScroll {
-    from {
-        background-position: 0 0;
-    }
-    to {
-        background-position: 0 550px;
-    }
 }
 
 /* Animated Grid Background */
@@ -723,296 +698,147 @@ body:has(#introScreen.active) .hud-wrapper {
     display: block;
 }
 
-/* Retro Arcade Start Button */
+/* Uiverse.io Gradient Border Button - Original Colors */
 .start-button {
-    position: relative;
-    padding: 16px 45px;
-    font-size: 20px;
-    font-weight: 900;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    border: none;
+    align-items: center;
+    background-image: linear-gradient(90deg, #af40ff, #5b42f3 50%, #00ddeb);
+    border: 0;
     border-radius: 8px;
-    background: linear-gradient(180deg, #FF1493 0%, #8B008B 100%);
-    color: #FFFFFF;
-    text-shadow:
-        0 0 10px rgba(255, 255, 255, 0.8),
-        0 0 20px rgba(255, 20, 147, 0.6),
-        2px 2px 0px rgba(0, 0, 0, 0.8);
-    box-shadow:
-        0 0 20px rgba(255, 20, 147, 0.6),
-        0 0 40px rgba(255, 20, 147, 0.4);
-    transform: translateY(0);
-    transition: all 0.15s ease;
+    box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+    box-sizing: border-box;
+    color: #ffffff;
+    display: flex;
+    font-size: 18px;
+    justify-content: center;
+    line-height: 1em;
+    max-width: 100%;
+    min-width: 140px;
+    padding: 3px;
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: nowrap;
     cursor: pointer;
-    overflow: hidden;
-    animation: buttonGlowPulse 2s ease-in-out infinite;
+    transition: all 0.3s;
 }
 
-/* Scanline overlay effect */
-.start-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.15) 0px,
-        transparent 2px,
-        transparent 4px,
-        rgba(0, 0, 0, 0.15) 6px
-    );
-    pointer-events: none;
-    opacity: 0.5;
-    z-index: 1;
-}
-
-/* Shine effect */
-.start-button::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -60%;
-    width: 40%;
-    height: 200%;
-    background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.3) 50%,
-        transparent 100%
-    );
-    transform: skewX(-20deg);
-    animation: buttonShine 3s ease-in-out infinite;
-}
-
-@keyframes buttonGlowPulse {
-    0%, 100% {
-        box-shadow:
-            0 0 20px rgba(255, 20, 147, 0.6),
-            0 0 40px rgba(255, 20, 147, 0.4);
-    }
-    50% {
-        box-shadow:
-            0 0 30px rgba(255, 20, 147, 0.8),
-            0 0 60px rgba(255, 20, 147, 0.6),
-            0 0 80px rgba(255, 20, 147, 0.4);
-    }
-}
-
-@keyframes buttonShine {
-    0% {
-        left: -60%;
-    }
-    20% {
-        left: 120%;
-    }
-    100% {
-        left: 120%;
-    }
-}
-
-/* Retro Arcade Play Again Button - Cyan/Blue */
-.play-again-button {
-    position: relative;
-    padding: 16px 45px;
-    font-size: 20px;
-    font-weight: 900;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    border: none;
-    border-radius: 8px;
-    background: linear-gradient(180deg, #00CED1 0%, #1E90FF 100%);
-    color: #FFFFFF;
-    text-shadow:
-        0 0 10px rgba(255, 255, 255, 0.8),
-        0 0 20px rgba(0, 206, 209, 0.6),
-        2px 2px 0px rgba(0, 0, 0, 0.8);
-    box-shadow:
-        0 0 20px rgba(0, 206, 209, 0.6),
-        0 0 40px rgba(0, 206, 209, 0.4);
-    transform: translateY(0);
-    transition: all 0.15s ease;
-    cursor: pointer;
-    overflow: hidden;
-    animation: buttonGlowPulseCyan 2s ease-in-out infinite;
-}
-
-.play-again-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.15) 0px,
-        transparent 2px,
-        transparent 4px,
-        rgba(0, 0, 0, 0.15) 6px
-    );
-    pointer-events: none;
-    opacity: 0.5;
-    z-index: 1;
-}
-
-.play-again-button::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -60%;
-    width: 40%;
-    height: 200%;
-    background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.3) 50%,
-        transparent 100%
-    );
-    transform: skewX(-20deg);
-    animation: buttonShine 3s ease-in-out infinite;
-}
-
-@keyframes buttonGlowPulseCyan {
-    0%, 100% {
-        box-shadow:
-            0 0 20px rgba(0, 206, 209, 0.6),
-            0 0 40px rgba(0, 206, 209, 0.4);
-    }
-    50% {
-        box-shadow:
-            0 0 30px rgba(0, 206, 209, 0.8),
-            0 0 60px rgba(0, 206, 209, 0.6),
-            0 0 80px rgba(0, 206, 209, 0.4);
-    }
-}
-
-.play-again-button:hover {
-    background: linear-gradient(180deg, #40E0D0 0%, #4169E1 100%);
-    box-shadow:
-        0 0 30px rgba(0, 206, 209, 0.8),
-        0 0 60px rgba(0, 206, 209, 0.6),
-        0 0 80px rgba(0, 206, 209, 0.4);
-    transform: translateY(-2px);
-}
-
-.play-again-button:active {
-    transform: translateY(2px);
-    box-shadow:
-        0 0 15px rgba(0, 206, 209, 0.5),
-        0 0 30px rgba(0, 206, 209, 0.3);
-}
-
-/* Retro Arcade Resume Button - Green/Emerald */
-.resume-button {
-    position: relative;
-    padding: 16px 45px;
-    font-size: 20px;
-    font-weight: 900;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    border: none;
-    border-radius: 8px;
-    background: linear-gradient(180deg, #00FF7F 0%, #228B22 100%);
-    color: #FFFFFF;
-    text-shadow:
-        0 0 10px rgba(255, 255, 255, 0.8),
-        0 0 20px rgba(0, 255, 127, 0.6),
-        2px 2px 0px rgba(0, 0, 0, 0.8);
-    box-shadow:
-        0 0 20px rgba(0, 255, 127, 0.6),
-        0 0 40px rgba(0, 255, 127, 0.4);
-    transform: translateY(0);
-    transition: all 0.15s ease;
-    cursor: pointer;
-    overflow: hidden;
-    animation: buttonGlowPulseGreen 2s ease-in-out infinite;
-}
-
-.resume-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.15) 0px,
-        transparent 2px,
-        transparent 4px,
-        rgba(0, 0, 0, 0.15) 6px
-    );
-    pointer-events: none;
-    opacity: 0.5;
-    z-index: 1;
-}
-
-.resume-button::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -60%;
-    width: 40%;
-    height: 200%;
-    background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.3) 50%,
-        transparent 100%
-    );
-    transform: skewX(-20deg);
-    animation: buttonShine 3s ease-in-out infinite;
-}
-
-@keyframes buttonGlowPulseGreen {
-    0%, 100% {
-        box-shadow:
-            0 0 20px rgba(0, 255, 127, 0.6),
-            0 0 40px rgba(0, 255, 127, 0.4);
-    }
-    50% {
-        box-shadow:
-            0 0 30px rgba(0, 255, 127, 0.8),
-            0 0 60px rgba(0, 255, 127, 0.6),
-            0 0 80px rgba(0, 255, 127, 0.4);
-    }
-}
-
-.resume-button:hover {
-    background: linear-gradient(180deg, #32CD32 0%, #2E8B57 100%);
-    box-shadow:
-        0 0 30px rgba(0, 255, 127, 0.8),
-        0 0 60px rgba(0, 255, 127, 0.6),
-        0 0 80px rgba(0, 255, 127, 0.4);
-    transform: translateY(-2px);
-}
-
-.resume-button:active {
-    transform: translateY(2px);
-    box-shadow:
-        0 0 15px rgba(0, 255, 127, 0.5),
-        0 0 30px rgba(0, 255, 127, 0.3);
-}
-
-/* Retro Start Button Hover & Active */
+.start-button:active,
 .start-button:hover {
-    background: linear-gradient(180deg, #FF69B4 0%, #9B30FF 100%);
-    box-shadow:
-        0 0 30px rgba(255, 20, 147, 0.8),
-        0 0 60px rgba(255, 20, 147, 0.6),
-        0 0 80px rgba(255, 20, 147, 0.4);
-    transform: translateY(-2px);
+    outline: 0;
+}
+
+.start-button span {
+    background-color: #151037;
+    padding: 16px 24px;
+    border-radius: 6px;
+    width: 100%;
+    height: 100%;
+    transition: 300ms;
+}
+
+.start-button:hover span {
+    background: none;
 }
 
 .start-button:active {
-    transform: translateY(2px);
-    box-shadow:
-        0 0 15px rgba(255, 20, 147, 0.5),
-        0 0 30px rgba(255, 20, 147, 0.3);
+    transform: scale(0.9);
 }
+
+/* Play Again Button - Same Style as Start Button */
+.play-again-button {
+    align-items: center;
+    background-image: linear-gradient(90deg, #af40ff, #5b42f3 50%, #00ddeb);
+    border: 0;
+    border-radius: 8px;
+    box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+    box-sizing: border-box;
+    color: #ffffff;
+    display: flex;
+    font-size: 18px;
+    justify-content: center;
+    line-height: 1em;
+    max-width: 100%;
+    min-width: 140px;
+    padding: 3px;
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.play-again-button:active,
+.play-again-button:hover {
+    outline: 0;
+}
+
+.play-again-button span {
+    background-color: #151037;
+    padding: 16px 24px;
+    border-radius: 6px;
+    width: 100%;
+    height: 100%;
+    transition: 300ms;
+}
+
+.play-again-button:hover span {
+    background: none;
+}
+
+.play-again-button:active {
+    transform: scale(0.9);
+}
+
+/* Resume Button - Same Style as Start Button */
+.resume-button {
+    align-items: center;
+    background-image: linear-gradient(90deg, #af40ff, #5b42f3 50%, #00ddeb);
+    border: 0;
+    border-radius: 8px;
+    box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+    box-sizing: border-box;
+    color: #ffffff;
+    display: flex;
+    font-size: 18px;
+    justify-content: center;
+    line-height: 1em;
+    max-width: 100%;
+    min-width: 140px;
+    padding: 3px;
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.resume-button:active,
+.resume-button:hover {
+    outline: 0;
+}
+
+.resume-button span {
+    background-color: #151037;
+    padding: 16px 24px;
+    border-radius: 6px;
+    width: 100%;
+    height: 100%;
+    transition: 300ms;
+}
+
+.resume-button:hover span {
+    background: none;
+}
+
+.resume-button:active {
+    transform: scale(0.9);
+}
+
 
 .menu-button, .quit-button {
     background: rgba(255, 255, 255, 0.1);
