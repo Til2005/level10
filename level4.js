@@ -1155,10 +1155,11 @@ class BildPuzzleGame {
 
             // Find or create survivor achievement
             let survivorIndex = achievements.hard.findIndex(a => a.id === 'survivor');
+            let wasJustUnlocked = false;
 
             if (survivorIndex === -1) {
                 // Create achievement if it doesn't exist
-                achievements.hard.push({
+                const newAchievement = {
                     id: 'survivor',
                     name: 'Überlebenskünstler',
                     description: 'Überlebe 180 Sekunden in Level 4',
@@ -1166,14 +1167,24 @@ class BildPuzzleGame {
                     progress: achievementData.level4MaxTime,
                     target: 180,
                     unlocked: achievementData.level4MaxTime >= 180
-                });
+                };
+                achievements.hard.push(newAchievement);
+
+                // Check if unlocked on creation
+                if (newAchievement.unlocked) {
+                    wasJustUnlocked = true;
+                }
             } else {
+                // Check if this is the moment of unlocking
+                const wasUnlocked = achievements.hard[survivorIndex].unlocked;
+
                 // Update existing achievement
                 achievements.hard[survivorIndex].progress = achievementData.level4MaxTime;
 
                 // Check if unlocked (180 seconds or more)
-                if (achievementData.level4MaxTime >= 180 && !achievements.hard[survivorIndex].unlocked) {
+                if (achievementData.level4MaxTime >= 180 && !wasUnlocked) {
                     achievements.hard[survivorIndex].unlocked = true;
+                    wasJustUnlocked = true;
                 }
             }
 
@@ -1181,6 +1192,14 @@ class BildPuzzleGame {
             localStorage.setItem('aiBytes_achievements', JSON.stringify(achievements));
 
             console.log('Achievement Progress Updated:', achievementData.level4MaxTime, '/180');
+
+            // Show achievement unlock animation if just unlocked
+            if (wasJustUnlocked) {
+                const achievement = achievements.hard.find(a => a.id === 'survivor');
+                if (achievement) {
+                    showAchievementUnlock(achievement, 'HARD');
+                }
+            }
         }
     }
 
@@ -1200,6 +1219,70 @@ class BildPuzzleGame {
             this.idleWarningShown = true;
             this.showSpeech("Du musst dich mit den Pfeiltasten bewegen! ⬅️➡️", 4000);
         }
+    }
+}
+
+// ===== ACHIEVEMENT UNLOCK ANIMATION =====
+// Show achievement unlock animation (same as index.html)
+function showAchievementUnlock(achievement, category) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(145deg, #4b0074, #3c3aa5);
+        border: 3px solid #F5C03B;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        z-index: 10000;
+        color: white;
+        font-family: 'Ithaca', serif;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(20px);
+        animation: achievementPop 6s ease-out forwards;
+        min-width: 350px;
+    `;
+
+    notification.innerHTML = `
+        <div style="font-size: 3rem; margin-bottom: 15px;">${achievement.icon}</div>
+        <div style="font-size: 1.5rem; color: #F5C03B; margin-bottom: 10px;">Achievement Unlocked!</div>
+        <div style="font-size: 1.2rem; margin-bottom: 8px;">${achievement.name}</div>
+        <div style="color: #67C7FF; font-size: 0.9rem; text-transform: uppercase;">${category}</div>
+        <div style="color: #67C7FF; font-size: 0.9rem; margin-top: 5px;">${achievement.description}</div>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Confetti effect
+    createConfettiEffect();
+
+    setTimeout(() => {
+        notification.remove();
+    }, 6000);
+}
+
+// Create confetti effect for achievement unlock
+function createConfettiEffect() {
+    for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.style.cssText = `
+                position: fixed;
+                width: 10px;
+                height: 10px;
+                background: ${['#A86AFF', '#67C7FF', '#F5C03B', '#FF4500'][Math.floor(Math.random() * 4)]};
+                top: 30%;
+                left: ${50 + (Math.random() - 0.5) * 20}%;
+                z-index: 9999;
+                animation: confettiFall 2s ease-out forwards;
+                transform: rotate(${Math.random() * 360}deg);
+            `;
+            document.body.appendChild(confetti);
+
+            setTimeout(() => confetti.remove(), 2000);
+        }, i * 20);
     }
 }
 
