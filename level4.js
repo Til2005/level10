@@ -14,7 +14,7 @@ const GAME_CONFIG = {
     cardHeight: 220, // Image container + caption
     lives: 3,
     debugHitboxes: false, // Toggle with 'H' key during gameplay
-    powerUpSpawnChance: 0.05, // 5% chance to spawn power-up instead of card
+    powerUpSpawnChance: 0.03, // 3% chance to spawn power-up instead of card
     powerUpStartTime: 30, // Power-ups start spawning after 30 seconds
     powerUpDuration: 8000, // Power-up effect duration in ms (slow-motion)
     shieldDuration: 10000 // Shield duration in ms
@@ -967,8 +967,8 @@ class BildPuzzleGame {
             this.updateTimeDisplay();
 
             // Progressive difficulty - increases speed by 4% every second
-            // Caps at 10x speed (after 225 seconds / 3.75 minutes)
-            this.difficultyMultiplier = Math.min(10.0, 1.0 + this.gameTime * 0.04);
+            // Caps at 20x speed (after 475 seconds / 7:55 minutes)
+            this.difficultyMultiplier = Math.min(20.0, 1.0 + this.gameTime * 0.04);
 
             // Update player (NOT affected by slow-motion - always full speed)
             this.player.update(deltaTime);
@@ -1021,8 +1021,8 @@ class BildPuzzleGame {
             // Easter egg: Check for idle player
             this.checkIdleState();
 
-            // Check survival achievement during gameplay (only once when reaching 250s)
-            if (!this.achievementShownThisRun && Math.floor(this.gameTime) >= 250) {
+            // Check survival achievement during gameplay (only once when reaching 300s)
+            if (!this.achievementShownThisRun && Math.floor(this.gameTime) >= 300) {
                 this.checkSurvivalAchievement();
                 this.achievementShownThisRun = true;
             }
@@ -1391,13 +1391,13 @@ class BildPuzzleGame {
 
         // Calculate rank
         let rank, rankName;
-        if (this.score >= 500) {
+        if (this.score >= 700) {
             rank = 'gold';
             rankName = 'Gold';
-        } else if (this.score >= 300) {
+        } else if (this.score >= 400) {
             rank = 'silver';
             rankName = 'Silber';
-        } else if (this.score >= 150) {
+        } else if (this.score >= 200) {
             rank = 'bronze';
             rankName = 'Bronze';
         } else {
@@ -1656,11 +1656,11 @@ class BildPuzzleGame {
                 const newAchievement = {
                     id: 'survivor',
                     name: 'Überlebenskünstler',
-                    description: 'Überlebe 250 Sekunden in Level 4',
+                    description: 'Überlebe 300 Sekunden in Level 4',
                     icon: '⏱️',
                     progress: achievementData.level4MaxTime,
-                    target: 250,
-                    unlocked: achievementData.level4MaxTime >= 250
+                    target: 300,
+                    unlocked: achievementData.level4MaxTime >= 300
                 };
                 achievements.hard.push(newAchievement);
 
@@ -1674,11 +1674,11 @@ class BildPuzzleGame {
 
                 // Update existing achievement
                 achievements.hard[survivorIndex].progress = achievementData.level4MaxTime;
-                achievements.hard[survivorIndex].target = 250;
-                achievements.hard[survivorIndex].description = 'Überlebe 250 Sekunden in Level 4';
+                achievements.hard[survivorIndex].target = 300;
+                achievements.hard[survivorIndex].description = 'Überlebe 300 Sekunden in Level 4';
 
-                // Check if unlocked (250 seconds or more)
-                if (achievementData.level4MaxTime >= 250 && !wasUnlocked) {
+                // Check if unlocked (300 seconds or more)
+                if (achievementData.level4MaxTime >= 300 && !wasUnlocked) {
                     achievements.hard[survivorIndex].unlocked = true;
                     wasJustUnlocked = true;
                 }

@@ -1441,10 +1441,10 @@ const achievements = {
         {
             id: 'survivor',
             name: 'Überlebenskünstler',
-            description: 'Überlebe 180 Sekunden in Level 4',
+            description: 'Überlebe 300 Sekunden in Level 4',
             icon: '⏱️',
             progress: 0,
-            target: 180,
+            target: 300,
             unlocked: false
         }
     ]
