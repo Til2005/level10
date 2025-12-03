@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schummeln erlaubt</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="level5.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- TXP Speech Bubble (Top Left) -->
+        <div class="mo-speech-container">
+            <div class="txp-host" id="txpHost">
+                <img id="txpHostImg" src="TXP/TXP_Stand_Pose/TXP Stand Pose_00000.png" alt="TXP Roboter">
+            </div>
+            <div class="mo-speech-bubble" id="moSpeech" style="display: none;">
+                <p id="moSpeechText">Willkommen beim Prompt Quest!</p>
+            </div>
+        </div>
+
+        <!-- Music Toggle Button (Top Right) -->
+        <button class="music-toggle-btn" id="musicToggle" aria-label="Musik an/aus">
+            🔇
+        </button>
+
+        <!-- Background Music -->
+        <audio id="backgroundMusic" loop>
+            <source src="Cat Mario Soundtrack Extended.mp3" type="audio/mpeg">
+        </audio>
+
+        <!-- Lava Section Music -->
+        <audio id="lavaMusic" loop>
+            <source src="Spelunker - Stage 01 Theme (Remix).mp3" type="audio/mpeg">
+        </audio>
+
+        <!-- Game HUD -->
+        <div class="hud-wrapper">
+            <!-- Ziel-Prompt Anzeige (nur im Gameplay sichtbar) -->
+            <div class="prompt-goal-display" id="promptGoalDisplay" style="display: none;">
+                <div class="prompt-goal-label">Prompt:</div>
+                <div class="prompt-goal-text" id="promptGoalText">
+                    <!-- Wird dynamisch gefüllt -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Game Area -->
+        <main class="game-area" id="gameArea">
+
+            <!-- Intro Screen -->
+            <div class="game-screen active" id="introScreen">
+                <div class="intro-content">
+                    <!-- Starfield Background -->
+                    <div class="starfield" id="starfield"></div>
+
+                    <!-- Background Grid -->
+                    <div class="grid-background"></div>
+
+                    <!-- Scanlines Effect -->
+                    <div class="scanlines"></div>
+
+                    <!-- Light Beams -->
+                    <div class="light-beam light-beam-1"></div>
+                    <div class="light-beam light-beam-2"></div>
+
+                    <!-- Main Title -->
+                    <h1 class="game-title">
+                        <span class="title-line-1">Schummeln</span>
+                        <span class="title-line-2">erlaubt</span>
+                    </h1>
+
+                    <!-- Press Any Key -->
+                    <div class="press-key">Drücke eine beliebige Taste</div>
+
+                    <!-- Copyright -->
+                    <div class="copyright">© 2025 AI Bytes</div>
+                </div>
+            </div>
+
+            <!-- Loading Screen -->
+            <div class="game-screen" id="loadingScreen">
+                <div class="loading-content">
+                    <h2 class="loading-title">Lade Assets...</h2>
+                    <div class="loading-bar-container">
+                        <div class="loading-bar" id="loadingBar"></div>
+                    </div>
+                    <div class="loading-text" id="loadingText">0%</div>
+                </div>
+            </div>
+
+            <!-- Level Selection Screen -->
+            <div class="game-screen" id="levelSelectScreen">
+                <div class="level-select-content">
+                    <h2 class="level-select-title">Wähle ein Level</h2>
+
+                    <div class="levels-grid">
+                        <!-- Level 1 -->
+                        <div class="level-card" data-level="1">
+                            <div class="level-number">1</div>
+                            <div class="level-name">Erste Anfrage</div>
+                            <div class="level-description">Sammle die Grundlagen eines guten Prompts</div>
+                        </div>
+
+                        <!-- Level 2 -->
+                        <div class="level-card" data-level="2">
+                            <div class="level-number">2</div>
+                            <div class="level-name">Zeitfilter</div>
+                            <div class="level-description">Lerne Zeiträume richtig zu filtern</div>
+                        </div>
+
+                        <!-- Level 3 -->
+                        <div class="level-card" data-level="3">
+                            <div class="level-number">3</div>
+                            <div class="level-name">Visualisierung</div>
+                            <div class="level-description">Erstelle aussagekräftige Diagramme</div>
+                        </div>
+
+                        <!-- Level 4 -->
+                        <div class="level-card" data-level="4">
+                            <div class="level-number">4</div>
+                            <div class="level-name">Filter & Sortierung</div>
+                            <div class="level-description">Meistere komplexe Datenabfragen</div>
+                        </div>
+
+                        <!-- Level 5 -->
+                        <div class="level-card" data-level="5">
+                            <div class="level-number">5</div>
+                            <div class="level-name">Cheat-Sheet Master</div>
+                            <div class="level-description">Nutze gespeicherte Prompts effizient</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Play Screen -->
+            <div class="game-screen" id="gameScreen">
+                <canvas id="gameCanvas"></canvas>
+
+                <!-- Mo Man Player -->
+                <div class="mo-player" id="moPlayer">
+                    <img id="moPlayerImg" src="Mo_man_Stand_Pose/Mo man Stand Pose_00000.png" alt="Mo Man">
+                </div>
+
+                <!-- Prompt Pieces Container -->
+                <div id="promptPiecesContainer"></div>
+
+                <!-- Platforms Container -->
+                <div id="platformsContainer"></div>
+
+                <!-- Death Overlay -->
+                <div class="death-overlay" id="deathOverlay" style="display: none;">
+                    <div class="death-content">
+                        <h2>💀 Oh nein!</h2>
+                        <p>Error 404: Skills not found</p>
+                        <div class="death-hint">Drücke <span class="key-highlight">R</span> zum Respawnen</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level Complete Screen -->
+            <div class="game-screen" id="levelCompleteScreen">
+                <div class="complete-content">
+                    <h2 class="complete-title">🎉 Level Geschafft!</h2>
+
+                    <div class="prompt-result">
+                        <h3>Dein gebauter Prompt:</h3>
+                        <div class="prompt-display" id="promptDisplay">
+                            <!-- Wird dynamisch gefüllt -->
+                        </div>
+                    </div>
+
+                    <div class="lego-dashboard" id="legoDashboard">
+                        <div class="lego-build-animation">
+                            🧱 Dashboard wird gebaut... 🧱
+                        </div>
+                    </div>
+
+                    <div class="complete-score">
+                        <div class="score-item">
+                            <span class="score-label">Gesammelt:</span>
+                            <span class="score-value" id="completeCollected">5/5</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-label">Bewertung:</span>
+                            <span class="score-value" id="completeRating">⭐⭐⭐ Perfekt!</span>
+                        </div>
+                    </div>
+
+                    <div class="complete-actions">
+                        <button class="next-level-button" onclick="nextLevel()"><span>Nächstes Level</span></button>
+                        <button class="menu-button" onclick="goToLevelSelect()"><span>Level-Auswahl</span></button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="script.js"></script>
+    <script src="level5.js"></script>
+</body>
+</html>
