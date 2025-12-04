@@ -18,7 +18,8 @@
       "Bash(git commit:*)",
       "Bash(start level_bilder.html)",
       "Bash(dir \"C:\\Users\\TILSAND\\Desktop\\AI Bytes HTML Game\\TXP\" /b)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(start level5.html)"
     ],
     "deny": [],
     "ask": []

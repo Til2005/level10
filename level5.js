@@ -50,6 +50,11 @@ const TXP_ANIMATIONS = {
         path: 'TXP/TXP_Talk_Pose/TXP_Talk Pose_',
         frames: 24,
         speed: 60
+    },
+    jump: {
+        path: 'TXP/TXP_Sprung_Pose/TXP Sprung_',
+        frames: 120,
+        speed: 40
     }
 };
 
@@ -58,22 +63,15 @@ const LEVEL_DATA = {
     1: {
         name: "Erste Anfrage",
         difficulty: "Tutorial - Sehr Einfach",
-        prompt: "Zeig mir Produktionsdaten für Werk 0500",
+        prompt: "Zeig mir Produktionsdaten für Werk 040",
         requiredPieces: [
             { id: "zeig-mir", text: "Zeig mir", type: "good" },
             { id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
-            { id: "werk-0500", text: "für Werk 0500", type: "good" }
+            { id: "werk-040", text: "für Werk 040", type: "good" }
         ],
         platforms: [
-            // SEHR BREITE Plattformen, KLEINE Gaps - Tutorial Level
-            { x: 0, y: 650, width: 500, height: 50 },
-            { x: 550, y: 650, width: 450, height: 50 },
-            { x: 1050, y: 650, width: 500, height: 50 },
-            { x: 1600, y: 650, width: 450, height: 50 },
-            { x: 2100, y: 650, width: 500, height: 50 },
-            { x: 2650, y: 650, width: 450, height: 50 },
-            { x: 3150, y: 650, width: 500, height: 50 },
-            { x: 3700, y: 650, width: 1300, height: 50 },
+            // Große durchgehende Bodenplattform - Tutorial Level (Grün)
+            { x: 0, y: 650, width: 5000, height: 50, green: true },
             // Wenige, einfache erhöhte Plattformen
             { x: 700, y: 500, width: 250, height: 30 },
             { x: 1700, y: 500, width: 250, height: 30 },
@@ -81,12 +79,12 @@ const LEVEL_DATA = {
         ],
         promptPieces: [
             // Good pieces auf einfachen Positionen
-            { x: 800, y: 370, id: "zeig-mir", text: "Zeig mir", type: "good" },
-            { x: 1800, y: 370, id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
-            { x: 2900, y: 370, id: "werk-0500", text: "für Werk 0500", type: "good" },
+            { x: 780, y: 220, id: "zeig-mir", text: "Zeig mir", type: "good" },
+            { x: 1750, y: 220, id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
+            { x: 2870, y: 220, id: "werk-040", text: "für Werk 040", type: "good" },
             // NUR 2 falsche Prompts - wenig Ablenkung
-            { x: 1300, y: 520, id: "gib-daten", text: "Gib Daten", type: "bad" },
-            { x: 2400, y: 520, id: "zeig-was", text: "Zeig was", type: "bad" }
+            { x: 1300, y: 590, id: "gib-daten", text: "Gib Daten", type: "bad" },
+            { x: 2400, y: 590, id: "zeig-was", text: "Zeig was", type: "bad" }
         ],
         goalX: 4700
     },
@@ -94,12 +92,12 @@ const LEVEL_DATA = {
     2: {
         name: "Zeitfilter",
         difficulty: "Leicht",
-        prompt: "Zeig mir Produktionsdaten im August 2025 für Werk 0500",
+        prompt: "Zeig mir Produktionsdaten im August 2025 für Werk 040",
         requiredPieces: [
             { id: "zeig-mir", text: "Zeig mir", type: "good" },
             { id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
             { id: "august-2025", text: "im August 2025", type: "good" },
-            { id: "werk-0500", text: "für Werk 0500", type: "good" }
+            { id: "werk-040", text: "für Werk 040", type: "good" }
         ],
         platforms: [
             // Mittelgroße Plattformen mit MODERATEN Gaps
@@ -125,17 +123,17 @@ const LEVEL_DATA = {
         ],
         promptPieces: [
             // Good pieces höher platziert (80px höher)
-            { x: 640, y: 370, id: "zeig-mir", text: "Zeig mir", type: "good" },
-            { x: 1010, y: 320, id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
-            { x: 1790, y: 370, id: "august-2025", text: "im August 2025", type: "good" },
-            { x: 3010, y: 370, id: "werk-0500", text: "für Werk 0500", type: "good" },
+            { x: 600, y: 300, id: "zeig-mir", text: "Zeig mir", type: "good" },
+            { x: 1130, y: 230, id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
+            { x: 1920, y: 230, id: "august-2025", text: "im August 2025", type: "good" },
+            { x: 3320, y: 300, id: "werk-040", text: "für Werk 040", type: "good" },
             // MEHR Bad pieces (6 statt 4) - mehr Ablenkung (80px höher)
-            { x: 1100, y: 520, id: "irgendwann", text: "irgendwann", type: "bad" },
-            { x: 1500, y: 520, id: "letzte-woche", text: "letzte Woche", type: "bad" },
-            { x: 2000, y: 520, id: "bald", text: "bald", type: "bad" },
-            { x: 2300, y: 520, id: "neulich", text: "neulich", type: "bad" },
-            { x: 2700, y: 520, id: "mal-schauen", text: "mal schauen", type: "bad" },
-            { x: 3400, y: 520, id: "später", text: "später", type: "bad" }
+            { x: 1160, y: 520, id: "irgendwann", text: "irgendwann", type: "bad" },
+            { x: 1540, y: 520, id: "letzte-woche", text: "letzte Woche", type: "bad" },
+            { x: 1980, y: 520, id: "bald", text: "bald", type: "bad" },
+            { x: 2370, y: 520, id: "neulich", text: "neulich", type: "bad" },
+            { x: 2750, y: 520, id: "mal-schauen", text: "mal schauen", type: "bad" },
+            { x: 3540, y: 520, id: "später", text: "später", type: "bad" }
         ],
         goalX: 4700
     },
@@ -143,13 +141,13 @@ const LEVEL_DATA = {
     3: {
         name: "Visualisierung",
         difficulty: "Mittel",
-        prompt: "Zeig mir Produktionsdaten im August 2025 als Balkendiagramm für Werk 0500",
+        prompt: "Zeig mir Produktionsdaten im August 2025 als Balkendiagramm für Werk 040",
         requiredPieces: [
             { id: "zeig-mir", text: "Zeig mir", type: "good" },
             { id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
             { id: "august-2025", text: "im August 2025", type: "good" },
             { id: "balkendiagramm", text: "als Balkendiagramm", type: "good" },
-            { id: "werk-0500", text: "für Werk 0500", type: "good" }
+            { id: "werk-040", text: "für Werk 040", type: "good" }
         ],
         platforms: [
             // KLEINERE Plattformen (150-200px), GRÖSSERE Gaps (120-150px) - Medium Difficulty
@@ -173,28 +171,26 @@ const LEVEL_DATA = {
             { x: 1090, y: 380, width: 130, height: 30 },
             { x: 1380, y: 350, width: 150, height: 30 },
             { x: 1690, y: 430, width: 130, height: 30 },
-            { x: 1980, y: 480, width: 130, height: 30 },
+            { x: 1980, y: 300, width: 130, height: 30 },
             { x: 2600, y: 480, width: 130, height: 30 },
             { x: 2910, y: 430, width: 130, height: 30 },
             { x: 3200, y: 380, width: 130, height: 30 }
         ],
         promptPieces: [
             // Good pieces höher und schwieriger platziert (80px höher)
-            { x: 590, y: 350, id: "zeig-mir", text: "Zeig mir", type: "good" },
-            { x: 1180, y: 250, id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
-            { x: 1470, y: 220, id: "august-2025", text: "im August 2025", type: "good" },
-            { x: 2070, y: 350, id: "balkendiagramm", text: "als Balkendiagramm", type: "good" },
-            { x: 3290, y: 250, id: "werk-0500", text: "für Werk 0500", type: "good" },
+            { x: 650, y: 250, id: "zeig-mir", text: "Zeig mir", type: "good" },
+            { x: 1210, y: 150, id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
+            { x: 1570, y: 100, id: "august-2025", text: "im August 2025", type: "good" },
+            { x: 2280, y: 70, id: "balkendiagramm", text: "als Balkendiagramm", type: "good" },
+            { x: 3410, y: 180, id: "werk-040", text: "für Werk 040", type: "good" },
             // Bad pieces verteilt auf verschiedenen Höhen
-            { x: 500, y: 550, id: "als-tabelle", text: "als Tabelle", type: "bad" },
-            { x: 750, y: 520, id: "als-text", text: "als Text", type: "bad" },
-            { x: 1050, y: 480, id: "ohne-visual", text: "ohne Visualisierung", type: "bad" },
-            { x: 1500, y: 450, id: "zeig-alles", text: "zeig alles", type: "bad" },
+            { x: 720, y: 520, id: "als-text", text: "als Text", type: "bad" },
+            { x: 965, y: 480, id: "ohne-visual", text: "ohne Visualisierung", type: "bad" },
+            { x: 1550, y: 450, id: "zeig-alles", text: "zeig alles", type: "bad" },
             { x: 1900, y: 520, id: "als-liste", text: "als Liste", type: "bad" },
-            { x: 2300, y: 480, id: "nur-zahlen", text: "nur Zahlen", type: "bad" },
             { x: 2650, y: 550, id: "keine-grafik", text: "keine Grafik", type: "bad" },
-            { x: 2950, y: 520, id: "zeig-irgendwas", text: "zeig irgendwas", type: "bad" },
-            { x: 3400, y: 480, id: "als-excel", text: "als Excel", type: "bad" }
+            { x: 2950, y: 490, id: "zeig-irgendwas", text: "zeig irgendwas", type: "bad" },
+            { x: 3420, y: 480, id: "als-excel", text: "als Excel", type: "bad" }
         ],
         goalX: 4700
     },
@@ -214,7 +210,6 @@ const LEVEL_DATA = {
             // KLEINE Plattformen (120-150px), GROSSE Gaps (150-200px) - Hard Difficulty
             { x: 0, y: 650, width: 200, height: 40 },
             // Schwieriger Zickzack-Parcours mit precision jumps
-            { x: 350, y: 600, width: 140, height: 35 },
             { x: 650, y: 550, width: 130, height: 35 },
             { x: 950, y: 500, width: 130, height: 35 },
             { x: 1250, y: 450, width: 140, height: 35 },
@@ -243,22 +238,22 @@ const LEVEL_DATA = {
         ],
         promptPieces: [
             // Good pieces auf sehr schwierigen Positionen (80px höher)
-            { x: 570, y: 290, id: "zeig-mir", text: "Zeig mir", type: "good" },
-            { x: 1170, y: 190, id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
-            { x: 1770, y: 150, id: "august-2025", text: "im August 2025", type: "good" },
-            { x: 2050, y: 200, id: "filter-farbe", text: "filtere nach Farbe", type: "good" },
-            { x: 3720, y: 420, id: "sortiert-menge", text: "sortiert nach Menge", type: "good" },
+            { x: 640, y: 250, id: "zeig-mir", text: "Zeig mir", type: "good" },
+            { x: 1200, y: 180, id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
+            { x: 1800, y: 100, id: "august-2025", text: "im August 2025", type: "good" },
+            { x: 2100, y: 150, id: "filter-farbe", text: "filtere nach Farbe", type: "good" },
+            { x: 3860, y: 240, id: "sortiert-menge", text: "sortiert nach Menge", type: "good" },
             // Bad pieces auf variierten Höhen verteilt
             { x: 350, y: 230, id: "keine-filter", text: "ohne Filter", type: "bad" },
-            { x: 650, y: 400, id: "unsortiert", text: "unsortiert", type: "bad" },
-            { x: 950, y: 360, id: "random", text: "zufällig", type: "bad" },
-            { x: 1200, y: 310, id: "alles-zeigen", text: "alles anzeigen", type: "bad" },
-            { x: 1500, y: 260, id: "keine-sortierung", text: "keine Sortierung", type: "bad" },
+            { x: 635, y: 400, id: "unsortiert", text: "unsortiert", type: "bad" },
+            { x: 945, y: 360, id: "random", text: "zufällig", type: "bad" },
+            { x: 1210, y: 310, id: "alles-zeigen", text: "alles anzeigen", type: "bad" },
+            { x: 1510, y: 260, id: "keine-sortierung", text: "keine Sortierung", type: "bad" },
             { x: 1830, y: 310, id: "zeig-alles", text: "zeig alles", type: "bad" },
-            { x: 2120, y: 360, id: "egal-wie", text: "egal wie", type: "bad" },
-            { x: 2420, y: 410, id: "mach-was", text: "mach was", type: "bad" },
-            { x: 2720, y: 480, id: "irgendwie", text: "irgendwie", type: "bad" },
-            { x: 4400, y: 430, id: "ohne-details", text: "ohne Details", type: "bad" }
+            { x: 2110, y: 360, id: "egal-wie", text: "egal wie", type: "bad" },
+            { x: 2400, y: 410, id: "mach-was", text: "mach was", type: "bad" },
+            { x: 2730, y: 480, id: "irgendwie", text: "irgendwie", type: "bad" },
+            { x: 4320, y: 430, id: "ohne-details", text: "ohne Details", type: "bad" }
         ],
         goalX: 4700
     },
@@ -266,12 +261,12 @@ const LEVEL_DATA = {
     5: {
         name: "Cheat-Sheet Master",
         difficulty: "Extrem Schwer",
-        prompt: "Zeig mir Produktionsdaten im August 2025 für Werk 0500 als Balkendiagramm filtere nach Farbe",
+        prompt: "Zeig mir Produktionsdaten im August 2025 für Werk 040 als Balkendiagramm filtere nach Farbe",
         requiredPieces: [
             { id: "zeig-mir", text: "Zeig mir", type: "good" },
             { id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
             { id: "august-2025", text: "im August 2025", type: "good" },
-            { id: "werk-0500", text: "für Werk 0500", type: "good" },
+            { id: "werk-040", text: "für Werk 040", type: "good" },
             { id: "balkendiagramm", text: "als Balkendiagramm", type: "good" },
             { id: "filter-farbe", text: "filtere nach Farbe", type: "good" }
         ],
@@ -323,7 +318,7 @@ const LEVEL_DATA = {
             { x: 1630, y: 250, id: "zeig-mir", text: "Zeig mir", type: "good" },
             { x: 2500, y: 280, id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
             { x: 11000, y: 500, id: "august-2025", text: "im August 2025", type: "good" },
-            { x: 13450, y: 400, id: "werk-0500", text: "für Werk 0500", type: "good" },
+            { x: 13450, y: 400, id: "werk-040", text: "für Werk 040", type: "good" },
             { x: 15650, y: 270, id: "balkendiagramm", text: "als Balkendiagramm", type: "good" },
             { x: 28100, y: 300, id: "filter-farbe", text: "filtere nach Farbe", type: "good" },
 
@@ -375,64 +370,6 @@ const LEVEL_DATA = {
         goalX: 28400
     }
 };
-
-// ===== TXP HOST CLASS (From Level 4) =====
-class TXPHost {
-    constructor() {
-        this.element = document.getElementById('txpHost');
-        this.img = document.getElementById('txpHostImg');
-        this.currentAnimation = null;
-        this.currentFrame = 0;
-        this.animationInterval = null;
-        this.canTalk = false;
-
-        this.startAnimation('stand');
-    }
-
-    startAnimation(animName) {
-        if (this.currentAnimation === animName && this.animationInterval) return;
-
-        this.stopAnimation();
-        this.currentAnimation = animName;
-        this.currentFrame = 0;
-        const anim = TXP_ANIMATIONS[animName];
-
-        this.animationInterval = setInterval(() => {
-            this.currentFrame = (this.currentFrame + 1) % anim.frames;
-            this.updateFrame();
-        }, anim.speed);
-    }
-
-    stopAnimation() {
-        if (this.animationInterval) {
-            clearInterval(this.animationInterval);
-            this.animationInterval = null;
-        }
-    }
-
-    updateFrame() {
-        const anim = TXP_ANIMATIONS[this.currentAnimation];
-        const frameStr = String(this.currentFrame).padStart(5, '0');
-        this.img.src = `${anim.path}${frameStr}.png`;
-    }
-
-    enableTalking() {
-        this.canTalk = true;
-    }
-
-    talk(duration = 3000) {
-        if (!this.canTalk) return;
-
-        this.startAnimation('talk');
-        setTimeout(() => {
-            this.startAnimation('stand');
-        }, duration);
-    }
-
-    destroy() {
-        this.stopAnimation();
-    }
-}
 
 // ===== MO MAN PLAYER CLASS (Platformer Version) =====
 class MoManPlayer {
@@ -711,13 +648,14 @@ class MoManPlayer {
 
 // ===== PLATFORM CLASS =====
 class Platform {
-    constructor(gameArea, x, y, width, height, isLava = false) {
+    constructor(gameArea, x, y, width, height, isLava = false, isGreen = false) {
         this.gameArea = gameArea;
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.isLava = isLava;
+        this.isGreen = isGreen;
 
         this.createElement();
         this.debugHitbox = null;
@@ -726,7 +664,13 @@ class Platform {
 
     createElement() {
         this.element = document.createElement('div');
-        this.element.className = this.isLava ? 'platform lava-platform' : 'platform';
+        let className = 'platform';
+        if (this.isLava) {
+            className += ' lava-platform';
+        } else if (this.isGreen) {
+            className += ' green-platform';
+        }
+        this.element.className = className;
         this.element.style.left = `${this.x}px`;
         this.element.style.top = `${this.y}px`;
         this.element.style.width = `${this.width}px`;
@@ -790,7 +734,12 @@ class PromptPiece {
         this.element = document.createElement('div');
         // Add lego class for all prompts in Level 5
         this.element.className = `prompt-piece ${this.type} lego`;
-        this.element.textContent = this.text;
+
+        // Create text wrapper
+        const textSpan = document.createElement('span');
+        textSpan.textContent = this.text;
+        this.element.appendChild(textSpan);
+
         this.element.style.left = `${this.x}px`;
         this.element.style.top = `${this.y}px`;
 
@@ -798,9 +747,9 @@ class PromptPiece {
 
         // Cache dimensions after element is added to DOM
         requestAnimationFrame(() => {
-            const rect = this.element.getBoundingClientRect();
-            this.width = rect.width;
-            this.height = rect.height;
+            // Use clientWidth/clientHeight (excludes border, only content + padding)
+            this.width = this.element.clientWidth;
+            this.height = this.element.clientHeight;
 
             // Update debug hitbox with actual dimensions
             if (this.debugHitbox) {
@@ -808,7 +757,7 @@ class PromptPiece {
                 this.debugHitbox.style.height = `${this.height}px`;
             }
 
-            // Add lego studs dynamically based on width
+            // Add lego studs dynamically based on width (insert before text)
             this.addLegoStuds();
         });
     }
@@ -841,31 +790,48 @@ class PromptPiece {
     }
 
     addLegoStuds() {
-        // Fixed stud spacing like real LEGO bricks
-        const studWidth = 12;
-        const fixedSpacing = 40; // Fester Abstand zwischen Noppen (Mitte zu Mitte)
+        const studWidth = 20;
+        const studSpacing = 40; // Abstand zwischen Noppen (Mitte zu Mitte)
 
-        // Calculate how many studs fit with fixed spacing
-        const numStuds = Math.max(1, Math.floor((this.width - 20) / fixedSpacing) + 1);
+        // this.width ist jetzt clientWidth (ohne Border)
+        // Also die innere Breite - genau was wir brauchen
+        const centerX = this.width / 2;
 
-        // Calculate total width needed for all studs
-        const totalWidth = (numStuds - 1) * fixedSpacing;
+        // Calculate how many studs fit (minimum 1)
+        const numStuds = Math.max(1, Math.floor(this.width / studSpacing));
 
-        // Center the studs horizontally
-        const startX = (this.width - totalWidth) / 2;
+        // Get background color based on type
+        const bgColor = this.type === 'good' ? '#2DBD2D' : '#E63E3E';
 
-        // Create studs
-        for (let i = 0; i < numStuds; i++) {
+        // Get the text span (first child)
+        const textSpan = this.element.firstChild;
+
+        if (numStuds === 1) {
+            // Single stud in center
             const stud = document.createElement('div');
             stud.className = 'lego-stud';
-            // Position with fixed spacing, centered on stud
-            stud.style.left = `${startX + (i * fixedSpacing) - (studWidth / 2)}px`;
+            stud.style.left = `${centerX - (studWidth / 2)}px`;
+            stud.style.backgroundColor = bgColor;
+            stud.style.borderBottom = `1px solid #000000`; // Dünner schwarzer Border unten
+            this.element.insertBefore(stud, textSpan);
+        } else {
+            // Multiple studs - symmetrisch von der Mitte aus
+            // Berechne die Spannweite von Mitte-zu-Mitte (erste bis letzte Noppe)
+            const spanWidth = (numStuds - 1) * studSpacing;
 
-            // Inherit background color from parent
-            const bgColor = window.getComputedStyle(this.element).background;
-            stud.style.background = bgColor;
+            // Mitte der ersten Noppe (relativ zur Mitte)
+            const firstStudCenterX = centerX - (spanWidth / 2);
 
-            this.element.appendChild(stud);
+            for (let i = 0; i < numStuds; i++) {
+                const stud = document.createElement('div');
+                stud.className = 'lego-stud';
+                // Berechne Mitte dieser Noppe, dann ziehe halbe Breite ab für die linke Kante
+                const studCenterX = firstStudCenterX + (i * studSpacing);
+                stud.style.left = `${studCenterX - (studWidth / 2)}px`;
+                stud.style.backgroundColor = bgColor;
+                stud.style.borderBottom = `1px solid #000000`; // Dünner schwarzer Border unten
+                this.element.insertBefore(stud, textSpan);
+            }
         }
     }
 
@@ -998,8 +964,12 @@ class Goal {
         this.gameArea = gameArea;
         this.x = x;
         this.y = y;
+        this.width = 100; // Goal width
+        this.height = 150; // Goal height
 
         this.createElement();
+        this.debugHitbox = null;
+        this.createDebugHitbox();
     }
 
     createElement() {
@@ -1022,9 +992,53 @@ class Goal {
         document.getElementById('platformsContainer').appendChild(this.element);
     }
 
+    createDebugHitbox() {
+        this.debugHitbox = document.createElement('div');
+        this.debugHitbox.className = 'debug-hitbox goal';
+        this.debugHitbox.style.display = GAME_CONFIG.debugHitboxes ? 'block' : 'none';
+        this.debugHitbox.style.position = 'absolute';
+        this.debugHitbox.style.left = `${this.x}px`;
+        this.debugHitbox.style.top = `${this.y}px`;
+        this.debugHitbox.style.width = `${this.width}px`;
+        this.debugHitbox.style.height = `${this.height}px`;
+        this.debugHitbox.style.border = '2px solid lime';
+        this.debugHitbox.style.backgroundColor = 'rgba(0, 255, 0, 0.2)';
+        this.debugHitbox.style.pointerEvents = 'none';
+
+        const label = document.createElement('div');
+        label.className = 'debug-hitbox-label';
+        label.textContent = 'Goal';
+        label.style.fontSize = '10px';
+        label.style.color = 'lime';
+        label.style.fontWeight = 'bold';
+        this.debugHitbox.appendChild(label);
+
+        document.getElementById('platformsContainer').appendChild(this.debugHitbox);
+    }
+
+    updateDebugHitbox() {
+        if (this.debugHitbox) {
+            this.debugHitbox.style.display = GAME_CONFIG.debugHitboxes ? 'block' : 'none';
+        }
+    }
+
+    getHitbox() {
+        return {
+            left: this.x,
+            right: this.x + this.width,
+            top: this.y,
+            bottom: this.y + this.height,
+            centerX: this.x + this.width / 2,
+            centerY: this.y + this.height / 2
+        };
+    }
+
     destroy() {
         if (this.element && this.element.parentNode) {
             this.element.parentNode.removeChild(this.element);
+        }
+        if (this.debugHitbox && this.debugHitbox.parentNode) {
+            this.debugHitbox.parentNode.removeChild(this.debugHitbox);
         }
     }
 }
@@ -1500,6 +1514,215 @@ class Camera {
     }
 }
 
+// ===== TXP NPC CLASS =====
+class TxpNpc {
+    constructor(gameArea, x, y) {
+        this.gameArea = gameArea;
+        this.x = x;
+        this.y = y;
+        this.width = 120;
+        this.height = 120;
+        this.proximityRange = 150;
+        this.isPlayerNear = false;
+        this.hasShownTutorial = false;
+        this.tutorialStep = 0;
+
+        this.element = document.getElementById('txpNpc');
+        this.img = document.getElementById('txpNpcImg');
+        this.speechElement = document.getElementById('txpNpcSpeech');
+        this.speechText = document.getElementById('txpNpcSpeechText');
+
+        // Animation state
+        this.currentAnimation = null;
+        this.currentFrame = 0;
+        this.animationInterval = null;
+        this.jumpInterval = null;
+
+        // Facing direction (like enemies)
+        this.facingRight = true;
+
+        this.tutorialMessages = [
+            "Halloo! Ich bin TXP und helfe dir bei deinem ersten Prompt.",
+            "Siehst du die verschiedenen Promptbausteine? Du musst die grünen Promptbausteine einsammeln. Sammel bloß keinen roten ein!",
+            "Schlechte Prompts wie 'Gib Daten' sind zu vage. Gute Prompts wie 'Zeig mir Produktionsdaten' sind präzise!",
+            "Ach du machst das schon! Sammel alle guten Promptbausteine ein und erreiche das Ziel rechts, um das Level abzuschließen."
+        ];
+
+        this.show();
+        this.startAnimation('stand');
+        this.startJumpRoutine();
+    }
+
+    show() {
+        if (this.element) {
+            this.element.style.display = 'block';
+            this.updatePosition();
+        }
+    }
+
+    hide() {
+        if (this.element) {
+            this.element.style.display = 'none';
+        }
+        this.stopAnimation();
+        this.stopJumpRoutine();
+        this.hideSpeech();
+    }
+
+    startAnimation(animName) {
+        if (this.currentAnimation === animName && this.animationInterval) return;
+
+        this.stopAnimation();
+        this.currentAnimation = animName;
+        this.currentFrame = 0;
+        const anim = TXP_ANIMATIONS[animName];
+
+        this.animationInterval = setInterval(() => {
+            this.currentFrame = (this.currentFrame + 1) % anim.frames;
+            this.updateFrame();
+        }, anim.speed);
+    }
+
+    stopAnimation() {
+        if (this.animationInterval) {
+            clearInterval(this.animationInterval);
+            this.animationInterval = null;
+        }
+    }
+
+    updateFrame() {
+        const anim = TXP_ANIMATIONS[this.currentAnimation];
+        let frameStr = String(this.currentFrame).padStart(5, '0');
+
+        // Handle special frame names in jump animation
+        if (this.currentAnimation === 'jump') {
+            if (this.currentFrame === 14) frameStr = '00014A';
+            else if (this.currentFrame === 15) frameStr = '00015B';
+        }
+
+        if (this.img) {
+            this.img.src = `${anim.path}${frameStr}.png`;
+        }
+    }
+
+    startJumpRoutine() {
+        // Jump every 10 seconds
+        this.jumpInterval = setInterval(() => {
+            this.performJump();
+        }, 10000);
+    }
+
+    stopJumpRoutine() {
+        if (this.jumpInterval) {
+            clearInterval(this.jumpInterval);
+            this.jumpInterval = null;
+        }
+    }
+
+    performJump() {
+        // Play jump animation once, then return to stand
+        this.startAnimation('jump');
+
+        // Jump animation takes 120 frames * 40ms = 4800ms
+        setTimeout(() => {
+            this.startAnimation('stand');
+        }, 4800);
+    }
+
+    updatePosition() {
+        if (this.element) {
+            this.element.style.left = `${this.x}px`;
+            this.element.style.top = `${this.y}px`;
+        }
+    }
+
+    checkProximity(player) {
+        const distance = Math.abs(player.x - this.x);
+        const wasNear = this.isPlayerNear;
+        this.isPlayerNear = distance < this.proximityRange && Math.abs(player.y - this.y) < 100;
+
+        // Update facing direction (like enemies)
+        if (player.x < this.x && this.facingRight) {
+            this.facingRight = false;
+            if (this.img) {
+                this.img.style.transform = 'scaleX(-1)';
+            }
+        } else if (player.x >= this.x && !this.facingRight) {
+            this.facingRight = true;
+            if (this.img) {
+                this.img.style.transform = 'scaleX(1)';
+            }
+        }
+
+        // Player just entered proximity
+        if (this.isPlayerNear && !wasNear && !this.hasShownTutorial) {
+            this.showTutorial();
+        }
+
+        // Player left proximity
+        if (!this.isPlayerNear && wasNear) {
+            this.hideSpeech();
+            // Return to stand animation when player leaves
+            if (this.currentAnimation === 'talk') {
+                this.startAnimation('stand');
+            }
+        }
+    }
+
+    showTutorial() {
+        if (this.tutorialStep < this.tutorialMessages.length) {
+            this.showSpeech(this.tutorialMessages[this.tutorialStep]);
+            // Switch to talk animation when showing tutorial
+            this.startAnimation('talk');
+        } else {
+            this.hasShownTutorial = true;
+            this.hideSpeech();
+            this.startAnimation('stand');
+        }
+    }
+
+    advanceTutorial() {
+        if (this.isPlayerNear && !this.hasShownTutorial) {
+            this.tutorialStep++;
+            if (this.tutorialStep < this.tutorialMessages.length) {
+                this.showSpeech(this.tutorialMessages[this.tutorialStep]);
+                // Switch to talk animation
+                this.startAnimation('talk');
+            } else {
+                this.hasShownTutorial = true;
+                this.hideSpeech();
+                this.startAnimation('stand');
+            }
+        }
+    }
+
+    showSpeech(message) {
+        if (this.speechElement && this.speechText) {
+            this.speechText.textContent = message;
+            this.speechElement.style.display = 'block';
+
+            // Position speech bubble above TXP (y is top position, so subtract for above)
+            this.speechElement.style.left = `${this.x - 140}px`;
+            this.speechElement.style.top = `${this.y - 150}px`;
+        }
+    }
+
+    hideSpeech() {
+        if (this.speechElement) {
+            this.speechElement.style.display = 'none';
+        }
+    }
+
+    applyCamera(camera) {
+        if (this.element) {
+            this.element.style.transform = `translateX(${-camera.x}px)`;
+        }
+        if (this.speechElement) {
+            this.speechElement.style.transform = `translateX(${-camera.x}px)`;
+        }
+    }
+}
+
 // ===== MAIN PLATFORMER GAME CLASS =====
 class PlatformerGame {
     constructor() {
@@ -1521,6 +1744,7 @@ class PlatformerGame {
         this.fallArrow = null;
         this.teleportZone = null;
         this.camera = null;
+        this.txpNpc = null;
 
         // Collected data
         this.collectedPieces = [];
@@ -1547,10 +1771,6 @@ class PlatformerGame {
         // Game loop
         this.lastTime = 0;
         this.gameLoopId = null;
-
-        // Speech bubble
-        this.speechBubble = document.getElementById('moSpeech');
-        this.speechText = document.getElementById('moSpeechText');
 
         // Death state
         this.isDead = false;
@@ -1785,6 +2005,12 @@ class PlatformerGame {
                 return;
             }
 
+            // Interact with TXP NPC with 'E'
+            if ((e.key === 'e' || e.key === 'E') && this.txpNpc) {
+                this.txpNpc.advanceTutorial();
+                return;
+            }
+
             if (!this.isRunning || this.isDead) return;
 
             // Movement
@@ -1854,6 +2080,11 @@ class PlatformerGame {
             jumpingEnemy.updateDebugHitbox();
         });
 
+        // Toggle goal hitbox
+        if (this.goal) {
+            this.goal.updateDebugHitbox();
+        }
+
         console.log('Hitboxes:', GAME_CONFIG.debugHitboxes ? 'ON' : 'OFF');
     }
 
@@ -1894,7 +2125,8 @@ class PlatformerGame {
                 platformData.y,
                 platformData.width,
                 platformData.height,
-                platformData.lava || false
+                platformData.lava || false,
+                platformData.green || false
             );
             this.platforms.push(platform);
         });
@@ -1978,8 +2210,10 @@ class PlatformerGame {
         // Create camera
         this.camera = new Camera(this.gameArea);
 
-        // Show level prompt from TXP
-        this.showSpeech(levelData.prompt, 4000);
+        // Create TXP NPC for Level 1 only (tutorial level)
+        if (levelNumber === 1) {
+            this.txpNpc = new TxpNpc(this.gameArea, 300, 535);
+        }
     }
 
     clearLevel() {
@@ -2012,6 +2246,11 @@ class PlatformerGame {
         if (this.fallArrow) {
             this.fallArrow.destroy();
             this.fallArrow = null;
+        }
+
+        if (this.txpNpc) {
+            this.txpNpc.hide();
+            this.txpNpc = null;
         }
 
         if (this.upArrow) {
@@ -2098,9 +2337,6 @@ class PlatformerGame {
         // Show game screen
         this.showScreen('gameScreen');
 
-        // Enable TXP talking
-        if (txpHost) txpHost.enableTalking();
-
         // Start game loop
         this.isRunning = true;
         this.lastTime = performance.now();
@@ -2127,6 +2363,12 @@ class PlatformerGame {
             // Update camera
             this.camera.follow(this.player);
             this.camera.apply(this.player);
+
+            // Update TXP NPC (Level 1 only)
+            if (this.txpNpc) {
+                this.txpNpc.checkProximity(this.player);
+                this.txpNpc.applyCamera(this.camera);
+            }
 
             // Check if player entered/left lava section (Level 5 only)
             if (this.currentLevel === 5) {
@@ -2170,9 +2412,9 @@ class PlatformerGame {
                 this.checkTeleportCollision(this.teleportZone2, 'teleport2');
             }
 
-            // Check level complete (reached goal)
-            if (this.player.x >= LEVEL_DATA[this.currentLevel].goalX) {
-                this.levelComplete();
+            // Check level complete (reached goal with proper hitbox collision)
+            if (this.goal) {
+                this.checkGoalCollision();
             }
         }
 
@@ -2228,6 +2470,23 @@ class PlatformerGame {
                 // But only if enemy is not already squashing (to prevent death during bounce-up)
                 this.handleDeath();
             }
+        }
+    }
+
+    checkGoalCollision() {
+        const playerBox = this.player.getHitbox();
+        const goalBox = this.goal.getHitbox();
+
+        // AABB collision
+        const collision = !(
+            playerBox.right < goalBox.left ||
+            playerBox.left > goalBox.right ||
+            playerBox.bottom < goalBox.top ||
+            playerBox.top > goalBox.bottom
+        );
+
+        if (collision) {
+            this.levelComplete();
         }
     }
 
@@ -2298,19 +2557,18 @@ class PlatformerGame {
             // Batch DOM updates using requestAnimationFrame
             requestAnimationFrame(() => {
                 this.updatePromptDisplay(piece.id);
-                this.showSpeech(`Richtig! "${piece.text}" eingesammelt!`, 2000);
             });
         } else if (piece.type === 'bad') {
             // Picked up bad piece - instant death (only 1 life)
-            requestAnimationFrame(() => {
-                this.showSpeech(`Falsch! "${piece.text}" ist ein schlechter Prompt!`, 2000);
-            });
             this.handleDeath();
         }
     }
 
     handleDeath() {
         this.isDead = true;
+
+        // Increment death counter
+        incrementDeathCounter();
 
         // Play death sound
         this.playDeathSound();
@@ -2375,31 +2633,13 @@ class PlatformerGame {
             cancelAnimationFrame(this.gameLoopId);
         }
 
+        // Unlock next level
+        unlockNextLevel(this.currentLevel);
+
         this.showLevelCompleteScreen();
     }
 
     showLevelCompleteScreen() {
-        // Calculate how many required pieces were collected
-        const requiredCollected = this.collectedPieces.filter(id =>
-            this.requiredPieces.includes(id)
-        ).length;
-
-        const totalRequired = this.requiredPieces.length;
-
-        // Update UI
-        document.getElementById('completeCollected').textContent = `${requiredCollected}/${totalRequired}`;
-
-        // Rating
-        let rating = '';
-        if (requiredCollected === totalRequired) {
-            rating = '⭐⭐⭐ Perfekt!';
-        } else if (requiredCollected >= totalRequired * 0.7) {
-            rating = '⭐⭐ Gut!';
-        } else {
-            rating = '⭐ OK!';
-        }
-        document.getElementById('completeRating').textContent = rating;
-
         // Build prompt display
         const levelData = LEVEL_DATA[this.currentLevel];
         const promptDisplay = document.getElementById('promptDisplay');
@@ -2417,7 +2657,95 @@ class PlatformerGame {
             promptDisplay.appendChild(pieceEl);
         });
 
+        // Show hints for next level
+        this.showNextLevelHints();
+
+        // Hide "Nächstes Level" button on Level 5 (final level)
+        const nextLevelButton = document.querySelector('.next-level-button');
+        if (nextLevelButton) {
+            if (this.currentLevel === 5) {
+                nextLevelButton.style.display = 'none';
+            } else {
+                nextLevelButton.style.display = 'inline-block';
+            }
+        }
+
         this.showScreen('levelCompleteScreen');
+    }
+
+    showNextLevelHints() {
+        const dashboard = document.getElementById('legoDashboard');
+        dashboard.innerHTML = '';
+
+        const nextLevel = this.currentLevel + 1;
+
+        // Check if there is a next level
+        if (!LEVEL_DATA[nextLevel]) {
+            // Last level completed
+            const message = document.createElement('div');
+            message.style.textAlign = 'center';
+            message.style.fontSize = '20px';
+            message.style.color = 'var(--saffron)';
+            message.style.padding = '20px';
+            message.textContent = '🎉 Du hast alle Level gemeistert! 🎉';
+            dashboard.appendChild(message);
+            return;
+        }
+
+        // Level-specific hints with learning context
+        const hints = {
+            2: {
+                tip: 'Im nächsten Level lernst du, wie du Zeiträume in deinen Prompts angeben kannst.',
+                newConcept: '📅 Zeitfilter'
+            },
+            3: {
+                tip: 'Im nächsten Level lernst du, wie du dir Daten grafisch anzeigen lassen kannst.',
+                newConcept: '📊 Visualisierung'
+            },
+            4: {
+                tip: 'Im nächsten Level lernst du, wie du Daten nach bestimmten Kriterien filterst und sortierst.',
+                newConcept: '🔍 Filter & Sortierung'
+            },
+            5: {
+                tip: 'Im finalen Level lernst du, dass der Ort deiner Anfrage klar sein muss (z.B. für Werk 040).',
+                newConcept: '📍 Ortsangabe'
+            }
+        };
+
+        const levelHint = hints[nextLevel];
+
+        if (levelHint) {
+            // New concept badge
+            const conceptBadge = document.createElement('div');
+            conceptBadge.style.display = 'inline-block';
+            conceptBadge.style.padding = '10px 20px';
+            conceptBadge.style.margin = '10px 0';
+            conceptBadge.style.background = 'rgba(245, 192, 59, 0.2)';
+            conceptBadge.style.border = '2px solid var(--saffron)';
+            conceptBadge.style.borderRadius = '20px';
+            conceptBadge.style.color = 'var(--saffron)';
+            conceptBadge.style.fontWeight = 'bold';
+            conceptBadge.style.fontSize = '18px';
+            conceptBadge.textContent = `Neues Konzept: ${levelHint.newConcept}`;
+            dashboard.appendChild(conceptBadge);
+
+            // Tip box
+            const tipBox = document.createElement('div');
+            tipBox.style.padding = '12px';
+            tipBox.style.marginTop = '15px';
+            tipBox.style.background = 'rgba(245, 192, 59, 0.1)';
+            tipBox.style.border = '2px dashed var(--saffron)';
+            tipBox.style.borderRadius = '8px';
+
+            const tipText = document.createElement('p');
+            tipText.innerHTML = `<strong>💬 Hinweis:</strong> ${levelHint.tip}`;
+            tipText.style.color = 'var(--text-light)';
+            tipText.style.fontSize = '14px';
+            tipText.style.margin = '0';
+            tipText.style.lineHeight = '1.6';
+            tipBox.appendChild(tipText);
+            dashboard.appendChild(tipBox);
+        }
     }
 
     showScreen(screenId) {
@@ -2435,20 +2763,14 @@ class PlatformerGame {
                 musicToggle.style.display = 'flex';
             }
         }
+
+        // Show/hide death counter based on screen
+        if (screenId === 'gameScreen' || screenId === 'levelSelectScreen') {
+            showDeathCounter();
+        } else {
+            hideDeathCounter();
+        }
     }
-
-    showSpeech(text, duration = 3000) {
-        this.speechText.textContent = text;
-        this.speechBubble.style.display = 'block';
-
-        if (txpHost) txpHost.talk(duration);
-
-        setTimeout(() => {
-            this.speechBubble.style.display = 'none';
-        }, duration);
-    }
-
-
 
     buildPromptDisplay(levelData) {
         const promptGoalText = document.getElementById('promptGoalText');
@@ -2493,7 +2815,6 @@ class PlatformerGame {
 
 // ===== GLOBAL FUNCTIONS =====
 let game;
-let txpHost;
 
 function showLevelSelect() {
     const screens = document.querySelectorAll('.game-screen');
@@ -2518,7 +2839,7 @@ function nextLevel() {
     }
 }
 
-function goToLevelSelect() {
+function goToLevelSelect(fromCompletedLevel = null) {
     if (game) {
         game.isRunning = false;
         if (game.gameLoopId) {
@@ -2527,67 +2848,24 @@ function goToLevelSelect() {
         game.clearLevel();
     }
     showLevelSelect();
+    // Re-initialize world map to show updated progress
+    setupLevelCards();
+
+    // Trigger unlock animation if coming from completed level
+    if (fromCompletedLevel) {
+        animateNextLevelUnlock(fromCompletedLevel);
+    }
+}
+
+function goToLevelSelectWithAnimation() {
+    // Call goToLevelSelect with the current completed level
+    const completedLevel = game ? game.currentLevel : null;
+    goToLevelSelect(completedLevel);
 }
 
 // ===== TXP CLICK EASTER EGG =====
 let txpClickTimeout = null;
 
-function setupTXPClickHandler() {
-    const txpElement = document.getElementById('txpHost');
-    if (!txpElement) return;
-
-    const aiJokes = [
-        "Warum ging die KI zum Arzt? Sie hatte einen Bug! 🐛",
-        "Was sagt eine KI beim Aufwachen? 'Guten Mor-gen!' 🌅",
-        "Wie nennt man eine faule KI? Artificial Unintelligence! 😴",
-        "Warum mag die KI keine Cookies? Sie bevorzugt Cache! 🍪",
-        "Was ist der Lieblingssport einer KI? Neural Networking! 🏐",
-        "Warum wurde die KI zum Lehrer? Sie hatte zu viele Trainings-Daten! 📚",
-        "Was trinkt eine KI? Java-Script! ☕",
-        "Warum ist die KI so ordentlich? Sie sortiert ihre Arrays! 📊"
-    ];
-
-    let lastJokeIndex = -1;
-
-    txpElement.addEventListener('click', () => {
-        if (!txpHost) return;
-
-        let jokeIndex;
-        do {
-            jokeIndex = Math.floor(Math.random() * aiJokes.length);
-        } while (jokeIndex === lastJokeIndex && aiJokes.length > 1);
-
-        lastJokeIndex = jokeIndex;
-
-        const speechBubble = document.getElementById('moSpeech');
-        const speechText = document.getElementById('moSpeechText');
-
-        if (speechBubble && speechText) {
-            if (txpClickTimeout) {
-                clearTimeout(txpClickTimeout);
-            }
-
-            if (game && game.isRunning) {
-                game.showSpeech(aiJokes[jokeIndex], 5000);
-            } else {
-                speechText.textContent = aiJokes[jokeIndex];
-                speechBubble.style.display = 'block';
-
-                txpHost.startAnimation('talk');
-                setTimeout(() => {
-                    txpHost.startAnimation('stand');
-                }, 4000);
-
-                txpClickTimeout = setTimeout(() => {
-                    speechBubble.style.display = 'none';
-                    txpClickTimeout = null;
-                }, 5000);
-            }
-        }
-    });
-
-    txpElement.style.cursor = 'pointer';
-}
 
 // ===== INTRO SCREEN SETUP =====
 function setupIntroScreen() {
@@ -2617,27 +2895,138 @@ function setupIntroScreen() {
     introScreen.addEventListener('click', handleClick);
 }
 
-// ===== LEVEL CARD CLICK HANDLERS =====
+// ===== WORLD MAP & LEVEL PROGRESSION =====
 function setupLevelCards() {
-    const levelCards = document.querySelectorAll('.level-card');
-    levelCards.forEach(card => {
-        card.addEventListener('click', () => {
-            const levelNum = parseInt(card.getAttribute('data-level'));
-            startLevel(levelNum);
+    // Load progress from localStorage
+    const completedLevels = JSON.parse(localStorage.getItem('completedLevels') || '[]');
+    // If no levels completed, only level 1 is unlocked
+    // Otherwise, highest completed level + 1 is unlocked
+    const highestUnlockedLevel = completedLevels.length === 0 ? 1 : Math.max(...completedLevels) + 1;
+
+    updateWorldMapProgress(completedLevels);
+
+    // Show death counter on level selection screen
+    showDeathCounter();
+
+    const mapLevels = document.querySelectorAll('.map-level');
+    mapLevels.forEach(mapLevel => {
+        const levelNum = parseInt(mapLevel.getAttribute('data-level'));
+
+        // Check if level is unlocked
+        const isUnlocked = levelNum <= highestUnlockedLevel;
+        const isCompleted = completedLevels.includes(levelNum);
+
+        // Reset all classes first
+        mapLevel.classList.remove('locked', 'unlocked', 'completed', 'unlocking');
+
+        const lockEl = mapLevel.querySelector('.map-level-lock');
+        const statusEl = mapLevel.querySelector('.map-level-status');
+
+        if (isCompleted) {
+            mapLevel.classList.add('completed');
+            if (statusEl) statusEl.textContent = '✓ Abgeschlossen';
+            if (lockEl) lockEl.style.display = 'none';
+        } else if (isUnlocked) {
+            mapLevel.classList.add('unlocked');
+            if (lockEl) lockEl.style.display = 'none';
+            if (statusEl) {
+                statusEl.textContent = '▶ Spielen';
+                statusEl.classList.add('unlocked');
+            }
+        } else {
+            // Locked
+            mapLevel.classList.add('locked');
+            if (lockEl) lockEl.style.display = 'block';
+            if (statusEl) {
+                statusEl.textContent = 'Gesperrt';
+                statusEl.classList.remove('unlocked');
+            }
+        }
+
+        // Remove old click handlers by cloning the node
+        const newMapLevel = mapLevel.cloneNode(true);
+        mapLevel.parentNode.replaceChild(newMapLevel, mapLevel);
+
+        // Add click handler to the new node
+        newMapLevel.addEventListener('click', () => {
+            if (isUnlocked || isCompleted) {
+                startLevel(levelNum);
+            } else {
+                // Show locked message
+                showLockedMessage(levelNum);
+            }
         });
     });
+}
+
+
+
+function updateWorldMapProgress(completedLevels) {
+    const totalLevels = 5;
+    const completed = completedLevels.length;
+    const progressPercent = (completed / totalLevels) * 100;
+
+    const progressBar = document.getElementById('worldMapProgress');
+    const progressText = document.getElementById('progressText');
+
+    if (progressBar) progressBar.style.width = `${progressPercent}%`;
+    if (progressText) progressText.textContent = `${completed} / ${totalLevels} Level abgeschlossen`;
+}
+
+function showLockedMessage(levelNum) {
+    // Level is locked - no action needed
+    console.log(`Level ${levelNum} is locked`);
+}
+
+function unlockNextLevel(completedLevel) {
+    // Load current progress
+    let completedLevels = JSON.parse(localStorage.getItem('completedLevels') || '[]');
+
+    // Add completed level if not already there
+    if (!completedLevels.includes(completedLevel)) {
+        completedLevels.push(completedLevel);
+        completedLevels.sort((a, b) => a - b);
+        localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
+        console.log(`✅ Level ${completedLevel} completed! Unlocked Level ${completedLevel + 1}`);
+    }
+}
+
+function animateNextLevelUnlock(completedLevel) {
+    const nextLevel = completedLevel + 1;
+
+    // Don't animate if there's no next level
+    if (nextLevel > 5) return;
+
+    // Wait a bit before starting animation
+    setTimeout(() => {
+        const nextLevelElement = document.querySelector(`.map-level[data-level="${nextLevel}"]`);
+        if (nextLevelElement && nextLevelElement.classList.contains('locked')) {
+            // Remove locked state
+            nextLevelElement.classList.remove('locked');
+            nextLevelElement.classList.add('unlocked', 'unlocking');
+
+            // Remove lock icon
+            const lockEl = nextLevelElement.querySelector('.map-level-lock');
+            if (lockEl) lockEl.style.display = 'none';
+
+            // Update status
+            const statusEl = nextLevelElement.querySelector('.map-level-status');
+            if (statusEl) {
+                statusEl.textContent = '▶ Spielen';
+                statusEl.classList.add('unlocked');
+            }
+
+            // Remove unlocking class after animation
+            setTimeout(() => {
+                nextLevelElement.classList.remove('unlocking');
+            }, 1000);
+        }
+    }, 500); // Reduced delay since no path animation
 }
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Schummeln erlaubt - Platformer initialized!');
-
-    // Initialize TXP Host
-    txpHost = new TXPHost();
-    txpHost.enableTalking();
-
-    // Easter Egg: TXP Click
-    setupTXPClickHandler();
 
     // Intro Screen
     setupIntroScreen();
@@ -2708,4 +3097,69 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// ===== DEATH COUNTER SYSTEM =====
+function getDeathCount() {
+    return parseInt(localStorage.getItem('deathCount') || '0');
+}
+
+function setDeathCount(count) {
+    localStorage.setItem('deathCount', count.toString());
+    updateDeathCounterDisplay();
+}
+
+function incrementDeathCounter() {
+    const currentCount = getDeathCount();
+    setDeathCount(currentCount + 1);
+}
+
+function updateDeathCounterDisplay() {
+    const deathCountElement = document.getElementById('deathCount');
+    if (deathCountElement) {
+        deathCountElement.textContent = getDeathCount();
+    }
+}
+
+function showDeathCounter() {
+    const deathCounter = document.getElementById('deathCounter');
+    if (deathCounter) {
+        deathCounter.style.display = 'flex';
+        updateDeathCounterDisplay();
+    }
+}
+
+function hideDeathCounter() {
+    const deathCounter = document.getElementById('deathCounter');
+    if (deathCounter) {
+        deathCounter.style.display = 'none';
+    }
+}
+
+// ===== RESET PROGRESS SYSTEM =====
+function showResetConfirmation() {
+    const resetPopup = document.getElementById('resetPopup');
+    if (resetPopup) {
+        resetPopup.style.display = 'flex';
+    }
+}
+
+function hideResetConfirmation() {
+    const resetPopup = document.getElementById('resetPopup');
+    if (resetPopup) {
+        resetPopup.style.display = 'none';
+    }
+}
+
+function confirmReset() {
+    // Clear all progress
+    localStorage.removeItem('completedLevels');
+    localStorage.removeItem('deathCount');
+
+    // Hide popup
+    hideResetConfirmation();
+
+    // Refresh the level selection to show reset state
+    setupLevelCards();
+    updateDeathCounterDisplay();
+}
 
