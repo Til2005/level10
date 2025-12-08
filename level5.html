@@ -29,7 +29,7 @@
         <div class="hud-wrapper">
             <!-- Ziel-Prompt Anzeige (nur im Gameplay sichtbar) -->
             <div class="prompt-goal-display" id="promptGoalDisplay" style="display: none;">
-                <div class="prompt-goal-label">Prompt:</div>
+                <div class="prompt-goal-label" id="promptGoalLabel">Prompt:</div>
                 <div class="prompt-goal-text" id="promptGoalText">
                     <!-- Wird dynamisch gefüllt -->
                 </div>
@@ -59,6 +59,7 @@
                     <!-- Light Beams -->
                     <div class="light-beam light-beam-1"></div>
                     <div class="light-beam light-beam-2"></div>
+
 
                     <!-- Main Title -->
                     <h1 class="game-title">
@@ -227,6 +228,14 @@
                         <div class="death-hint">Drücke <span class="key-highlight">R</span> zum Respawnen</div>
                     </div>
                 </div>
+
+                <!-- Note Popup (Level 4) -->
+                <div class="note-popup-overlay" id="notePopup" style="display: none;">
+                    <div class="note-popup-content">
+                        <img src="schriftrolle.png" alt="Prompt Zettel" class="note-scroll-image">
+                        <div class="note-popup-hint">Drücke <span class="key-highlight">E</span> um fortzufahren</div>
+                    </div>
+                </div>
             </div>
 
             <!-- Level Complete Screen -->
@@ -237,6 +246,14 @@
                     <div class="prompt-result">
                         <h3>Dein gebauter Prompt:</h3>
                         <div class="prompt-display" id="promptDisplay">
+                            <!-- Wird dynamisch gefüllt -->
+                        </div>
+                    </div>
+
+                    <!-- AI Result Visualization (Level 1-3) -->
+                    <div class="ai-result-container" id="aiResultContainer" style="display: none;">
+                        <h3>Das Ergebnis deiner Anfrage:</h3>
+                        <div class="ai-result-content" id="aiResultContent">
                             <!-- Wird dynamisch gefüllt -->
                         </div>
                     </div>

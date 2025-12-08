@@ -92,12 +92,19 @@ const LEVEL_DATA = {
     2: {
         name: "Zeitfilter",
         difficulty: "Leicht",
-        prompt: "Zeig mir Produktionsdaten im August 2025 für Werk 040",
+        prompt: "Zeig mir Produktionsdaten im August 2025 als Balkendiagramm für Werk 040",
         requiredPieces: [
             { id: "zeig-mir", text: "Zeig mir", type: "good" },
             { id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
             { id: "august-2025", text: "im August 2025", type: "good" },
+            { id: "balkendiagramm", text: "als Balkendiagramm", type: "good" },
             { id: "werk-040", text: "für Werk 040", type: "good" }
+        ],
+        // Pieces that are already filled from previous level (shown as text, not placeholders)
+        prefilledPieces: [
+            { id: "zeig-mir", text: "Zeig mir" },
+            { id: "produktionsdaten", text: "Produktionsdaten" },
+            { id: "werk-040", text: "für Werk 040" }
         ],
         platforms: [
             // Mittelgroße Plattformen mit MODERATEN Gaps
@@ -122,12 +129,10 @@ const LEVEL_DATA = {
             { x: 3290, y: 450, width: 180, height: 30 }
         ],
         promptPieces: [
-            // Good pieces höher platziert (80px höher)
-            { x: 600, y: 300, id: "zeig-mir", text: "Zeig mir", type: "good" },
-            { x: 1130, y: 230, id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
-            { x: 1920, y: 230, id: "august-2025", text: "im August 2025", type: "good" },
-            { x: 3320, y: 300, id: "werk-040", text: "für Werk 040", type: "good" },
-            // MEHR Bad pieces (6 statt 4) - mehr Ablenkung (80px höher)
+            // Only NEW pieces to collect in Level 2
+            { x: 1130, y: 230, id: "august-2025", text: "im August 2025", type: "good" },
+            { x: 2800, y: 230, id: "balkendiagramm", text: "als Balkendiagramm", type: "good" },
+            // Bad pieces
             { x: 1160, y: 520, id: "irgendwann", text: "irgendwann", type: "bad" },
             { x: 1540, y: 520, id: "letzte-woche", text: "letzte Woche", type: "bad" },
             { x: 1980, y: 520, id: "bald", text: "bald", type: "bad" },
@@ -141,13 +146,23 @@ const LEVEL_DATA = {
     3: {
         name: "Visualisierung",
         difficulty: "Mittel",
-        prompt: "Zeig mir Produktionsdaten im August 2025 als Balkendiagramm für Werk 040",
+        prompt: "Zeig mir Produktionsdaten im August 2025 als Balkendiagramm für Werk 040 filtere nach Farbe sortiert nach Menge",
         requiredPieces: [
             { id: "zeig-mir", text: "Zeig mir", type: "good" },
             { id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
             { id: "august-2025", text: "im August 2025", type: "good" },
             { id: "balkendiagramm", text: "als Balkendiagramm", type: "good" },
-            { id: "werk-040", text: "für Werk 040", type: "good" }
+            { id: "werk-040", text: "für Werk 040", type: "good" },
+            { id: "filtere-farbe", text: "filtere nach Farbe", type: "good" },
+            { id: "sortiert-menge", text: "sortiert nach Menge", type: "good" }
+        ],
+        // Pieces from Level 2 are prefilled
+        prefilledPieces: [
+            { id: "zeig-mir", text: "Zeig mir" },
+            { id: "produktionsdaten", text: "Produktionsdaten" },
+            { id: "august-2025", text: "im August 2025" },
+            { id: "balkendiagramm", text: "als Balkendiagramm" },
+            { id: "werk-040", text: "für Werk 040" }
         ],
         platforms: [
             // KLEINERE Plattformen (150-200px), GRÖSSERE Gaps (120-150px) - Medium Difficulty
@@ -177,20 +192,15 @@ const LEVEL_DATA = {
             { x: 3200, y: 380, width: 130, height: 30 }
         ],
         promptPieces: [
-            // Good pieces höher und schwieriger platziert (80px höher)
-            { x: 650, y: 250, id: "zeig-mir", text: "Zeig mir", type: "good" },
-            { x: 1210, y: 150, id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
-            { x: 1570, y: 100, id: "august-2025", text: "im August 2025", type: "good" },
-            { x: 2280, y: 70, id: "balkendiagramm", text: "als Balkendiagramm", type: "good" },
-            { x: 3410, y: 180, id: "werk-040", text: "für Werk 040", type: "good" },
-            // Bad pieces verteilt auf verschiedenen Höhen
-            { x: 720, y: 520, id: "als-text", text: "als Text", type: "bad" },
-            { x: 965, y: 480, id: "ohne-visual", text: "ohne Visualisierung", type: "bad" },
-            { x: 1550, y: 450, id: "zeig-alles", text: "zeig alles", type: "bad" },
-            { x: 1900, y: 520, id: "als-liste", text: "als Liste", type: "bad" },
-            { x: 2650, y: 550, id: "keine-grafik", text: "keine Grafik", type: "bad" },
-            { x: 2950, y: 490, id: "zeig-irgendwas", text: "zeig irgendwas", type: "bad" },
-            { x: 3420, y: 480, id: "als-excel", text: "als Excel", type: "bad" }
+            // Only NEW pieces to collect in Level 3
+            { x: 1210, y: 150, id: "filtere-farbe", text: "filtere nach Farbe", type: "good" },
+            { x: 2800, y: 150, id: "sortiert-menge", text: "sortiert nach Menge", type: "good" },
+            // Bad pieces
+            { x: 720, y: 520, id: "filter-größe", text: "filtere nach Größe", type: "bad" },
+            { x: 1900, y: 520, id: "gruppiere", text: "gruppiere nach", type: "bad" },
+            { x: 2650, y: 550, id: "ohne-filter", text: "ohne Filter", type: "bad" },
+            { x: 2950, y: 490, id: "zeig-alles", text: "zeig alles", type: "bad" },
+            { x: 3420, y: 480, id: "unsortiert", text: "unsortiert", type: "bad" }
         ],
         goalX: 4700
     },
@@ -208,7 +218,7 @@ const LEVEL_DATA = {
         ],
         platforms: [
             // KLEINE Plattformen (120-150px), GROSSE Gaps (150-200px) - Hard Difficulty
-            { x: 0, y: 650, width: 200, height: 40 },
+            { x: 0, y: 650, width: 350, height: 40 },
             // Schwieriger Zickzack-Parcours mit precision jumps
             { x: 650, y: 550, width: 130, height: 35 },
             { x: 950, y: 500, width: 130, height: 35 },
@@ -237,25 +247,18 @@ const LEVEL_DATA = {
             { x: 2550, y: 430, width: 110, height: 25 }
         ],
         promptPieces: [
-            // Good pieces auf sehr schwierigen Positionen (80px höher)
-            { x: 640, y: 250, id: "zeig-mir", text: "Zeig mir", type: "good" },
-            { x: 1200, y: 180, id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
-            { x: 1800, y: 100, id: "august-2025", text: "im August 2025", type: "good" },
-            { x: 2100, y: 150, id: "filter-farbe", text: "filtere nach Farbe", type: "good" },
-            { x: 3860, y: 240, id: "sortiert-menge", text: "sortiert nach Menge", type: "good" },
-            // Bad pieces auf variierten Höhen verteilt
+            // Only bad pieces - good pieces removed (Level 4: Share your prompt with colleagues)
             { x: 350, y: 230, id: "keine-filter", text: "ohne Filter", type: "bad" },
-            { x: 635, y: 400, id: "unsortiert", text: "unsortiert", type: "bad" },
             { x: 945, y: 360, id: "random", text: "zufällig", type: "bad" },
-            { x: 1210, y: 310, id: "alles-zeigen", text: "alles anzeigen", type: "bad" },
-            { x: 1510, y: 260, id: "keine-sortierung", text: "keine Sortierung", type: "bad" },
             { x: 1830, y: 310, id: "zeig-alles", text: "zeig alles", type: "bad" },
             { x: 2110, y: 360, id: "egal-wie", text: "egal wie", type: "bad" },
             { x: 2400, y: 410, id: "mach-was", text: "mach was", type: "bad" },
             { x: 2730, y: 480, id: "irgendwie", text: "irgendwie", type: "bad" },
             { x: 4320, y: 430, id: "ohne-details", text: "ohne Details", type: "bad" }
         ],
-        goalX: 4700
+        // Special collectible: Note to share with colleagues
+        notePosition: { x: 2000, y: 200 },
+        goalX: 4850
     },
 
     5: {
@@ -282,10 +285,9 @@ const LEVEL_DATA = {
 
             // Section 3: Abstieg
             { x: 1780, y: 450, width: 110, height: 30 },
-            { x: 2280, y: 490, width: 130, height: 30 },
 
             // Section 4: Plattform vor dem Fall (mit Pfeil-Markierung)
-            { x: 2720, y: 550, width: 150, height: 30 },
+            { x: 2300, y: 550, width: 550, height: 30 },
             // HIER IST DER FALL - Kein Boden mehr, nur Teleport-Zone!
             // Keine Plattformen mehr bis zur Lava-Sektion!
 
@@ -314,14 +316,7 @@ const LEVEL_DATA = {
             { x: 26100, y: 600, width: 2500, height: 40 }
         ],
         promptPieces: [
-            // Good pieces verteilt über das ganze Level - hoch positioniert und schwer zu erreichen
-            { x: 1630, y: 250, id: "zeig-mir", text: "Zeig mir", type: "good" },
-            { x: 2500, y: 280, id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
-            { x: 11000, y: 500, id: "august-2025", text: "im August 2025", type: "good" },
-            { x: 13450, y: 400, id: "werk-040", text: "für Werk 040", type: "good" },
-            { x: 15650, y: 270, id: "balkendiagramm", text: "als Balkendiagramm", type: "good" },
-            { x: 28100, y: 300, id: "filter-farbe", text: "filtere nach Farbe", type: "good" },
-
+            // No good pieces in Level 5 - only bad pieces remain
             // BAD pieces - Challenge auf der langen Final-Plattform (x: 26100 bis 28600)
             // Untere Reihe - erreichbar mit Sprung (y: 460-520)
             { x: 26200, y: 520, id: "bad-1", text: "ohne Details", type: "bad" },
@@ -876,6 +871,102 @@ class PromptPiece {
         this.element.addEventListener('transitionend', removeElement, { once: true });
 
         // Fallback timeout in case transitionend doesn't fire
+        setTimeout(removeElement, 350);
+    }
+
+    destroy() {
+        if (this.element && this.element.parentNode) {
+            this.element.parentNode.removeChild(this.element);
+        }
+        if (this.debugHitbox) {
+            this.debugHitbox.remove();
+        }
+    }
+}
+
+// ===== NOTE CLASS (Level 4 - Share with Colleagues) =====
+class Note {
+    constructor(gameArea, x, y) {
+        this.gameArea = gameArea;
+        this.x = x;
+        this.y = y;
+        this.collected = false;
+        this.width = 60;
+        this.height = 60;
+
+        this.createElement();
+        this.debugHitbox = null;
+        this.createDebugHitbox();
+    }
+
+    createElement() {
+        this.element = document.createElement('div');
+        this.element.className = 'note-collectible';
+        this.element.style.left = `${this.x}px`;
+        this.element.style.top = `${this.y}px`;
+
+        // Note icon (📝)
+        this.element.textContent = '📝';
+
+        document.getElementById('promptPiecesContainer').appendChild(this.element);
+    }
+
+    createDebugHitbox() {
+        this.debugHitbox = document.createElement('div');
+        this.debugHitbox.className = 'debug-hitbox note';
+        this.debugHitbox.style.display = GAME_CONFIG.debugHitboxes ? 'block' : 'none';
+        this.debugHitbox.style.position = 'absolute';
+        this.debugHitbox.style.left = `${this.x}px`;
+        this.debugHitbox.style.top = `${this.y}px`;
+        this.debugHitbox.style.width = `${this.width}px`;
+        this.debugHitbox.style.height = `${this.height}px`;
+        this.debugHitbox.style.border = '2px solid orange';
+        this.debugHitbox.style.backgroundColor = 'rgba(255, 165, 0, 0.2)';
+        this.debugHitbox.style.pointerEvents = 'none';
+
+        const label = document.createElement('div');
+        label.className = 'debug-hitbox-label';
+        label.textContent = 'Note';
+        label.style.fontSize = '10px';
+        label.style.color = 'orange';
+        label.style.fontWeight = 'bold';
+        this.debugHitbox.appendChild(label);
+
+        document.getElementById('promptPiecesContainer').appendChild(this.debugHitbox);
+    }
+
+    updateDebugHitbox() {
+        if (this.debugHitbox) {
+            this.debugHitbox.style.display = GAME_CONFIG.debugHitboxes ? 'block' : 'none';
+        }
+    }
+
+    getHitbox() {
+        return {
+            left: this.x,
+            right: this.x + this.width,
+            top: this.y,
+            bottom: this.y + this.height,
+            centerX: this.x + this.width / 2,
+            centerY: this.y + this.height / 2
+        };
+    }
+
+    collect() {
+        this.collected = true;
+        this.element.classList.add('collected');
+
+        if (this.debugHitbox) {
+            this.debugHitbox.style.display = 'none';
+        }
+
+        const removeElement = () => {
+            if (this.element && this.element.parentNode) {
+                this.element.parentNode.removeChild(this.element);
+            }
+        };
+
+        this.element.addEventListener('transitionend', removeElement, { once: true });
         setTimeout(removeElement, 350);
     }
 
@@ -1516,10 +1607,11 @@ class Camera {
 
 // ===== TXP NPC CLASS =====
 class TxpNpc {
-    constructor(gameArea, x, y) {
+    constructor(gameArea, x, y, level = 1) {
         this.gameArea = gameArea;
         this.x = x;
         this.y = y;
+        this.level = level;
         this.width = 120;
         this.height = 120;
         this.proximityRange = 150;
@@ -1537,20 +1629,54 @@ class TxpNpc {
         this.currentFrame = 0;
         this.animationInterval = null;
         this.jumpInterval = null;
+        this.jumpTimeoutHandle = null; // Track the setTimeout from performJump
 
         // Facing direction (like enemies)
         this.facingRight = true;
 
-        this.tutorialMessages = [
-            "Halloo! Ich bin TXP und helfe dir bei deinem ersten Prompt.",
-            "Siehst du die verschiedenen Promptbausteine? Du musst die grünen Promptbausteine einsammeln. Sammel bloß keinen roten ein!",
-            "Schlechte Prompts wie 'Gib Daten' sind zu vage. Gute Prompts wie 'Zeig mir Produktionsdaten' sind präzise!",
-            "Ach du machst das schon! Sammel alle guten Promptbausteine ein und erreiche das Ziel rechts, um das Level abzuschließen."
-        ];
+        // Different messages based on level
+        if (level === 1) {
+            this.tutorialMessages = [
+                "Halloo! Ich bin TXP und helfe dir bei deinem ersten Prompt.",
+                "Siehst du die verschiedenen Promptbausteine? Du musst die grünen Promptbausteine einsammeln. Sammel bloß keinen roten ein!",
+                "Schlechte Prompts wie 'Gib Daten' sind zu vage. Gute Prompts wie 'Zeig mir Produktionsdaten' sind präzise!",
+                "Ach du machst das schon! Sammel alle guten Promptbausteine ein und erreiche das Ziel rechts, um das Level abzuschließen."
+            ];
+        } else if (level === 2) {
+            // Level 2: Time filter and visualization
+            this.tutorialMessages = [
+                "Hey! Schön dich wiederzusehen!",
+                "Jetzt erweitern wir deinen Prompt mit einer genauen Zeitangabe und einer Visualisierungsmöglichkeit.",
+                "So kannst du ein besseres Ergebnis erzielen!"
+            ];
+        } else if (level === 3) {
+            // Level 3: Filter and sorting
+            this.tutorialMessages = [
+                "Gut gemacht! Du machst große Fortschritte!",
+                "In diesem Level fügen wir Filter- und Sortierungsfunktionen hinzu.",
+                "Damit kannst du die Daten noch präziser anpassen!"
+            ];
+        } else if (level === 4) {
+            // Level 4: Share with colleagues
+            this.tutorialMessages = [];
+            this.isGoal = true; // TXP acts as level goal in Level 4
+            this.level4CompletionConfirmed = false; // Track if user confirmed completion
+        } else if (level === 5) {
+            // Level 5: Standardization
+            this.tutorialMessages = [
+                "Super! Dein Prompt wurde erfolgreich mit deinen Kollegen geteilt.",
+                "Jetzt möchten wir den Prompt standardisieren, damit alle Mitarbeiter ihn nutzen können.",
+                "Spring runter zum Pfeil, um fortzufahren!"
+            ];
+        }
 
         this.show();
         this.startAnimation('stand');
-        this.startJumpRoutine();
+
+        // Only start jump routine if NOT acting as goal (Level 4)
+        if (!this.isGoal) {
+            this.startJumpRoutine();
+        }
     }
 
     show() {
@@ -1573,12 +1699,31 @@ class TxpNpc {
         if (this.currentAnimation === animName && this.animationInterval) return;
 
         this.stopAnimation();
+
+        // Cancel any pending jump-to-stand timeout
+        if (this.jumpTimeoutHandle) {
+            clearTimeout(this.jumpTimeoutHandle);
+            this.jumpTimeoutHandle = null;
+        }
+
         this.currentAnimation = animName;
         this.currentFrame = 0;
         const anim = TXP_ANIMATIONS[animName];
 
         this.animationInterval = setInterval(() => {
-            this.currentFrame = (this.currentFrame + 1) % anim.frames;
+            this.currentFrame++;
+
+            // Jump animation should NOT loop - stop at last frame
+            if (animName === 'jump' && this.currentFrame >= anim.frames) {
+                this.currentFrame = anim.frames - 1; // Hold on last frame
+                return; // Don't update anymore, wait for timeout to switch to stand
+            }
+
+            // Other animations loop normally
+            if (this.currentFrame >= anim.frames) {
+                this.currentFrame = 0;
+            }
+
             this.updateFrame();
         }, anim.speed);
     }
@@ -1620,12 +1765,24 @@ class TxpNpc {
     }
 
     performJump() {
+        // Only jump if not talking to player (tutorial) and speech is not visible
+        if (this.currentAnimation === 'talk' || this.isPlayerNear ||
+            (this.speechElement && this.speechElement.style.display !== 'none')) {
+            return; // Skip jump if in tutorial mode or speech is visible
+        }
+
         // Play jump animation once, then return to stand
         this.startAnimation('jump');
 
         // Jump animation takes 120 frames * 40ms = 4800ms
-        setTimeout(() => {
-            this.startAnimation('stand');
+        // Store the timeout handle so it can be cancelled if animation changes
+        this.jumpTimeoutHandle = setTimeout(() => {
+            this.jumpTimeoutHandle = null;
+            // Only return to stand if we're not in talk mode now and speech is not visible
+            if (this.currentAnimation !== 'talk' &&
+                (!this.speechElement || this.speechElement.style.display === 'none')) {
+                this.startAnimation('stand');
+            }
         }, 4800);
     }
 
@@ -1699,11 +1856,20 @@ class TxpNpc {
     showSpeech(message) {
         if (this.speechElement && this.speechText) {
             this.speechText.textContent = message;
-            this.speechElement.style.display = 'block';
 
-            // Position speech bubble above TXP (y is top position, so subtract for above)
-            this.speechElement.style.left = `${this.x - 140}px`;
+            // Position speech bubble above TXP BEFORE making it visible
+            // Level 4: Further left (x - 280) to stay on screen
+            // All other levels: Standard position (x - 140)
+            let offsetX = 140;
+            if (this.level === 4) {
+                offsetX = 280;
+            }
+
+            this.speechElement.style.left = `${this.x - offsetX}px`;
             this.speechElement.style.top = `${this.y - 150}px`;
+
+            // Make visible AFTER positioning
+            this.speechElement.style.display = 'block';
         }
     }
 
@@ -1718,8 +1884,47 @@ class TxpNpc {
             this.element.style.transform = `translateX(${-camera.x}px)`;
         }
         if (this.speechElement) {
+            // Set CSS variable for animation and apply transform
+            this.speechElement.style.setProperty('--camera-x', `${-camera.x}px`);
             this.speechElement.style.transform = `translateX(${-camera.x}px)`;
         }
+    }
+
+    getHitbox() {
+        return {
+            left: this.x,
+            right: this.x + this.width,
+            top: this.y,
+            bottom: this.y + this.height,
+            centerX: this.x + this.width / 2,
+            centerY: this.y + this.height / 2
+        };
+    }
+
+    checkLevel4Completion(noteCollected) {
+        // Level 4: Check if note was collected
+        if (noteCollected) {
+            if (!this.level4CompletionConfirmed) {
+                // First interaction: Show success message
+                this.showSpeech("Super! Du hast den Zettel mit deinem Prompt gefunden. Teile ihn mit deinen Kollegen!");
+                this.startAnimation('talk');
+                return false; // Don't complete yet, wait for confirmation
+            } else {
+                // User pressed E to confirm
+                return true; // Allow level completion
+            }
+        } else {
+            this.showSpeech("Du musst erst den Zettel 📝 einsammeln, um deinen Prompt mit deinen Kollegen zu teilen!");
+            this.startAnimation('talk');
+            return false; // Block level completion
+        }
+    }
+
+    confirmLevel4Completion() {
+        // Called when user presses E in Level 4
+        this.level4CompletionConfirmed = true;
+        this.hideSpeech();
+        this.startAnimation('stand');
     }
 }
 
@@ -1732,11 +1937,13 @@ class PlatformerGame {
         this.isRunning = false;
         this.currentLevel = 1;
         this.lives = GAME_CONFIG.lives;
+        this.notePopupVisible = false; // Track if note popup is showing (blocks movement)
 
         // Game objects
         this.player = null;
         this.platforms = [];
         this.promptPieces = [];
+        this.note = null; // Level 4 collectible
         this.spikes = [];
         this.enemies = [];
         this.jumpingEnemies = [];
@@ -2005,13 +2212,28 @@ class PlatformerGame {
                 return;
             }
 
-            // Interact with TXP NPC with 'E'
-            if ((e.key === 'e' || e.key === 'E') && this.txpNpc) {
-                this.txpNpc.advanceTutorial();
+            // Close note popup with 'E'
+            if ((e.key === 'e' || e.key === 'E') && this.notePopupVisible) {
+                this.hideNotePopup();
                 return;
             }
 
-            if (!this.isRunning || this.isDead) return;
+            // Interact with TXP NPC with 'E'
+            if ((e.key === 'e' || e.key === 'E') && this.txpNpc) {
+                // Level 4: Confirm completion after showing success message
+                if (this.currentLevel === 4 && this.txpNpc.isGoal && !this.txpNpc.level4CompletionConfirmed) {
+                    const noteCollected = this.note && this.note.collected;
+                    if (noteCollected) {
+                        this.txpNpc.confirmLevel4Completion();
+                    }
+                } else {
+                    // Level 1: Advance tutorial
+                    this.txpNpc.advanceTutorial();
+                }
+                return;
+            }
+
+            if (!this.isRunning || this.isDead || this.notePopupVisible) return;
 
             // Movement
             if (e.key === 'ArrowLeft') {
@@ -2030,7 +2252,7 @@ class PlatformerGame {
         document.addEventListener('keyup', (e) => {
             this.keys[e.key] = false;
 
-            if (!this.isRunning || this.isDead) return;
+            if (!this.isRunning || this.isDead || this.notePopupVisible) return;
 
             // Stop movement
             if (e.key === 'ArrowLeft') {
@@ -2117,6 +2339,11 @@ class PlatformerGame {
         // Store required pieces
         this.requiredPieces = levelData.requiredPieces.map(p => p.id);
 
+        // Add prefilled pieces to collected pieces (auto-filled from previous level)
+        if (levelData.prefilledPieces) {
+            this.collectedPieces = levelData.prefilledPieces.map(p => p.id);
+        }
+
         // Create platforms
         levelData.platforms.forEach(platformData => {
             const platform = new Platform(
@@ -2141,6 +2368,15 @@ class PlatformerGame {
             );
             this.promptPieces.push(piece);
         });
+
+        // Create note (if level has one - Level 4)
+        if (levelData.notePosition) {
+            this.note = new Note(
+                this.gameArea,
+                levelData.notePosition.x,
+                levelData.notePosition.y
+            );
+        }
 
         // Create spikes (if level has them)
         if (levelData.spikes) {
@@ -2190,8 +2426,14 @@ class PlatformerGame {
             });
         }
 
-        // Create goal at end of level
-        this.goal = new Goal(this.gameArea, levelData.goalX, 450);
+        // Create goal at end of level (or TXP for Level 4)
+        if (levelNumber === 4) {
+            // Level 4: TXP instead of goal (share prompt with colleagues)
+            this.txpNpc = new TxpNpc(this.gameArea, levelData.goalX, 535, 4);
+            // No regular goal in Level 4
+        } else {
+            this.goal = new Goal(this.gameArea, levelData.goalX, 450);
+        }
 
         // Create fall arrow and teleport zones for Level 5 only
         if (levelNumber === 5) {
@@ -2210,9 +2452,18 @@ class PlatformerGame {
         // Create camera
         this.camera = new Camera(this.gameArea);
 
-        // Create TXP NPC for Level 1 only (tutorial level)
+        // Create TXP NPC for tutorial levels
         if (levelNumber === 1) {
-            this.txpNpc = new TxpNpc(this.gameArea, 300, 535);
+            this.txpNpc = new TxpNpc(this.gameArea, 300, 535, 1);
+        } else if (levelNumber === 2) {
+            // Level 2: TXP auf der zweiten Plattform (x: 450, width: 280)
+            this.txpNpc = new TxpNpc(this.gameArea, 590, 535, 2);
+        } else if (levelNumber === 3) {
+            // Level 3: TXP erscheint nach ein bisschen Laufstrecke (x: 1380, width: 150)
+            this.txpNpc = new TxpNpc(this.gameArea, 1455, 235, 3);
+        } else if (levelNumber === 5) {
+            // Level 5: TXP erscheint mittig auf der Plattform bei x: 2300
+            this.txpNpc = new TxpNpc(this.gameArea, 2500, 435, 5);
         }
     }
 
@@ -2228,6 +2479,11 @@ class PlatformerGame {
 
         this.promptPieces.forEach(piece => piece.destroy());
         this.promptPieces = [];
+
+        if (this.note) {
+            this.note.destroy();
+            this.note = null;
+        }
 
         this.spikes.forEach(spike => spike.destroy());
         this.spikes = [];
@@ -2404,6 +2660,11 @@ class PlatformerGame {
                 }
             }
 
+            // Check note collision (Level 4 only)
+            if (this.note && !this.note.collected) {
+                this.checkNoteCollision();
+            }
+
             // Check teleport zone collision (Level 5 only)
             if (this.teleportZone) {
                 this.checkTeleportCollision(this.teleportZone, 'teleport1');
@@ -2415,6 +2676,11 @@ class PlatformerGame {
             // Check level complete (reached goal with proper hitbox collision)
             if (this.goal) {
                 this.checkGoalCollision();
+            }
+
+            // Check TXP collision for Level 4 (TXP acts as goal)
+            if (this.currentLevel === 4 && this.txpNpc && this.txpNpc.isGoal) {
+                this.checkTxpLevel4Collision();
             }
         }
 
@@ -2435,6 +2701,56 @@ class PlatformerGame {
 
         if (collision) {
             this.handlePromptCollected(piece);
+        }
+    }
+
+    checkNoteCollision() {
+        const playerBox = this.player.getHitbox();
+        const noteBox = this.note.getHitbox();
+
+        // AABB collision
+        const collision = !(
+            playerBox.right < noteBox.left ||
+            playerBox.left > noteBox.right ||
+            playerBox.bottom < noteBox.top ||
+            playerBox.top > noteBox.bottom
+        );
+
+        if (collision) {
+            this.note.collect();
+            console.log('📝 Note collected! You can now share your prompt with colleagues!');
+
+            // Show note popup with scroll image
+            this.showNotePopup();
+        }
+    }
+
+    showNotePopup() {
+        const notePopup = document.getElementById('notePopup');
+        if (notePopup) {
+            notePopup.style.display = 'flex';
+            this.notePopupVisible = true;
+
+            // Stop Mo Man immediately
+            this.player.isMovingLeft = false;
+            this.player.isMovingRight = false;
+            this.player.velocityX = 0;
+        }
+    }
+
+    hideNotePopup() {
+        const notePopup = document.getElementById('notePopup');
+        if (notePopup) {
+            notePopup.style.display = 'none';
+            this.notePopupVisible = false;
+
+            // Update HUD text after closing scroll in Level 4
+            if (this.currentLevel === 4) {
+                const promptGoalText = document.getElementById('promptGoalText');
+                if (promptGoalText) {
+                    promptGoalText.textContent = 'Erreiche das Ende um dein Prompt zu teilen';
+                }
+            }
         }
     }
 
@@ -2487,6 +2803,29 @@ class PlatformerGame {
 
         if (collision) {
             this.levelComplete();
+        }
+    }
+
+    checkTxpLevel4Collision() {
+        const playerBox = this.player.getHitbox();
+        const txpBox = this.txpNpc.getHitbox();
+
+        // AABB collision
+        const collision = !(
+            playerBox.right < txpBox.left ||
+            playerBox.left > txpBox.right ||
+            playerBox.bottom < txpBox.top ||
+            playerBox.top > txpBox.bottom
+        );
+
+        if (collision) {
+            // Check if note was collected
+            const noteCollected = this.note && this.note.collected;
+            const canComplete = this.txpNpc.checkLevel4Completion(noteCollected);
+
+            if (canComplete) {
+                this.levelComplete();
+            }
         }
     }
 
@@ -2657,6 +2996,9 @@ class PlatformerGame {
             promptDisplay.appendChild(pieceEl);
         });
 
+        // Show AI result visualization for Level 1-3
+        this.showAIResult();
+
         // Show hints for next level
         this.showNextLevelHints();
 
@@ -2671,6 +3013,194 @@ class PlatformerGame {
         }
 
         this.showScreen('levelCompleteScreen');
+    }
+
+    showAIResult() {
+        const aiResultContainer = document.getElementById('aiResultContainer');
+        const aiResultContent = document.getElementById('aiResultContent');
+
+        // Only show for Level 1-3
+        if (this.currentLevel > 3) {
+            aiResultContainer.style.display = 'none';
+            return;
+        }
+
+        aiResultContainer.style.display = 'block';
+        aiResultContent.innerHTML = '';
+
+        // Sample data for Werk 040 (Mercedes factory - production components)
+        const productionData = {
+            // Level 1: All months (no filter)
+            allMonths: [
+                { month: 'Juni 2025', edrive: 3800, eecomp: 3200, amgmotor: 720, konv: 2100, subassy: 5500 },
+                { month: 'Juli 2025', edrive: 4000, eecomp: 3350, amgmotor: 760, konv: 2250, subassy: 5800 },
+                { month: 'August 2025', edrive: 4200, eecomp: 3500, amgmotor: 800, konv: 2400, subassy: 6000 },
+                { month: 'September 2025', edrive: 3950, eecomp: 3300, amgmotor: 740, konv: 2200, subassy: 5650 }
+            ],
+            // Level 2 & 3: August only
+            august: [
+                { category: 'E-Drive Units (komplett)', value: 4200 },
+                { category: 'EE-Compartments', value: 3500 },
+                { category: 'Hochleistungs-Elektromotoren (AMG)', value: 800 },
+                { category: 'Konventionelle Antriebskomponenten', value: 2400 },
+                { category: 'Subassemblies / Vormontagen', value: 6000 }
+            ]
+        };
+
+        if (this.currentLevel === 1) {
+            // Level 1: Unformatted raw data table (hard to read)
+            const rawTable = document.createElement('div');
+            rawTable.className = 'raw-data-table';
+
+            let tableText = 'PRODUKTIONSDATEN WERK 040\n';
+            tableText += '================================\n';
+            productionData.allMonths.forEach(month => {
+                tableText += `${month.month}: `;
+                tableText += `EDU=${month.edrive} EEC=${month.eecomp} AMG-EM=${month.amgmotor} KONV=${month.konv} SUB=${month.subassy}\n`;
+            });
+            tableText += '\n[Hinweis: Daten schwer lesbar - kein Filter, keine Visualisierung]';
+
+            rawTable.textContent = tableText;
+            aiResultContent.appendChild(rawTable);
+
+        } else if (this.currentLevel === 2) {
+            // Level 2: Simple bar chart (August 2025)
+            const simpleChart = document.createElement('div');
+            simpleChart.className = 'simple-chart';
+
+            // Title
+            const title = document.createElement('div');
+            title.style.textAlign = 'center';
+            title.style.color = 'var(--accent-color)';
+            title.style.marginBottom = '20px';
+            title.style.fontSize = '16px';
+            title.textContent = 'Produktionsdaten - August 2025';
+            simpleChart.appendChild(title);
+
+            // Find max value for scaling
+            const maxValue = Math.max(...productionData.august.map(d => d.value));
+
+            // Create chart rows
+            productionData.august.forEach(data => {
+                const row = document.createElement('div');
+                row.className = 'chart-row';
+
+                const label = document.createElement('div');
+                label.className = 'chart-label';
+                label.textContent = data.category;
+                label.style.minWidth = '200px';
+                label.style.fontSize = '12px';
+                row.appendChild(label);
+
+                const barContainer = document.createElement('div');
+                barContainer.className = 'chart-bar-container';
+
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.width = '0%';
+                barContainer.appendChild(bar);
+
+                row.appendChild(barContainer);
+
+                const value = document.createElement('div');
+                value.className = 'chart-value';
+                value.textContent = data.value;
+                row.appendChild(value);
+
+                simpleChart.appendChild(row);
+
+                // Animate bar width
+                setTimeout(() => {
+                    bar.style.width = `${(data.value / maxValue) * 100}%`;
+                }, 100);
+            });
+
+            aiResultContent.appendChild(simpleChart);
+
+        } else if (this.currentLevel === 3) {
+            // Level 3: Advanced chart (filtered by color, sorted by quantity)
+            const advancedChart = document.createElement('div');
+            advancedChart.className = 'advanced-chart';
+
+            // Title
+            const title = document.createElement('div');
+            title.style.textAlign = 'center';
+            title.style.color = 'var(--saffron)';
+            title.style.marginBottom = '20px';
+            title.style.fontSize = '18px';
+            title.style.fontWeight = 'bold';
+            title.textContent = 'Produktionsdaten - August 2025 (nach Komponente gefiltert, sortiert nach Menge)';
+            advancedChart.appendChild(title);
+
+            // Header
+            const header = document.createElement('div');
+            header.className = 'advanced-chart-header';
+            header.innerHTML = `
+                <span style="text-align: left;">Komponente</span>
+                <span>Produktionsmenge</span>
+                <span>Stück</span>
+            `;
+            advancedChart.appendChild(header);
+
+            // Sort data by value (descending)
+            const sortedData = [...productionData.august].sort((a, b) => b.value - a.value);
+
+            // Find max value for scaling
+            const maxValue = Math.max(...sortedData.map(d => d.value));
+
+            // Category color mapping
+            const categoryMap = {
+                'E-Drive Units (komplett)': { class: 'blue', bar: 'bar-blue' },
+                'EE-Compartments': { class: 'green', bar: 'bar-green' },
+                'Hochleistungs-Elektromotoren (AMG)': { class: 'purple', bar: 'bar-purple' },
+                'Konventionelle Antriebskomponenten': { class: 'yellow', bar: 'bar-yellow' },
+                'Subassemblies / Vormontagen': { class: 'red', bar: 'bar-red' }
+            };
+
+            // Create chart rows
+            sortedData.forEach((data, index) => {
+                const categoryInfo = categoryMap[data.category];
+
+                const row = document.createElement('div');
+                row.className = 'advanced-chart-row';
+
+                // Category indicator
+                const categoryIndicator = document.createElement('div');
+                categoryIndicator.className = 'color-indicator';
+                categoryIndicator.style.minWidth = '260px';
+                categoryIndicator.innerHTML = `
+                    <div class="color-dot color-${categoryInfo.class}"></div>
+                    <span style="font-size: 12px;">${data.category}</span>
+                `;
+                row.appendChild(categoryIndicator);
+
+                // Bar container
+                const barContainer = document.createElement('div');
+                barContainer.className = 'advanced-bar-container';
+
+                const bar = document.createElement('div');
+                bar.className = `advanced-bar ${categoryInfo.bar}`;
+                bar.style.width = '0%';
+                barContainer.appendChild(bar);
+
+                row.appendChild(barContainer);
+
+                // Value
+                const value = document.createElement('div');
+                value.className = 'advanced-value';
+                value.textContent = data.value;
+                row.appendChild(value);
+
+                advancedChart.appendChild(row);
+
+                // Animate bar width with delay
+                setTimeout(() => {
+                    bar.style.width = `${(data.value / maxValue) * 100}%`;
+                }, 200 + (index * 100));
+            });
+
+            aiResultContent.appendChild(advancedChart);
+        }
     }
 
     showNextLevelHints() {
@@ -2774,20 +3304,55 @@ class PlatformerGame {
 
     buildPromptDisplay(levelData) {
         const promptGoalText = document.getElementById('promptGoalText');
+        const promptGoalLabel = document.getElementById('promptGoalLabel');
         if (!promptGoalText) return;
 
         // Clear existing content
         promptGoalText.innerHTML = '';
 
+        // Level 4 & 5: Hide "Prompt:" label
+        if (promptGoalLabel) {
+            if (this.currentLevel === 4 || this.currentLevel === 5) {
+                promptGoalLabel.style.display = 'none';
+            } else {
+                promptGoalLabel.style.display = 'block';
+            }
+        }
+
+        // Level 4: Show special instruction instead of prompt pieces
+        if (this.currentLevel === 4) {
+            promptGoalText.textContent = 'Finde die Schriftrolle wo dein fertiger Prompt steht';
+            return;
+        }
+
+        // Level 5: Show final challenge instruction
+        if (this.currentLevel === 5) {
+            promptGoalText.textContent = 'Erreiche das Ende der finalen Hürde';
+            return;
+        }
+
+        // Check if this level has prefilled pieces
+        const prefilledIds = levelData.prefilledPieces ? levelData.prefilledPieces.map(p => p.id) : [];
+
         // Build prompt from required pieces
         levelData.requiredPieces.forEach((piece, index) => {
             const span = document.createElement('span');
             span.dataset.pieceId = piece.id;
-            span.textContent = piece.text;
 
-            // Check if already collected
-            if (this.collectedPieces.includes(piece.id)) {
+            // Check if this piece is prefilled from previous level
+            if (prefilledIds.includes(piece.id)) {
+                span.textContent = piece.text;
+                span.classList.add('collected'); // Already filled, show as green
+            }
+            // Check if already collected in current level
+            else if (this.collectedPieces.includes(piece.id)) {
+                span.textContent = piece.text;
                 span.classList.add('collected');
+            }
+            // Show as placeholder (long dash)
+            else {
+                span.textContent = '___________';
+                span.classList.add('placeholder');
             }
 
             promptGoalText.appendChild(span);
@@ -2803,10 +3368,21 @@ class PlatformerGame {
         const promptGoalText = document.getElementById('promptGoalText');
         if (!promptGoalText) return;
 
-        // Find the span with this piece ID and mark it as collected (green)
+        // Find the span with this piece ID
         const spans = promptGoalText.querySelectorAll('span');
         spans.forEach(span => {
             if (span.dataset.pieceId === pieceId) {
+                // If it's a placeholder, replace with actual text
+                if (span.classList.contains('placeholder')) {
+                    // Find the piece text from level data
+                    const currentLevelData = LEVEL_DATA[this.currentLevel];
+                    const piece = currentLevelData.requiredPieces.find(p => p.id === pieceId);
+                    if (piece) {
+                        span.textContent = piece.text;
+                    }
+                    span.classList.remove('placeholder');
+                }
+                // Mark as collected (green)
                 span.classList.add('collected');
             }
         });
@@ -3082,7 +3658,18 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < anim.frames; i++) {
             const img = new Image();
             const frameStr = String(i).padStart(5, '0');
-            img.src = `${anim.path}${frameStr}.png`;
+
+            // Handle special filenames for TXP Sprung frames 14 and 15
+            let filename;
+            if (animName === 'jump' && i === 14) {
+                filename = `${anim.path}${frameStr}A.png`;
+            } else if (animName === 'jump' && i === 15) {
+                filename = `${anim.path}${frameStr}B.png`;
+            } else {
+                filename = `${anim.path}${frameStr}.png`;
+            }
+
+            img.src = filename;
             img.onload = () => {
                 loadedCount++;
                 if (loadedCount === totalImages) {
@@ -3162,4 +3749,5 @@ function confirmReset() {
     setupLevelCards();
     updateDeathCounterDisplay();
 }
+
 
