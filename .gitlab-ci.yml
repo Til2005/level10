@@ -7,6 +7,9 @@ pages:
     - mkdir -p public
     - cp -r * public/ 2>/dev/null || :
     - rm -rf public/.git public/.gitlab-ci.yml
+    - echo "/*" > public/_headers
+    - echo "  X-Frame-Options: ALLOWALL" >> public/_headers
+    - echo "  Content-Security-Policy: frame-ancestors *" >> public/_headers
   artifacts:
     paths:
       - public
