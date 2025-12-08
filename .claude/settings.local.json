@@ -19,7 +19,8 @@
       "Bash(start level_bilder.html)",
       "Bash(dir \"C:\\Users\\TILSAND\\Desktop\\AI Bytes HTML Game\\TXP\" /b)",
       "Bash(ls:*)",
-      "Bash(start level5.html)"
+      "Bash(start level5.html)",
+      "Bash(git remote:*)"
     ],
     "deny": [],
     "ask": []
