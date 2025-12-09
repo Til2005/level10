@@ -33,6 +33,11 @@ const ANIMATIONS = {
         peakFrames: [27, 28]
     },
     enemy: {
+        path: 'Gegner FPS 12/AI Gegner_FPS 120',
+        frames: 12,
+        speed: 3
+    },
+    jumpingEnemy: {
         path: 'Gegner PNG 12 FPS/Gegner Loop_',
         frames: 24,
         speed: 2
@@ -85,6 +90,12 @@ const LEVEL_DATA = {
             // NUR 2 falsche Prompts - wenig Ablenkung
             { x: 1300, y: 590, id: "gib-daten", text: "Gib Daten", type: "bad" },
             { x: 2400, y: 590, id: "zeig-was", text: "Zeig was", type: "bad" }
+        ],
+        signs: [
+            // Decorative wooden sign left of "Gib Daten" prompt (on platform)
+            { x: 1070, y: 580, message: "bad-prompts" },
+            // Sign before goal explaining level end
+            { x: 3600, y: 580, message: "level-end" }
         ],
         goalX: 4700
     },
@@ -139,6 +150,10 @@ const LEVEL_DATA = {
             { x: 2370, y: 520, id: "neulich", text: "neulich", type: "bad" },
             { x: 2750, y: 520, id: "mal-schauen", text: "mal schauen", type: "bad" },
             { x: 3540, y: 520, id: "später", text: "später", type: "bad" }
+        ],
+        signs: [
+            // Sign on sixth elevated platform about music and sound effects
+            { x: 2160, y: 376, message: "music-info" }
         ],
         goalX: 4700
     },
@@ -202,6 +217,10 @@ const LEVEL_DATA = {
             { x: 2950, y: 490, id: "zeig-alles", text: "zeig alles", type: "bad" },
             { x: 3420, y: 480, id: "unsortiert", text: "unsortiert", type: "bad" }
         ],
+        signs: [
+            // Sign about specificity in prompts
+            { x: 3220, y: 307, message: "prompt-specificity" }
+        ],
         goalX: 4700
     },
 
@@ -258,6 +277,10 @@ const LEVEL_DATA = {
         ],
         // Special collectible: Note to share with colleagues
         notePosition: { x: 2000, y: 200 },
+        signs: [
+            // Sign on high platform near the note/scroll
+            { x: 1680, y: 207, message: "collect-scroll" }
+        ],
         goalX: 4850
     },
 
@@ -349,18 +372,28 @@ const LEVEL_DATA = {
         enemies: [
             // Enemies auf längeren Lava-Plattformen - bewegen sich nur auf ihrer Plattform
             // Plattform 2: x: 10700, y: 650, width: 600
-            { x: 10700, y: 520, width: 115, height: 115, speed: 1.7, platformX: 10700, platformWidth: 600 },
+            { x: 10700, y: 539, width: 115, height: 115, speed: 1.7, platformX: 10700, platformWidth: 600 },
             // Plattform 3: x: 11700, y: 650, width: 500
-            { x: 11700, y: 520, width: 115, height: 115, speed: 1.7, platformX: 11700, platformWidth: 500 },
+            { x: 11700, y: 539, width: 115, height: 115, speed: 1.7, platformX: 11700, platformWidth: 500 },
             // Plattform 4: x: 12550, y: 600, width: 400
-            { x: 12550, y: 470, width: 115, height: 115, speed: 1.7, platformX: 12550, platformWidth: 400 },
+            { x: 12550, y: 489, width: 115, height: 115, speed: 1.7, platformX: 12550, platformWidth: 400 },
             // Plattform 5: x: 13300, y: 550, width: 400
-            { x: 13300, y: 420, width: 115, height: 115, speed: 1.7, platformX: 13300, platformWidth: 400 }
+            { x: 13300, y: 439, width: 115, height: 115, speed: 1.7, platformX: 13300, platformWidth: 400 }
         ],
         jumpingEnemies: [
             // Großer springender Enemy auf langer Plattform: x: 14700, y: 450, width: 1000
             // Mittig: platformX (14700) + (platformWidth (1000) - enemyWidth (400)) / 2 = 14700 + 300 = 15000
             { x: 15000, y: 50, width: 400, height: 400, platformX: 14700, platformWidth: 1000 }
+        ],
+        signs: [
+            // Sign at start of lava section explaining enemy jumping mechanic
+            { x: 10050, y: 575, message: "enemy-jumping" },
+            // Sign before jumping enemy explaining to go under (Platform: x: 14700, y: 450)
+            { x: 14750, y: 375, message: "enemy-duck" },
+            // Sign at start of final section (Platform: x: 25700, y: 650)
+            { x: 25730, y: 577, message: "final-section" },
+            // Motivational sign near the end between "keine Filter" and "keine Sortierung"
+            { x: 27900, y: 525, message: "final-motivation" }
         ],
         goalX: 28400
     }
@@ -980,6 +1013,116 @@ class Note {
     }
 }
 
+// ===== SIGN CLASS (Wooden sign decoration with interaction) =====
+class Sign {
+    constructor(gameArea, x, y, message = "bad-prompts") {
+        this.gameArea = gameArea;
+        this.x = x;
+        this.y = y;
+        this.width = 120;
+        this.height = 80;
+        this.interactionDistance = 100; // Distance to show prompt
+        this.isNearby = false;
+        this.message = message; // Type of message to show
+
+        this.createElement();
+        this.createInteractionPrompt();
+    }
+
+    createElement() {
+        this.element = document.createElement('div');
+        this.element.className = 'sign-decoration';
+        this.element.style.position = 'absolute';
+        this.element.style.left = `${this.x}px`;
+        this.element.style.top = `${this.y}px`;
+        this.element.style.width = `${this.width}px`;
+        this.element.style.height = `${this.height}px`;
+        this.element.style.zIndex = '30';
+        this.element.style.pointerEvents = 'none';
+        this.element.style.transform = 'none'; // Stay fixed in level, no camera movement
+
+        // Create image element
+        const img = document.createElement('img');
+        img.src = 'sign.png';
+        img.alt = 'Wooden Sign';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+
+        this.element.appendChild(img);
+        document.getElementById('platformsContainer').appendChild(this.element);
+    }
+
+    createInteractionPrompt() {
+        this.promptElement = document.createElement('div');
+        this.promptElement.className = 'sign-interaction-prompt';
+        this.promptElement.style.position = 'absolute';
+        this.promptElement.style.left = `${this.x + this.width / 2 - 60}px`;
+        this.promptElement.style.top = `${this.y - 40}px`;
+        this.promptElement.style.width = '120px';
+        this.promptElement.style.textAlign = 'center';
+        this.promptElement.style.color = '#F5C03B';
+        this.promptElement.style.fontSize = '14px';
+        this.promptElement.style.fontWeight = 'bold';
+        this.promptElement.style.backgroundColor = 'rgba(21, 16, 55, 0.8)';
+        this.promptElement.style.padding = '8px 12px';
+        this.promptElement.style.borderRadius = '8px';
+        this.promptElement.style.border = '2px solid rgba(245, 192, 59, 0.6)';
+        this.promptElement.style.zIndex = '40';
+        this.promptElement.style.pointerEvents = 'none';
+        this.promptElement.style.transform = 'none';
+        this.promptElement.style.display = 'none';
+        this.promptElement.textContent = 'Drücke [E]';
+
+        document.getElementById('platformsContainer').appendChild(this.promptElement);
+    }
+
+    checkProximity(player) {
+        // Check if player is within interaction range of the sign
+        // Player position is player.x (left edge of player)
+        const playerCenter = player.x + GAME_CONFIG.playerWidth / 2;
+        const signCenter = this.x + this.width / 2;
+
+        // Calculate distance between player center and sign center
+        const distance = Math.abs(playerCenter - signCenter);
+
+        const wasNearby = this.isNearby;
+        this.isNearby = distance < this.interactionDistance;
+
+        if (this.isNearby && !wasNearby) {
+            this.showPrompt();
+        } else if (!this.isNearby && wasNearby) {
+            this.hidePrompt();
+        }
+    }
+
+    showPrompt() {
+        if (this.promptElement) {
+            this.promptElement.style.display = 'block';
+        }
+    }
+
+    hidePrompt() {
+        if (this.promptElement) {
+            this.promptElement.style.display = 'none';
+        }
+    }
+
+    interact() {
+        // Show wooden text box popup
+        return true; // Signal that interaction happened
+    }
+
+    destroy() {
+        if (this.element && this.element.parentNode) {
+            this.element.parentNode.removeChild(this.element);
+        }
+        if (this.promptElement && this.promptElement.parentNode) {
+            this.promptElement.parentNode.removeChild(this.promptElement);
+        }
+    }
+}
+
 // ===== SPIKE CLASS (Statisches Hindernis) =====
 class Spike {
     constructor(gameArea, x, y, width, height) {
@@ -1146,7 +1289,7 @@ class Enemy {
 
         for (let i = 0; i < ANIMATIONS.enemy.frames; i++) {
             const img = new Image();
-            const paddedNumber = String(i).padStart(5, '0');
+            const paddedNumber = String(i).padStart(4, '0');
             img.src = `${ANIMATIONS.enemy.path}${paddedNumber}.png`;
             Enemy.preloadedFrames[i] = img;
             promises.push(new Promise((resolve) => {
@@ -1203,7 +1346,7 @@ class Enemy {
         const hitboxWidth = this.width * 0.6;
         const hitboxHeight = this.height * 0.6;
         const offsetX = (this.width - hitboxWidth) / 2;
-        const offsetY = (this.height - hitboxHeight) / 2;
+        const offsetY = (this.height - hitboxHeight) / 2 + 5;
 
         this.debugHitbox = document.createElement('div');
         this.debugHitbox.className = 'debug-hitbox';
@@ -1227,7 +1370,7 @@ class Enemy {
     }
 
     getFramePath(frameNumber) {
-        const paddedNumber = String(frameNumber).padStart(5, '0');
+        const paddedNumber = String(frameNumber).padStart(4, '0');
         return `${ANIMATIONS.enemy.path}${paddedNumber}.png`;
     }
 
@@ -1285,9 +1428,12 @@ class Enemy {
             this.game.playEnemyStompSound();
         }
 
-        // Apply squash animation
-        this.element.style.transition = 'transform 0.1s ease-out';
-        this.element.style.transform = 'scaleY(0.3) scaleX(1.2)';
+        // Apply squash animation - compress from bottom by changing transform-origin
+        // Keep the current direction (this.direction: 1 = right, -1 = left)
+        const scaleX = this.direction === 1 ? 1.2 : -1.2;
+        this.element.style.transition = 'transform 0.1s ease-out, opacity 0.1s ease-out';
+        this.element.style.transformOrigin = 'center 90%';
+        this.element.style.transform = `scaleY(0.3) scaleX(${scaleX})`;
         this.element.style.opacity = '0.8';
 
         // After animation, destroy enemy
@@ -1317,10 +1463,10 @@ class JumpingEnemy {
         JumpingEnemy.preloadedFrames = [];
         const promises = [];
 
-        for (let i = 0; i < ANIMATIONS.enemy.frames; i++) {
+        for (let i = 0; i < ANIMATIONS.jumpingEnemy.frames; i++) {
             const img = new Image();
             const paddedNumber = String(i).padStart(5, '0');
-            img.src = `${ANIMATIONS.enemy.path}${paddedNumber}.png`;
+            img.src = `${ANIMATIONS.jumpingEnemy.path}${paddedNumber}.png`;
             JumpingEnemy.preloadedFrames[i] = img;
             promises.push(new Promise((resolve) => {
                 img.onload = resolve;
@@ -1378,7 +1524,7 @@ class JumpingEnemy {
         const hitboxWidth = this.width * 0.6;
         const hitboxHeight = this.height * 0.6;
         const offsetX = (this.width - hitboxWidth) / 2;
-        const offsetY = (this.height - hitboxHeight) / 2;
+        const offsetY = (this.height - hitboxHeight) / 2 + 5;
 
         this.debugHitbox = document.createElement('div');
         this.debugHitbox.className = 'debug-hitbox';
@@ -1403,7 +1549,7 @@ class JumpingEnemy {
 
     getFramePath(frameNumber) {
         const paddedNumber = String(frameNumber).padStart(5, '0');
-        return `${ANIMATIONS.enemy.path}${paddedNumber}.png`;
+        return `${ANIMATIONS.jumpingEnemy.path}${paddedNumber}.png`;
     }
 
     update(deltaTime) {
@@ -1430,9 +1576,9 @@ class JumpingEnemy {
 
         // Animation
         this.frameCounter++;
-        if (this.frameCounter >= ANIMATIONS.enemy.speed) {
+        if (this.frameCounter >= ANIMATIONS.jumpingEnemy.speed) {
             this.frameCounter = 0;
-            this.currentFrame = (this.currentFrame + 1) % ANIMATIONS.enemy.frames;
+            this.currentFrame = (this.currentFrame + 1) % ANIMATIONS.jumpingEnemy.frames;
             this.element.src = this.getFramePath(this.currentFrame);
         }
 
@@ -1693,6 +1839,23 @@ class TxpNpc {
         this.stopAnimation();
         this.stopJumpRoutine();
         this.hideSpeech();
+
+        // Clear any pending jump timeout
+        if (this.jumpTimeoutHandle) {
+            clearTimeout(this.jumpTimeoutHandle);
+            this.jumpTimeoutHandle = null;
+        }
+    }
+
+    destroy() {
+        // Completely clean up this TXP instance
+        this.hide();
+
+        // Nullify references to shared DOM elements
+        this.element = null;
+        this.img = null;
+        this.speechElement = null;
+        this.speechText = null;
     }
 
     startAnimation(animName) {
@@ -1799,16 +1962,10 @@ class TxpNpc {
         this.isPlayerNear = distance < this.proximityRange && Math.abs(player.y - this.y) < 100;
 
         // Update facing direction (like enemies)
-        if (player.x < this.x && this.facingRight) {
+        if (player.x < this.x) {
             this.facingRight = false;
-            if (this.img) {
-                this.img.style.transform = 'scaleX(-1)';
-            }
-        } else if (player.x >= this.x && !this.facingRight) {
+        } else if (player.x >= this.x) {
             this.facingRight = true;
-            if (this.img) {
-                this.img.style.transform = 'scaleX(1)';
-            }
         }
 
         // Player just entered proximity
@@ -1880,7 +2037,10 @@ class TxpNpc {
     }
 
     applyCamera(camera) {
-        if (this.element) {
+        if (this.element && this.img) {
+            // Combine camera translation with facing direction
+            const scaleX = this.facingRight ? 1 : -1;
+            this.img.style.transform = `scaleX(${scaleX})`;
             this.element.style.transform = `translateX(${-camera.x}px)`;
         }
         if (this.speechElement) {
@@ -1938,12 +2098,14 @@ class PlatformerGame {
         this.currentLevel = 1;
         this.lives = GAME_CONFIG.lives;
         this.notePopupVisible = false; // Track if note popup is showing (blocks movement)
+        this.signPopupVisible = false; // Track if sign popup is showing (blocks movement)
 
         // Game objects
         this.player = null;
         this.platforms = [];
         this.promptPieces = [];
         this.note = null; // Level 4 collectible
+        this.signs = []; // Decorative signs
         this.spikes = [];
         this.enemies = [];
         this.jumpingEnemies = [];
@@ -2218,6 +2380,22 @@ class PlatformerGame {
                 return;
             }
 
+            // Close sign popup with 'E'
+            if ((e.key === 'e' || e.key === 'E') && this.signPopupVisible) {
+                this.hideSignPopup();
+                return;
+            }
+
+            // Interact with Sign with 'E'
+            if ((e.key === 'e' || e.key === 'E') && this.signs.length > 0) {
+                for (let sign of this.signs) {
+                    if (sign.isNearby) {
+                        this.showSignPopup(sign.message);
+                        return;
+                    }
+                }
+            }
+
             // Interact with TXP NPC with 'E'
             if ((e.key === 'e' || e.key === 'E') && this.txpNpc) {
                 // Level 4: Confirm completion after showing success message
@@ -2233,7 +2411,7 @@ class PlatformerGame {
                 return;
             }
 
-            if (!this.isRunning || this.isDead || this.notePopupVisible) return;
+            if (!this.isRunning || this.isDead || this.notePopupVisible || this.signPopupVisible) return;
 
             // Movement
             if (e.key === 'ArrowLeft') {
@@ -2252,7 +2430,7 @@ class PlatformerGame {
         document.addEventListener('keyup', (e) => {
             this.keys[e.key] = false;
 
-            if (!this.isRunning || this.isDead || this.notePopupVisible) return;
+            if (!this.isRunning || this.isDead || this.notePopupVisible || this.signPopupVisible) return;
 
             // Stop movement
             if (e.key === 'ArrowLeft') {
@@ -2378,6 +2556,19 @@ class PlatformerGame {
             );
         }
 
+        // Create signs (decorative wooden signs)
+        if (levelData.signs) {
+            levelData.signs.forEach(signData => {
+                const sign = new Sign(
+                    this.gameArea,
+                    signData.x,
+                    signData.y,
+                    signData.message
+                );
+                this.signs.push(sign);
+            });
+        }
+
         // Create spikes (if level has them)
         if (levelData.spikes) {
             levelData.spikes.forEach(spikeData => {
@@ -2460,7 +2651,7 @@ class PlatformerGame {
             this.txpNpc = new TxpNpc(this.gameArea, 590, 535, 2);
         } else if (levelNumber === 3) {
             // Level 3: TXP erscheint nach ein bisschen Laufstrecke (x: 1380, width: 150)
-            this.txpNpc = new TxpNpc(this.gameArea, 1455, 235, 3);
+            this.txpNpc = new TxpNpc(this.gameArea, 1405, 235, 3);
         } else if (levelNumber === 5) {
             // Level 5: TXP erscheint mittig auf der Plattform bei x: 2300
             this.txpNpc = new TxpNpc(this.gameArea, 2500, 435, 5);
@@ -2485,6 +2676,9 @@ class PlatformerGame {
             this.note = null;
         }
 
+        this.signs.forEach(sign => sign.destroy());
+        this.signs = [];
+
         this.spikes.forEach(spike => spike.destroy());
         this.spikes = [];
 
@@ -2505,7 +2699,7 @@ class PlatformerGame {
         }
 
         if (this.txpNpc) {
-            this.txpNpc.hide();
+            this.txpNpc.destroy();
             this.txpNpc = null;
         }
 
@@ -2593,6 +2787,21 @@ class PlatformerGame {
         // Show game screen
         this.showScreen('gameScreen');
 
+        // Show controls display only in Level 1
+        const controlsDisplay = document.getElementById('controlsDisplay');
+        if (controlsDisplay) {
+            if (levelNumber === 1) {
+                controlsDisplay.style.display = 'block';
+            } else {
+                controlsDisplay.style.display = 'none';
+            }
+        }
+
+        // Show music toggle button when entering gameplay
+        if (this.musicToggleBtn) {
+            this.musicToggleBtn.style.display = 'flex';
+        }
+
         // Start game loop
         this.isRunning = true;
         this.lastTime = performance.now();
@@ -2624,6 +2833,17 @@ class PlatformerGame {
             if (this.txpNpc) {
                 this.txpNpc.checkProximity(this.player);
                 this.txpNpc.applyCamera(this.camera);
+            }
+
+            // Update Signs (check proximity for interaction prompt)
+            this.signs.forEach(sign => sign.checkProximity(this.player));
+
+            // Apply camera transform to controls display (Level 1 only)
+            if (this.currentLevel === 1) {
+                const controlsDisplay = document.getElementById('controlsDisplay');
+                if (controlsDisplay && controlsDisplay.style.display !== 'none') {
+                    controlsDisplay.style.transform = `translateX(${-this.camera.x}px)`;
+                }
             }
 
             // Check if player entered/left lava section (Level 5 only)
@@ -2751,6 +2971,82 @@ class PlatformerGame {
                     promptGoalText.textContent = 'Erreiche das Ende um dein Prompt zu teilen';
                 }
             }
+        }
+    }
+
+    showSignPopup(messageType) {
+        const signPopup = document.getElementById('signPopup');
+        const signPopupText = document.getElementById('signPopupText');
+
+        if (signPopup && signPopupText) {
+            // Set message based on type
+            if (messageType === "bad-prompts") {
+                signPopupText.innerHTML = `
+                    Achtung!<br><br>
+                    Laufe nicht gegen die <span style="color: #ff4444;">roten Prompts</span>!<br><br>
+                    Das sind Wörter im Prompt, die kein wertvolles Ergebnis liefern.
+                `;
+            } else if (messageType === "level-end") {
+                signPopupText.innerHTML = `
+                    Fast geschafft!<br><br>
+                    Laufe zum <span style="color: #67C7FF;">Ziel</span> rechts und schau dir an, was dein Prompt bewirkt hat.<br><br>
+                    Je besser der Prompt, desto besser das Ergebnis!
+                `;
+            } else if (messageType === "music-info") {
+                signPopupText.innerHTML = `
+                    Tipp!<br><br>
+                    Drücke oben rechts auf den <span style="color: #67C7FF;">Lautsprecher</span> 🔊<br><br>
+                    Das Spiel hat Musik und Soundeffekte!
+                `;
+            } else if (messageType === "prompt-specificity") {
+                signPopupText.innerHTML = `
+                    Merke dir!<br><br>
+                    Je spezifischer deine Anfrage, desto besser das Ergebnis.<br><br>
+                    <span style="color: #67C7FF;">"Filtere nach Farbe"</span> ist besser als <span style="color: #ff4444;">"zeig mir irgendwas"</span>!
+                `;
+            } else if (messageType === "collect-scroll") {
+                signPopupText.innerHTML = `
+                    Prompt-Weitergabe<br><br>
+                    Sammle die <span style="color: #F5C03B;">Schriftrolle</span> mit deinem fertigen Prompt ein!<br><br>
+                    Gute Prompts mit Kollegen teilen spart Zeit, die Entwicklung eines passenden Prompts kann aufwendig sein.
+                `;
+            } else if (messageType === "enemy-jumping") {
+                signPopupText.innerHTML = `
+                    Gegner-Tipp<br><br>
+                    Du kannst auf <span style="color: #ff4444;">Gegner springen</span>, um sie zu besiegen!<br><br>
+                    Spring von oben auf sie drauf, um sicher weiterzukommen.
+                `;
+            } else if (messageType === "enemy-duck") {
+                signPopupText.innerHTML = `
+                    Gegner-Tipp 2<br><br>
+                    Der Gegner ist zu groß, um auf ihn zu springen.<br><br>
+                    Vielleicht findest du ja eine andere Möglichkeit, ihm zu entkommen.
+                `;
+            } else if (messageType === "final-section") {
+                signPopupText.innerHTML = `
+                    Letzte Etappe! 🏁<br><br>
+                    Du hast das <span style="color: #67C7FF;">Ziel fast erreicht</span>!<br><br>
+                    Es sind nur noch die <span style="color: #F5C03B;">letzten Meter</span>.
+                `;
+            } else if (messageType === "final-motivation") {
+                signPopupText.innerHTML = `
+                    Fast geschafft! 🎉<br><br>
+                    Du bist <span style="color: #67C7FF;">kurz davor</span>, das letzte Level zu meistern!<br><br>
+                    Es ist nur noch ein <span style="color: #F5C03B;">ganz einfacher Sprung</span>.<br><br>
+                    Du schaffst das! 💪
+                `;
+            }
+
+            signPopup.style.display = 'flex';
+            this.signPopupVisible = true;
+        }
+    }
+
+    hideSignPopup() {
+        const signPopup = document.getElementById('signPopup');
+        if (signPopup) {
+            signPopup.style.display = 'none';
+            this.signPopupVisible = false;
         }
     }
 
@@ -2972,29 +3268,66 @@ class PlatformerGame {
             cancelAnimationFrame(this.gameLoopId);
         }
 
-        // Unlock next level
-        unlockNextLevel(this.currentLevel);
+        // Check if level is truly completed (for Level 1-3: all good prompts must be collected)
+        const isFullyCompleted = this.checkLevelCompletion();
+
+        // Only unlock next level and award points if fully completed
+        if (isFullyCompleted) {
+            unlockNextLevel(this.currentLevel);
+        }
 
         this.showLevelCompleteScreen();
+    }
+
+    checkLevelCompletion() {
+        const levelData = LEVEL_DATA[this.currentLevel];
+
+        // Level 1-3: Must collect all required pieces (good prompts)
+        if (this.currentLevel >= 1 && this.currentLevel <= 3) {
+            if (!levelData.requiredPieces) return true;
+
+            const allCollected = levelData.requiredPieces.every(piece =>
+                this.collectedPieces.includes(piece.id)
+            );
+
+            if (!allCollected) {
+                console.log(`⚠️ Level ${this.currentLevel} not fully completed - missing required prompts`);
+                return false;
+            }
+        }
+
+        // Level 4-5: Reaching the goal is enough
+        return true;
     }
 
     showLevelCompleteScreen() {
         // Build prompt display
         const levelData = LEVEL_DATA[this.currentLevel];
         const promptDisplay = document.getElementById('promptDisplay');
-        promptDisplay.innerHTML = '';
 
-        levelData.requiredPieces.forEach(piece => {
-            const wasCollected = this.collectedPieces.includes(piece.id);
-            const pieceEl = document.createElement('div');
-            pieceEl.style.padding = '5px 10px';
-            pieceEl.style.margin = '5px 0';
-            pieceEl.style.borderRadius = '5px';
-            pieceEl.style.background = wasCollected ? 'rgba(50, 205, 50, 0.2)' : 'rgba(255, 68, 68, 0.2)';
-            pieceEl.style.border = wasCollected ? '2px solid #32CD32' : '2px solid #FF4444';
-            pieceEl.textContent = `${wasCollected ? '✓' : '✗'} ${piece.text}`;
-            promptDisplay.appendChild(pieceEl);
-        });
+        // Level 4: Show prompt sharing visualization
+        if (this.currentLevel === 4) {
+            promptDisplay.innerHTML = '';
+            this.showPromptSharingVisualization();
+        } else if (this.currentLevel === 5) {
+            // Level 5: Show prompt standardization visualization
+            promptDisplay.innerHTML = '';
+            this.showPromptStandardizationVisualization();
+        } else {
+            // Level 1-3: Show collected pieces list
+            promptDisplay.innerHTML = '';
+            levelData.requiredPieces.forEach(piece => {
+                const wasCollected = this.collectedPieces.includes(piece.id);
+                const pieceEl = document.createElement('div');
+                pieceEl.style.padding = '5px 10px';
+                pieceEl.style.margin = '5px 0';
+                pieceEl.style.borderRadius = '5px';
+                pieceEl.style.background = wasCollected ? 'rgba(50, 205, 50, 0.2)' : 'rgba(255, 68, 68, 0.2)';
+                pieceEl.style.border = wasCollected ? '2px solid #32CD32' : '2px solid #FF4444';
+                pieceEl.textContent = `${wasCollected ? '✓' : '✗'} ${piece.text}`;
+                promptDisplay.appendChild(pieceEl);
+            });
+        }
 
         // Show AI result visualization for Level 1-3
         this.showAIResult();
@@ -3203,6 +3536,226 @@ class PlatformerGame {
         }
     }
 
+    showPromptSharingVisualization() {
+        const promptDisplay = document.getElementById('promptDisplay');
+        promptDisplay.innerHTML = '';
+
+        // Create sharing visualization container
+        const sharingViz = document.createElement('div');
+        sharingViz.className = 'prompt-sharing-viz';
+        sharingViz.innerHTML = `
+            <div class="sharing-title">Prompt-Weitergabe in Aktion</div>
+
+            <div class="sharing-network">
+                <!-- Central user (you) with prompt -->
+                <div class="central-user">
+                    <div class="user-avatar user-you">
+                        <span class="avatar-icon">👤</span>
+                        <span class="user-label">Du</span>
+                    </div>
+                    <div class="prompt-scroll">
+                        <span class="scroll-icon">📜</span>
+                        <span class="scroll-label">Dein Prompt</span>
+                    </div>
+                </div>
+
+                <!-- Connection lines (will animate) -->
+                <svg class="connection-lines" viewBox="0 0 600 400">
+                    <line class="share-line line-1" x1="300" y1="200" x2="150" y2="100" />
+                    <line class="share-line line-2" x1="300" y1="200" x2="450" y2="100" />
+                    <line class="share-line line-3" x1="300" y1="200" x2="150" y2="300" />
+                    <line class="share-line line-4" x1="300" y1="200" x2="450" y2="300" />
+                </svg>
+
+                <!-- Colleague avatars (recipients) -->
+                <div class="colleague colleague-1">
+                    <div class="user-avatar">
+                        <span class="avatar-icon">👤</span>
+                    </div>
+                    <div class="colleague-prompt">📜</div>
+                </div>
+                <div class="colleague colleague-2">
+                    <div class="user-avatar">
+                        <span class="avatar-icon">👤</span>
+                    </div>
+                    <div class="colleague-prompt">📜</div>
+                </div>
+                <div class="colleague colleague-3">
+                    <div class="user-avatar">
+                        <span class="avatar-icon">👤</span>
+                    </div>
+                    <div class="colleague-prompt">📜</div>
+                </div>
+                <div class="colleague colleague-4">
+                    <div class="user-avatar">
+                        <span class="avatar-icon">👤</span>
+                    </div>
+                    <div class="colleague-prompt">📜</div>
+                </div>
+            </div>
+
+            <div class="sharing-stats">
+                <div class="stat-item">
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">Prompt entwickelt</div>
+                </div>
+                <div class="stat-arrow">→</div>
+                <div class="stat-item stat-highlight">
+                    <div class="stat-value">4</div>
+                    <div class="stat-label">Kollegen profitieren</div>
+                </div>
+                <div class="stat-arrow">=</div>
+                <div class="stat-item stat-success">
+                    <div class="stat-value">5x</div>
+                    <div class="stat-label">Effizienz</div>
+                </div>
+            </div>
+
+            <div class="sharing-message">
+                Zeitersparnis durch Teilen: Ein guter Prompt hilft dem ganzen Team!
+            </div>
+        `;
+
+        promptDisplay.appendChild(sharingViz);
+    }
+
+    showPromptStandardizationVisualization() {
+        const promptDisplay = document.getElementById('promptDisplay');
+        promptDisplay.innerHTML = '';
+
+        const standardizationViz = document.createElement('div');
+        standardizationViz.className = 'prompt-standardization-viz';
+        standardizationViz.innerHTML = `
+            <div class="standardization-title">🎯 Prompt-Standardisierung erfolgreich!</div>
+
+            <div class="standardization-container">
+                <!-- Before: Chaotic individual prompts -->
+                <div class="before-section">
+                    <div class="section-header">
+                        <span class="section-icon">😵</span>
+                        <span class="section-title">Vorher: Individuelle Prompts</span>
+                    </div>
+                    <div class="chaotic-prompts">
+                        <div class="chaotic-prompt prompt-1">
+                            <div class="prompt-bubble">Zeig mir mal die Daten vom August</div>
+                            <div class="prompt-author">👤 Mitarbeiter A</div>
+                        </div>
+                        <div class="chaotic-prompt prompt-2">
+                            <div class="prompt-bubble">Produktionszahlen August bitte</div>
+                            <div class="prompt-author">👤 Mitarbeiter B</div>
+                        </div>
+                        <div class="chaotic-prompt prompt-3">
+                            <div class="prompt-bubble">Gib Daten für 08/2025</div>
+                            <div class="prompt-author">👤 Mitarbeiter C</div>
+                        </div>
+                        <div class="chaotic-prompt prompt-4">
+                            <div class="prompt-bubble">August Werk 040 Zahlen</div>
+                            <div class="prompt-author">👤 Mitarbeiter D</div>
+                        </div>
+                    </div>
+                    <div class="problem-indicators">
+                        <div class="problem-item">❌ Inkonsistent</div>
+                        <div class="problem-item">❌ Fehleranfällig</div>
+                        <div class="problem-item">❌ Schwer wartbar</div>
+                    </div>
+                </div>
+
+                <!-- Arrow transformation -->
+                <div class="transformation-arrow">
+                    <div class="arrow-container">
+                        <div class="arrow-line"></div>
+                        <div class="arrow-head">▶</div>
+                    </div>
+                    <div class="transformation-label">Standardisierung</div>
+                </div>
+
+                <!-- After: Standardized template -->
+                <div class="after-section">
+                    <div class="section-header">
+                        <span class="section-icon">✨</span>
+                        <span class="section-title">Nachher: Standard-Template</span>
+                    </div>
+                    <div class="template-card">
+                        <div class="template-header">
+                            <span class="template-icon">📋</span>
+                            <span class="template-name">Produktionsdaten-Abfrage v1.0</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-line">
+                                <span class="template-label">Zeig mir</span>
+                                <span class="template-variable">[Produktionsdaten]</span>
+                            </div>
+                            <div class="template-line">
+                                <span class="template-label">im</span>
+                                <span class="template-variable">[August 2025]</span>
+                            </div>
+                            <div class="template-line">
+                                <span class="template-label">für Werk</span>
+                                <span class="template-variable">[040]</span>
+                            </div>
+                            <div class="template-line">
+                                <span class="template-label">als</span>
+                                <span class="template-variable">[Balkendiagramm]</span>
+                            </div>
+                            <div class="template-line">
+                                <span class="template-label">filtere nach Farbe</span>
+                            </div>
+                            <div class="template-line">
+                                <span class="template-label">sortiert nach Menge</span>
+                            </div>
+                        </div>
+                        <div class="template-users">
+                            <span class="template-users-label">Verwendet von:</span>
+                            <div class="template-users-list">
+                                <span class="user-badge">👤</span>
+                                <span class="user-badge">👤</span>
+                                <span class="user-badge">👤</span>
+                                <span class="user-badge">👤</span>
+                                <span class="user-count">+12 weitere</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="benefit-indicators">
+                        <div class="benefit-item">✅ Einheitlich</div>
+                        <div class="benefit-item">✅ Zuverlässig</div>
+                        <div class="benefit-item">✅ Wartbar</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats section -->
+            <div class="standardization-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-content">
+                        <div class="stat-value">80%</div>
+                        <div class="stat-label">Weniger Fehler</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-content">
+                        <div class="stat-value">95%</div>
+                        <div class="stat-label">Konsistente Ergebnisse</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🚀</div>
+                    <div class="stat-content">
+                        <div class="stat-value">60%</div>
+                        <div class="stat-label">Zeitersparnis</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="standardization-message">
+                Ein standardisierter Prompt sorgt für verlässliche Ergebnisse im gesamten Unternehmen!
+            </div>
+        `;
+
+        promptDisplay.appendChild(standardizationViz);
+    }
+
     showNextLevelHints() {
         const dashboard = document.getElementById('legoDashboard');
         dashboard.innerHTML = '';
@@ -3237,8 +3790,8 @@ class PlatformerGame {
                 newConcept: '🔍 Filter & Sortierung'
             },
             5: {
-                tip: 'Im finalen Level lernst du, dass der Ort deiner Anfrage klar sein muss (z.B. für Werk 040).',
-                newConcept: '📍 Ortsangabe'
+                tip: 'Im finalen Level lernst du, alle Konzepte zu kombinieren und einen standardisierten Prompt zu erstellen.',
+                newConcept: '⭐ Prompt-Standardisierung'
             }
         };
 
@@ -3327,7 +3880,7 @@ class PlatformerGame {
 
         // Level 5: Show final challenge instruction
         if (this.currentLevel === 5) {
-            promptGoalText.textContent = 'Erreiche das Ende der finalen Hürde';
+            promptGoalText.textContent = 'Erreiche das Ende um den Prompt zu standardisieren';
             return;
         }
 
@@ -3422,6 +3975,12 @@ function goToLevelSelect(fromCompletedLevel = null) {
             cancelAnimationFrame(game.gameLoopId);
         }
         game.clearLevel();
+        // Stop music when going to level select
+        game.pauseMusic();
+        // Hide music toggle button in level select
+        if (game.musicToggleBtn) {
+            game.musicToggleBtn.style.display = 'none';
+        }
     }
     showLevelSelect();
     // Re-initialize world map to show updated progress
@@ -3484,6 +4043,9 @@ function setupLevelCards() {
     // Show death counter on level selection screen
     showDeathCounter();
 
+    // Show rank badge
+    updateRankBadge();
+
     const mapLevels = document.querySelectorAll('.map-level');
     mapLevels.forEach(mapLevel => {
         const levelNum = parseInt(mapLevel.getAttribute('data-level'));
@@ -3497,11 +4059,16 @@ function setupLevelCards() {
 
         const lockEl = mapLevel.querySelector('.map-level-lock');
         const statusEl = mapLevel.querySelector('.map-level-status');
+        const pointsEl = mapLevel.querySelector('.map-level-points');
 
         if (isCompleted) {
             mapLevel.classList.add('completed');
-            if (statusEl) statusEl.textContent = '✓ Abgeschlossen';
+            if (statusEl) statusEl.textContent = 'Abgeschlossen';
             if (lockEl) lockEl.style.display = 'none';
+            if (pointsEl) {
+                pointsEl.textContent = '100 / 100 Punkte';
+                pointsEl.classList.add('completed');
+            }
         } else if (isUnlocked) {
             mapLevel.classList.add('unlocked');
             if (lockEl) lockEl.style.display = 'none';
@@ -3509,13 +4076,21 @@ function setupLevelCards() {
                 statusEl.textContent = '▶ Spielen';
                 statusEl.classList.add('unlocked');
             }
+            if (pointsEl) {
+                pointsEl.textContent = '0 / 100 Punkte';
+                pointsEl.classList.remove('completed');
+            }
         } else {
             // Locked
             mapLevel.classList.add('locked');
-            if (lockEl) lockEl.style.display = 'block';
+            if (lockEl) lockEl.style.display = 'none';
             if (statusEl) {
                 statusEl.textContent = 'Gesperrt';
                 statusEl.classList.remove('unlocked');
+            }
+            if (pointsEl) {
+                pointsEl.textContent = '0 / 100 Punkte';
+                pointsEl.classList.remove('completed');
             }
         }
 
@@ -3538,15 +4113,10 @@ function setupLevelCards() {
 
 
 function updateWorldMapProgress(completedLevels) {
-    const totalLevels = 5;
-    const completed = completedLevels.length;
-    const progressPercent = (completed / totalLevels) * 100;
+    const rankLegendPoints = document.getElementById('rankLegendPoints');
+    const currentPoints = getPlayerPoints();
 
-    const progressBar = document.getElementById('worldMapProgress');
-    const progressText = document.getElementById('progressText');
-
-    if (progressBar) progressBar.style.width = `${progressPercent}%`;
-    if (progressText) progressText.textContent = `${completed} / ${totalLevels} Level abgeschlossen`;
+    if (rankLegendPoints) rankLegendPoints.textContent = `${currentPoints} / 500 Punkte`;
 }
 
 function showLockedMessage(levelNum) {
@@ -3563,8 +4133,56 @@ function unlockNextLevel(completedLevel) {
         completedLevels.push(completedLevel);
         completedLevels.sort((a, b) => a - b);
         localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
+
+        // Award 100 points for completing the level
+        awardPoints(100);
+
         console.log(`✅ Level ${completedLevel} completed! Unlocked Level ${completedLevel + 1}`);
     }
+}
+
+// Points and ranking system
+function awardPoints(points) {
+    let currentPoints = parseInt(localStorage.getItem('playerPoints') || '0');
+    currentPoints += points;
+    localStorage.setItem('playerPoints', currentPoints.toString());
+
+    // Update highest rank achieved
+    updateHighestRank();
+
+    // Update rank badge display
+    updateRankBadge();
+
+    console.log(`🏆 Awarded ${points} points! Total: ${currentPoints}/500`);
+}
+
+function getPlayerPoints() {
+    return parseInt(localStorage.getItem('playerPoints') || '0');
+}
+
+function getRank(points) {
+    if (points >= 500) return 'gold';
+    if (points >= 400) return 'silver';
+    if (points >= 300) return 'bronze';
+    return 'none';
+}
+
+function updateHighestRank() {
+    const currentPoints = getPlayerPoints();
+    const currentRank = getRank(currentPoints);
+    const highestRank = localStorage.getItem('highestRank') || 'none';
+
+    // Rank hierarchy: gold > silver > bronze > none
+    const rankValue = { gold: 3, silver: 2, bronze: 1, none: 0 };
+
+    if (rankValue[currentRank] > rankValue[highestRank]) {
+        localStorage.setItem('highestRank', currentRank);
+        console.log(`🏆 New rank achieved: ${currentRank.toUpperCase()}!`);
+    }
+}
+
+function getHighestRank() {
+    return localStorage.getItem('highestRank') || 'none';
 }
 
 function animateNextLevelUnlock(completedLevel) {
@@ -3600,6 +4218,36 @@ function animateNextLevelUnlock(completedLevel) {
     }, 500); // Reduced delay since no path animation
 }
 
+// Update rank badge display
+function updateRankBadge() {
+    const rankBadge = document.getElementById('rankBadge');
+    const rankIcon = document.getElementById('rankIcon');
+    const rankLabel = document.getElementById('rankLabel');
+
+    if (!rankBadge || !rankIcon || !rankLabel) return;
+
+    const highestRank = getHighestRank();
+
+    if (highestRank === 'none') {
+        rankBadge.style.display = 'none';
+        return;
+    }
+
+    // Show badge
+    rankBadge.style.display = 'flex';
+    rankBadge.className = `rank-badge ${highestRank}`;
+
+    // Set label based on rank (no icon)
+    const rankData = {
+        bronze: 'Bronze',
+        silver: 'Silber',
+        gold: 'Gold'
+    };
+
+    rankLabel.textContent = rankData[highestRank] || '';
+    rankIcon.textContent = ''; // No icon
+}
+
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Schummeln erlaubt - Platformer initialized!');
@@ -3630,7 +4278,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const anim = ANIMATIONS[animName];
         for (let i = 0; i < anim.frames; i++) {
             const img = new Image();
-            let frameStr = String(i).padStart(5, '0');
+            let frameStr;
+
+            // Special handling for enemy animation (4 digits)
+            if (animName === 'enemy') {
+                frameStr = String(i).padStart(4, '0');
+            } else {
+                frameStr = String(i).padStart(5, '0');
+            }
 
             if (animName === 'jump') {
                 if (i === 27) frameStr = '00027_a';
@@ -3738,9 +4393,12 @@ function hideResetConfirmation() {
 }
 
 function confirmReset() {
-    // Clear all progress
+    // Clear level progress and death count
     localStorage.removeItem('completedLevels');
     localStorage.removeItem('deathCount');
+
+    // Keep playerPoints and highestRank (they persist)
+    // These are NOT removed to preserve the player's rank achievement
 
     // Hide popup
     hideResetConfirmation();
@@ -3748,6 +4406,7 @@ function confirmReset() {
     // Refresh the level selection to show reset state
     setupLevelCards();
     updateDeathCounterDisplay();
+    updateRankBadge(); // Update rank badge display
 }
 
 

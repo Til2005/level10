@@ -36,6 +36,12 @@
             </div>
         </div>
 
+        <!-- Rank Badge (Top Left) -->
+        <div class="rank-badge" id="rankBadge" style="display: none;">
+            <span class="rank-icon" id="rankIcon"></span>
+            <span class="rank-label" id="rankLabel"></span>
+        </div>
+
         <!-- Death Counter (Top Right) -->
         <div class="death-counter" id="deathCounter" style="display: none;">
             💀 <span id="deathCount">0</span>
@@ -102,6 +108,7 @@
                             <div class="map-level-info">
                                 <div class="map-level-name">Erste Anfrage</div>
                                 <div class="map-level-status unlocked">▶ Start</div>
+                                <div class="map-level-points">0 / 100 Punkte</div>
                             </div>
                         </div>
 
@@ -115,6 +122,7 @@
                             <div class="map-level-info">
                                 <div class="map-level-name">Zeitfilter</div>
                                 <div class="map-level-status">Gesperrt</div>
+                                <div class="map-level-points">0 / 100 Punkte</div>
                             </div>
                         </div>
 
@@ -128,6 +136,7 @@
                             <div class="map-level-info">
                                 <div class="map-level-name">Visualisierung</div>
                                 <div class="map-level-status">Gesperrt</div>
+                                <div class="map-level-points">0 / 100 Punkte</div>
                             </div>
                         </div>
 
@@ -141,6 +150,7 @@
                             <div class="map-level-info">
                                 <div class="map-level-name">Filter & Sortierung</div>
                                 <div class="map-level-status">Gesperrt</div>
+                                <div class="map-level-points">0 / 100 Punkte</div>
                             </div>
                         </div>
 
@@ -155,20 +165,34 @@
                             <div class="map-level-info">
                                 <div class="map-level-name">Finale Prüfung</div>
                                 <div class="map-level-status">Gesperrt</div>
+                                <div class="map-level-points">0 / 100 Punkte</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Progress Info -->
-                    <div class="world-map-progress">
-                        <div class="progress-label">Fortschritt:</div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" id="worldMapProgress" style="width: 0%"></div>
+                    <!-- Rank Legend -->
+                    <div class="rank-legend">
+                        <div class="rank-legend-header">
+                            <div class="rank-legend-title">Ränge:</div>
+                            <div class="rank-legend-current-points" id="rankLegendPoints">0 / 500 Punkte</div>
                         </div>
-                        <div class="progress-text" id="progressText">0 / 5 Level abgeschlossen</div>
+                        <div class="rank-legend-items">
+                            <div class="rank-legend-item bronze">
+                                <span class="rank-legend-badge">Bronze</span>
+                                <span class="rank-legend-points">300 Punkte</span>
+                            </div>
+                            <div class="rank-legend-item silver">
+                                <span class="rank-legend-badge">Silber</span>
+                                <span class="rank-legend-points">400 Punkte</span>
+                            </div>
+                            <div class="rank-legend-item gold">
+                                <span class="rank-legend-badge">Gold</span>
+                                <span class="rank-legend-points">500 Punkte</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Reset Progress Button -->
+                    <!-- Reset Progress Button (outside card, to the right) -->
                     <button class="reset-progress-btn" onclick="showResetConfirmation()">
                         Fortschritt zurücksetzen
                     </button>
@@ -184,6 +208,7 @@
                         <li>Alle Level werden wieder gesperrt</li>
                         <li>Du startest wieder bei Level 1</li>
                         <li>Dein Death-Counter wird zurückgesetzt</li>
+                        <li>✅ Dein Rang und deine Punkte bleiben erhalten</li>
                     </ul>
                     <div class="reset-popup-actions">
                         <button class="reset-confirm-btn" onclick="confirmReset()">Ja, zurücksetzen</button>
@@ -214,6 +239,25 @@
                     </div>
                 </div>
 
+                <!-- Controls Display (Level 1 only) -->
+                <div class="controls-display" id="controlsDisplay" style="display: none;">
+                    <div class="controls-title">Steuerung</div>
+                    <div class="controls-list">
+                        <div class="control-item">
+                            <span class="control-key">←</span>
+                            <span class="control-action">Links</span>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-key">→</span>
+                            <span class="control-action">Rechts</span>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-key">Space</span>
+                            <span class="control-action">Springen</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Prompt Pieces Container -->
                 <div id="promptPiecesContainer"></div>
 
@@ -234,6 +278,18 @@
                     <div class="note-popup-content">
                         <img src="schriftrolle.png" alt="Prompt Zettel" class="note-scroll-image">
                         <div class="note-popup-hint">Drücke <span class="key-highlight">E</span> um fortzufahren</div>
+                    </div>
+                </div>
+
+                <!-- Sign Message Popup (Level 1) -->
+                <div class="sign-popup-overlay" id="signPopup" style="display: none;">
+                    <div class="sign-popup-content">
+                        <div class="sign-popup-wood-frame">
+                            <div class="sign-popup-text" id="signPopupText">
+                                <!-- Text wird dynamisch gefüllt -->
+                            </div>
+                        </div>
+                        <div class="sign-popup-hint">Drücke <span class="key-highlight">E</span> um fortzufahren</div>
                     </div>
                 </div>
             </div>
