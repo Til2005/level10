@@ -687,7 +687,7 @@ class FallingCard {
 
     getQualityLabel() {
         const labels = {
-            good: '+10',
+            good: '+5',
             bad: '-1 ❤️'
         };
         return labels[this.quality] || '?';
@@ -1118,10 +1118,10 @@ class BildPuzzleGame {
 
         // Update score based on quality
         if (card.quality === 'good') {
-            this.score += 10;
+            this.score += 5;
             this.collected++;
             this.checkScoreMilestone(this.score); // Easter egg: milestone celebration
-            this.showSpeech("Richtig! +10 Punkte!", 1500);
+            this.showSpeech("Richtig! +5 Punkte!", 1500);
         } else if (card.quality === 'bad') {
             // Check if shield is active
             if (this.activePowerUps.shield) {
@@ -1391,13 +1391,13 @@ class BildPuzzleGame {
 
         // Calculate rank
         let rank, rankName;
-        if (this.score >= 700) {
+        if (this.score >= 500) {
             rank = 'gold';
             rankName = 'Gold';
-        } else if (this.score >= 400) {
+        } else if (this.score >= 300) {
             rank = 'silver';
             rankName = 'Silber';
-        } else if (this.score >= 200) {
+        } else if (this.score >= 150) {
             rank = 'bronze';
             rankName = 'Bronze';
         } else {
@@ -1910,7 +1910,7 @@ class TutorialDemo {
 
         const badge = document.createElement('span');
         badge.className = 'demo-card-badge';
-        badge.textContent = quality === 'good' ? '+10' : '-1 ❤️';
+        badge.textContent = quality === 'good' ? '+5' : '-1 ❤️';
 
         const img = document.createElement('img');
         const promptData = quality === 'good' ? IMAGE_PROMPTS.good[0] : IMAGE_PROMPTS.bad[0];
