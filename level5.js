@@ -2857,7 +2857,11 @@ class PlatformerGame {
     gameLoop(currentTime = performance.now()) {
         if (!this.isRunning) return;
 
-        let deltaTime = (currentTime - this.lastTime) / 16.67; // Normalize to 60fps
+        // Calculate actual time difference in seconds
+        const actualDeltaTime = (currentTime - this.lastTime) / 1000;
+
+        // Normalize to 60fps (1/60 = 0.01667 seconds per frame)
+        let deltaTime = actualDeltaTime / 0.01667;
 
         // Clamp deltaTime to prevent huge jumps during lag spikes
         if (deltaTime > 3) deltaTime = 1; // Cap at 3x normal speed
