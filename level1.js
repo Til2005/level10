@@ -523,10 +523,10 @@ const tutorials = [
                 badPoints: "0 Punkte",
                 whyBad: "Viel zu vage - welches Meeting?<br>Was soll kommuniziert werden?",
                 mediumPrompt: "Schreibe eine E-Mail an mein Team, dass das Meeting morgen ausfällt",
-                mediumPoints: "3 Punkte",
+                mediumPoints: "30 Punkte",
                 whyMedium: "Besser! Aber es fehlt noch der neue Termin und die Zeit.",
                 goodPrompt: "E-Mail an mein Team: Meeting morgen 10 Uhr fällt aus, wird auf nächste Woche verschoben.",
-                goodPoints: "10 Punkte",
+                goodPoints: "100 Punkte",
                 whyGood: "Perfekt! Spezifisch: Empfänger, Inhalt, Ton und alle wichtigen Details definiert."
             }
         ],
@@ -552,14 +552,14 @@ const challenges = [
             {
                 text: "Erstelle einen LinkedIn-Post für Mercedes-Benz Werk Sindelfingen. Heute wurde das 50.000ste vollelektrische EQS-Fahrzeug in diesem Jahr produziert. Ton: Professionell, stolz aber nicht übertrieben. Zielgruppe: Automobilindustrie-Professionals, potenzielle Mitarbeiter, Partner. Betone: Meilenstein Elektromobilität, Teamleistung, Zukunft der Mobilität.",
                 quality: "excellent",
-                score: 10,
+                score: 100,
                 response: "🎉 Meilenstein in Sindelfingen: 50.000 EQS in 2025!\n\nHeute haben wir am Standort Sindelfingen das 50.000ste vollelektrische EQS-Fahrzeug in diesem Jahr vom Band rollen lassen. Dieser Erfolg ist das Ergebnis der außergewöhnlichen Teamleistung unserer Mitarbeiterinnen und Mitarbeiter.\n\nMit jedem EQS gestalten wir aktiv die Zukunft der Mobilität – elektrisch, nachhaltig und innovativ. Danke an alle, die diesen Meilenstein möglich gemacht haben!\n\n#MercedesBenz #Elektromobilität #EQS #Sindelfingen #ZukunftDerMobilität #Teamwork\n\n*[Perfekt: Alle wichtigen Infos enthalten, professioneller Ton, richtige Zielgruppe]*",
                 explanation: "Exzellent! Du hast alle wichtigen Informationen in den Prompt gepackt: Ort, Meilenstein, Ton, Zielgruppe und Kernbotschaften. Das Ergebnis ist präzise und professionell!"
             },
             {
                 text: "LinkedIn-Post für Mercedes-Benz: 50.000 EQS produziert in Sindelfingen. Professionell und stolz.",
                 quality: "good",
-                score: 3,
+                score: 30,
                 response: "Heute haben wir im Mercedes-Benz Werk Sindelfingen das 50.000ste EQS-Fahrzeug produziert. Ein wichtiger Meilenstein für unser Team.\n\n#MercedesBenz #EQS #Elektromobilität\n\n*[Okay, aber zu knapp - fehlen Kontext, Zielgruppe und wichtige Details]*",
                 explanation: "Auf dem richtigen Weg! Die Grundinformationen sind da, aber es fehlen wichtige Details wie 'vollelektrisch', 'in diesem Jahr', die genaue Zielgruppe und was betont werden soll. Mehr Details = besseres Ergebnis!"
             }
@@ -589,7 +589,7 @@ const challenges = [
             {
                 text: "Erkläre einer 78-jährigen Oma in ganz einfachen Schritten, wie sie ein Foto per WhatsApp schickt. Beruhigend und geduldig, als würdest du neben ihr stehen.",
                 quality: "excellent",
-                score: 10,
+                score: 100,
                 response: "**Fotos schicken - ganz einfach, liebe Oma!**\n\n**Schritt 1:** WhatsApp öffnen (das grüne Symbol mit dem Telefon)\n**Schritt 2:** Den Namen antippen, dem du das Foto schicken willst\n**Schritt 3:** Das kleine Kamera-Symbol unten drücken\n**Schritt 4:** 'Kamera' oder 'Galerie' wählen (Galerie = schon gemachte Fotos)\n**Schritt 5:** Foto auswählen und auf den blauen Pfeil drücken\n\n**Fertig!** Das war's schon. Du schaffst das! ❤️\n\n*[Perfekt: Einfach, beruhigend, Schritt-für-Schritt]*",
                 explanation: "Perfekt! Du hast verstanden: Der beste Prompt passt sich der PERSON an. Oma braucht Geduld und einfache Worte, keine Technologie-Expertise. Empathie schlägt Fachwissen!"
             }
@@ -612,14 +612,14 @@ const challenges = [
             {
                 text: "Du bist ein zertifizierter HR-Experte mit 25 Jahren Erfahrung mit Expertise in modernen Bewerbungsstrategien. Analysiere das Anschreiben meines Freundes für eine Grafikdesigner-Position und optimiere es nach neuesten HR-Trends, sodass es nicht so langweilig wirkt. Er hat 3 Jahre Erfahrung, kann Photoshop/Illustrator und hat das Rebranding einer lokalen Bäckerei gemacht.",
                 quality: "excellent",
-                score: 10,
+                score: 100,
                 response: "**Überarbeitetes Anschreiben - Grafikdesigner:**\n\nSehr geehrte Damen und Herren,\n\nDesign ist für mich mehr als schöne Bilder – es löst Probleme. Als ich letztes Jahr das Rebranding für die lokale Bäckerei Schmidt entwickelte, stieg deren Umsatz um 30%. Das war der Moment, wo ich wusste: Gutes Design verändert wirklich etwas.\n\nMeine 3-jährige Berufserfahrung mit Photoshop und Illustrator ermöglicht es mir, vielseitige Lösungen zu entwickeln. Von Plakat-Kampagnen bis zu digitalen Web-Experiences – ich denke immer daran, wie Menschen mit Design interagieren.\n\nIhre Stellenausschreibung hat mich sofort angesprochen, weil Sie nach jemandem suchen, der 'über den Tellerrand blickt'. Genau das mache ich: Ich verbinde kreative Vision mit strategischem Denken.\n\nIch würde gerne zeigen, wie meine Erfahrung und Leidenschaft Ihr Team bereichern kann.\n\nMit freundlichen Grüßen\nMax\n\n*[Perfekt: Konkret, authentisch, zeigt Erfahrung und Erfolge]*",
                 explanation: "Exzellent! Du hast verstanden: Gib der AI eine Expertenrolle und alle wichtigen Details. Spezifische Verbesserungsanweisungen führen zu viel besseren Ergebnissen!"
             },
             {
                 text: "Überarbeite das Anschreiben für die Grafikdesigner-Stelle. Mach es persönlicher und weniger langweilig.",
                 quality: "good",
-                score: 3,
+                score: 30,
                 response: "**Überarbeitetes Anschreiben:**\n\nSehr geehrte Damen und Herren,\n\nich interessiere mich sehr für Ihre Grafikdesigner-Position. Design ist meine große Leidenschaft und ich bringe viel Kreativität mit.\n\nIn meiner bisherigen Berufslaufbahn konnte ich bereits verschiedene Projekte erfolgreich umsetzen. Dabei habe ich gelernt, kundenorientiert zu arbeiten und Deadlines einzuhalten.\n\nIch würde mich freuen, meine Fähigkeiten in Ihrem Team einzusetzen und freue mich auf ein persönliches Gespräch.\n\nMit freundlichen Grüßen\n[Name]\n\n*[Etwas persönlicher, aber immer noch zu allgemein und ohne konkrete Beispiele]*",
                 explanation: "Gut, aber nicht optimal! Du warst auf dem richtigen Weg mit 'persönlicher', aber die AI brauchte mehr Details über Max und seine Projekte."
             },
@@ -642,14 +642,14 @@ const challenges = [
             {
                 text: "Erstelle eine verständliche Zusammenfassung der neuen Sicherheitsrichtlinien für Hochvolt-Batterien in der Mercedes-Benz Elektromontage. Zielgruppe: 450 Produktionsmitarbeiter mit unterschiedlichem Erfahrungslevel. Dauer: 15-minütige Sicherheitsunterweisung.",
                 quality: "excellent",
-                score: 10,
+                score: 100,
                 response: "**SICHERHEITSUNTERWEISUNG: HOCHVOLT-BATTERIEN**\n**Mercedes-Benz Elektromontage | 15-Minuten-Schulung**\n\n**1. HAUPTGEFAHREN:**\n• Hochspannung (400V+) - Lebensgefahr bei Kontakt\n• Chemische Gefahren bei Beschädigung\n• Brandgefahr bei unsachgemäßer Handhabung\n\n**2. PFLICHT-SCHUTZAUSRÜSTUNG:**\n✓ Isolierte Handschuhe (geprüft)\n✓ Schutzbrille\n✓ Sicherheitsschuhe\n\n**3. WICHTIGSTE VERHALTENSREGELN:**\n• VOR jeder Arbeit: System spannungsfrei schalten\n• NIEMALS alleine an Hochvolt-Systemen arbeiten\n• Bei Unsicherheit: STOPP - Vorgesetzten fragen\n• Beschädigte Batterien NICHT berühren\n\n**4. DOS & DON'TS:**\n✓ DO: Werkzeuge vor Nutzung prüfen\n✓ DO: Arbeitsbereich absichern\n✗ DON'T: Schmuck/Metallgegenstände tragen\n✗ DON'T: Mit nassen Händen arbeiten\n\n**NOTFALL:** Roten Notaus-Schalter drücken → Bereich räumen → Ersthelfer rufen\n\n*[Perfekt: Klar strukturiert, verständlich, praxisnah]*",
                 explanation: "Exzellent! Alle wichtigen Infos: Kontext (Hochvolt), Zielgruppe (450 MA, unterschiedliches Level), Format (15 Min) und gewünschte Struktur. Sofort einsetzbar!"
             },
             {
                 text: "Sicherheitsunterweisung Hochvolt-Batterien für Mercedes Mitarbeiter. Verständlich erklären.",
                 quality: "good",
-                score: 3,
+                score: 30,
                 response: "**Sicherheit bei Hochvolt-Batterien:**\n\nHochvolt-Batterien sind gefährlich. Tragen Sie immer Schutzkleidung. Arbeiten Sie nur an spannungsfreien Systemen. Bei Fragen wenden Sie sich an Ihren Vorgesetzten.\n\nWichtige Punkte:\n- Schutzausrüstung tragen\n- System vor Arbeit abschalten\n- Keine beschädigten Batterien anfassen\n\n*[Grundlagen sind da, aber zu knapp und unstrukturiert]*",
                 explanation: "Auf dem richtigen Weg! Es fehlen wichtige Details: Anzahl Mitarbeiter, unterschiedliches Level, 15-Min-Format, Struktur. Mehr Kontext = besseres Ergebnis!"
             }
@@ -672,14 +672,14 @@ const challenges = [
             {
                 text: "Newsletter für Mercedes-Benz Werk Rastatt: Neue Kantine mit veganem Bereich. Freundlich schreiben.",
                 quality: "good",
-                score: 3,
+                score: 30,
                 response: "Liebe Kolleginnen und Kollegen,\n\nunsere Kantine im Werk Rastatt wurde renoviert und hat jetzt auch einen veganen Bereich. Schauen Sie vorbei!\n\nIhr Team der internen Kommunikation\n\n*[Basics sind da, aber zu knapp und uninspirierend]*",
                 explanation: "Okay, aber zu simpel! Es fehlen: 6.500 Mitarbeiter, was renoviert wurde, Öffnungszeiten, und dass sich ALLE angesprochen fühlen sollen. Mehr Context!"
             },
             {
                 text: "Erstelle einen Newsletter-Artikel für Mercedes-Benz Werk Rastatt. Die Kantine wurde komplett renoviert und um einen veganen Bereich erweitert. Zielgruppe: 6.500 Mitarbeiter. Ton: Informativ, freundlich, inklusiv - alle sollen sich angesprochen fühlen.",
                 quality: "excellent",
-                score: 10,
+                score: 100,
                 response: "🎉 Eure neue Kantine ist da!\n\nLiebe Kolleginnen und Kollegen im Werk Rastatt,\n\nab morgen erwartet euch ein komplett neues Kantine-Erlebnis! Nach mehrwöchiger Renovierung öffnen wir mit frischem Design, mehr Platz und einem erweiterten Angebot.\n\n**Was ist neu?**\n✓ Modernes, helles Ambiente zum Wohlfühlen\n✓ Neuer veganer Bereich mit täglich wechselnden Gerichten\n✓ Klassiker bleiben: Schnitzel, Currywurst & Co.\n✓ Erweiterte vegetarische Auswahl\n✓ Frische Salatbar und Snack-Station\n\n**Für jeden was dabei!** Ob Fleischliebhaber, Veggie-Fan oder vegan – bei uns findet jeder sein Lieblingsessen.\n\n📍 **Öffnungszeiten:** Mo-Fr, 11:30-14:00 Uhr\n🍴 **Ab morgen:** Kommt vorbei und überzeugt euch selbst!\n\nWir freuen uns auf euch!\nEuer Kantine-Team & Interne Kommunikation\n\n*[Perfekt: Alle Infos, inklusiv, motivierend, strukturiert]*",
                 explanation: "Exzellent! An alles gedacht: Standort, Zielgruppe (6.500 MA), was neu ist, ALLE Essenstypen berücksichtigt, Ton (freundlich + inklusiv) und Call-to-Action. Top!"
             }
@@ -702,14 +702,14 @@ const challenges = [
             {
                 text: "Erstelle Lautsprecher-Durchsage für Mercedes Werk Sindelfingen, Produktionshalle 3. Inhalt: Außerplanmäßiger Staplerverkehr, 180 Mitarbeiter warnen. Durchsage maximal 15 Sekunden - knapp, klar, direkt verständlich während der Arbeit. Betone: Welche Halle, was beachten (Wege freihalten).",
                 quality: "excellent",
-                score: 10,
+                score: 100,
                 response: "Achtung Halle 3! In den nächsten 30 Minuten außerplanmäßiger Staplerverkehr. Bitte Hauptwege freihalten und auf Warnsignale achten. Danke!\n\n*[Perfekt: 12 Sekunden, alle wichtigen Infos, klar und knapp]*",
                 explanation: "Perfekt! In 12 Sekunden alle Infos: Welche Halle (Halle 3), wie lange (30 Min), was tun (Wege freihalten, Signale beachten). Knapp, klar, schnell erfassbar!"
             },
             {
                 text: "Du bist Sicherheitsbeauftragter mit 15 Jahren Erfahrung im Arbeitsschutz bei Mercedes-Benz, spezialisiert auf Staplerverkehr, Gefährdungsbeurteilung und Unfallprävention. Erstelle eine professionelle, rechtlich einwandfreie, umfassende Lautsprecher-Durchsage für Produktionshalle 3 in Werk Sindelfingen. 180 Mitarbeiter müssen über außerplanmäßigen Staplerverkehr informiert werden.",
                 quality: "good",
-                score: 3,
+                score: 30,
                 response: "Achtung an alle Mitarbeiterinnen und Mitarbeiter in Produktionshalle 3!\n\nDies ist eine wichtige Sicherheitsdurchsage gemäß DGUV Vorschrift 68, Betrieb von Flurförderzeugen.\n\nIn den kommenden 30 bis 45 Minuten findet außerplanmäßiger Staplerverkehr in Ihrer Halle statt. Zu Ihrer eigenen Sicherheit beachten Sie bitte folgende Verhaltensregeln:\n\nErstens: Halten Sie mindestens 1,5 Meter Abstand zu Fahrwegen.\n\nZweitens: Achten Sie auf akustische und optische Warnsignale.\n\nDrittens: Überqueren Sie Fahrwege nur an gekennzeichneten Übergängen.\n\nViertens: Bei Unsicherheiten stehen bleiben und Stapler vorbeifahren lassen.\n\nBei Fragen wenden Sie sich an Ihren Schichtleiter, Durchwahl 4521. Vielen Dank!\n\n*[Viel zu lang - über 90 Sekunden! Niemand hört bis zum Ende zu]*",
                 explanation: "Totaler Overkill! 90 Sekunden - viermal zu lang! Mitten in der Arbeit hört niemand DGUV-Vorschriften zu. Die wichtigste Info geht unter. Regel: So kurz wie möglich!"
             }
@@ -725,14 +725,14 @@ const challenges = [
             {
                 text: "Schreibe einen E-Mail Betreff über ein Meeting",
                 quality: "poor",
-                score: 3,
+                score: 30,
                 response: "Meeting-Änderung\n\n*[Zu vage - welches Meeting? Was wurde geändert?]*",
                 explanation: "Zu vage! WELCHES Meeting? Was geändert - Datum? Zeit? Raum? Abgesagt? Teilnehmer müssen die Mail öffnen um zu wissen, was los ist!"
             },
             {
                 text: "Schreibe E-Mail Betreff-Zeile für Meeting-Änderung Mercedes Werk Berlin. Meeting morgen von 10 Uhr auf 15 Uhr verlegt, Raum von 201 zu 304 geändert. Betreff muss alle wichtigen Infos enthalten - maximal 10 Wörter, Teilnehmer sollen im Posteingang sofort sehen was Sache ist ohne E-Mail zu öffnen.",
                 quality: "excellent",
-                score: 10,
+                score: 100,
                 response: "GEÄNDERT: Projekt-Meeting morgen 15 Uhr (statt 10 Uhr), Raum 304\n\n*[Perfekt: 10 Wörter, alle wichtigen Infos auf einen Blick]*",
                 explanation: "Perfekt! In 10 Wörtern alle Infos: 'GEÄNDERT' = Aufmerksamkeit, 'Projekt-Meeting' = Identifikation, '15 Uhr (statt 10)' = neue Zeit, 'Raum 304' = neue Location. Alles klar ohne Mail zu öffnen!"
             },
@@ -762,7 +762,7 @@ const challenges = [
             {
                 text: "Fasse das 8-seitige Protokoll vom E-Mobilität Strategie-Meeting im Werk Berlin zusammen für die Geschäftsführung. Sie brauchen maximal 5 Bullet Points mit den wichtigsten Entscheidungen.",
                 quality: "excellent",
-                score: 10,
+                score: 100,
                 response: "**Meeting-Zusammenfassung: E-Mobilität Strategie (8-seitiges Protokoll)**\n\n• **Investitionsentscheidung:** 45 Mio. € Budget für Ausbau Ladeinfrastruktur am Standort Berlin bis Q2 2025 genehmigt\n\n• **Produktionsziel:** Ab Januar 2025 Umstellung auf 60% E-Antriebssysteme-Produktion (aktuell 35%), neue Schichtmodelle erforderlich\n\n• **Lieferanten-Verträge:** Drei neue Batterie-Lieferanten qualifiziert, Vertragsabschluss bis 15. Dezember (kritische Deadline!)\n\n• **Schulungsbedarf:** 1.200 Mitarbeiter benötigen Hochvolt-Schulung bis März 2025, externes Trainingsunternehmen wird beauftragt (Budget: 2,8 Mio. €)\n\n• **Risiko identifiziert:** Engpass bei Elektromotoren-Komponenten aus China - Alternative Lieferanten werden bis Januar evaluiert\n\n*[Perfekt: 5 konkrete Punkte, Entscheidungen klar, Budget/Deadlines genannt]*",
                 explanation: "Perfekt! 5 Bullet Points mit allen geschäftsrelevanten Infos: Entscheidungen mit Zahlen (45 Mio. €), Ziele (60% E-Antriebe), Deadlines (15. Dez), Budget (2,8 Mio. €), Risiken. Geschäftsführung weiß sofort alles Wichtige!"
             },
@@ -792,14 +792,14 @@ const challenges = [
             {
                 text: "Erstelle ein Schulungskonzept für Mercedes-Benz Werk Berlin. 250 Produktionsmitarbeiter müssen das neue KI-Assistenzsystem für E-Antriebe-Montage lernen. Gliedere das Konzept nach Schulungstagen und beschreibe die Inhalte.",
                 quality: "good",
-                score: 3,
+                score: 30,
                 response: "**Schulungskonzept: KI-Assistenzsystem E-Antriebe-Montage**\n**Mercedes-Benz Werk Berlin**\n\n**Tag 1 - Grundlagen (7 Stunden):**\n- Vormittag: Was ist KI? Wie funktioniert das neue System?\n- Nachmittag: Sicherheitseinweisung und erste Bedienung am Tablet\n\n**Tag 2 - Praxistraining (7 Stunden):**\n- Vormittag: Montageabläufe mit KI-Unterstützung durchführen\n- Nachmittag: Übungen an echten Bauteilen\n\n**Tag 3 - Vertiefung (7 Stunden):**\n- Vormittag: Fehlererkennung und Qualitätskontrolle\n- Nachmittag: Abschlusstest (Theorie + Praxis)\n\n**Durchführung:**\nGruppen à 25 Personen, 10 Durchgänge über 2 Monate\n\n*[Okay, aber zu simpel - keine Differenzierung nach Vorkenntnissen, keine Methodenvielfalt]*",
                 explanation: "Schon besser! Aber: Was ist mit unterschiedlichen Vorkenntnissen (22 vs. 62 Jahre)? Wie lernen verschiedene Altersgruppen? Wie wird Erfolg gemessen? Für GF-Präsentation fehlen strategische Antworten!"
             },
             {
                 text: "Erstelle ein professionelles Schulungskonzept für die Geschäftsführung Mercedes-Benz Werk Berlin. 250 Produktionsmitarbeiter (Alter 22-62 Jahre, sehr unterschiedliche digitale Vorkenntnisse) müssen das neue KI-Assistenzsystem für E-Antriebe-Montage lernen. Das System führt Schritt-für-Schritt durch Montage und erkennt Fehler automatisch.",
                 quality: "excellent",
-                score: 10,
+                score: 100,
                 response: "**SCHULUNGSKONZEPT: KI-ASSISTENZSYSTEM E-ANTRIEBE-MONTAGE**\n**Mercedes-Benz Werk Berlin | Geschäftsführungspräsentation**\n\n**1. VORKENNTNISSE:**\n✓ Einstufungstest (10 Min)\n✓ 3 Gruppen: Digital Natives (2,5 Tage), Standard (3,5 Tage), Intensiv (4,5 Tage)\n\n**2. METHODEN:**\n25% Theorie • 50% Praxis • 15% Peer-Learning • 10% E-Learning\n\n**3. ZEITPLAN (3,5 Tage):**\nTag 1: System verstehen | Tag 2-3: Praxis-Training | Tag 4: Prüfung\n\n**4. ERFOLGSMESSUNG:**\nPraktische Prüfung (70%) + Theorietest (60%)\n\n**5. RESSOURCEN:**\n6 Haupttrainer + 4 Assistenten | 13 Durchgänge über 3 Monate\n\n**6. BUDGET:** 350.000€ (1.400€/Person)\nTrainer: 180.000€ | Material: 90.000€ | Ausfall: 80.000€\n\n*[Perfekt: Alle Fragen beantwortet, strategisch durchdacht, präsentationsreif]*",
                 explanation: "Exzellent! DAS ist ein GF-Konzept! Alle kritischen Fragen beantwortet: 3 Altersgruppen, vielfältige Methoden (Peer-Learning!), Zeitplan, Erfolgsmessung, Trainer-Bedarf UND Budget. Lektion: Bei komplexen Business-Konzepten führen nur detaillierte Prompts zu professionellen Ergebnissen!"
             }
@@ -822,14 +822,14 @@ const challenges = [
             {
                 text: "Erstelle einen Türschild-Text für das neue 'Innovation Lab' im Mercedes-Benz Werk Berlin. Der Raum ist für kreative Workshops, Brainstorming und agile Team-Meetings gedacht. Hat Whiteboards, flexible Möbel, moderne Technik. Maximal 3 Zeilen - muss auf einen Blick verständlich sein.",
                 quality: "excellent",
-                score: 10,
+                score: 100,
                 response: "**Innovation Lab**\nKreativ-Raum für Workshops, Brainstorming & agile Meetings\nWhiteboards • Flexible Möbel • Moderne Technik\n\n*[Perfekt: 3 Zeilen, alle wichtigen Infos, sofort erfassbar]*",
                 explanation: "Perfekt! In 3 kompakten Zeilen alles Wichtige: Name, Zweck (Workshops, Brainstorming, agile Meetings) und Ausstattung. Auf einen Blick erfassbar!"
             },
             {
                 text: "Du bist ein professioneller Workplace Experience Spezialist mit 20 Jahren Erfahrung in modernen Office-Konzepten. Erstelle einen umfassenden, detaillierten Türschild-Text für das neue Innovation Lab im Mercedes-Benz Werk Berlin. Ausstattung: 6 Whiteboards, höhenverstellbare Tische, 75-Zoll-Touchscreen, Videokonferenz-System, Sticky Notes. Ton: Professionell, inspirierend, einladend.",
                 quality: "good",
-                score: 3,
+                score: 30,
                 response: "**Innovation Lab – Ihr Raum für kreative Exzellenz**\n\nWillkommen im Innovation Lab, dem Herzstück kreativer Kollaboration im Mercedes-Benz Werk Berlin!\n\n**Raum-Philosophie:**\nSpeziell konzipiert, um innovative Denkprozesse und interdisziplinäre Zusammenarbeit zu fördern.\n\n**Zielgruppe:**\nIdeal für Entwicklungsteams, Marketing, HR. Perfekt für Design Thinking, Sprint Plannings, Brainstorming-Workshops und Hackathons.\n\n**Premium-Ausstattung:**\n• 6 Whiteboards • Höhenverstellbare Tische • Flexible Möbel\n• 75-Zoll Touchscreen • Videokonferenz-System • Creative-Supply-Kit\n\n**Buchung:**\nOutlook-Kalender oder Workplace-App. Max. 4h, 24h Vorlauf.\n\n**Regeln:**\nWhiteboards löschen • Möbel zurückstellen • Kits auffüllen\n\n**Kontakt:** Facility Management, 4856\n\n*[Viel zu lang - das ist ein A4-Blatt, kein Türschild!]*",
                 explanation: "Katastrophe! Das ist kein Türschild, das ist ein Handbuch! Die wichtigste Info geht im Wortschwall unter. Ein Türschild muss in 3 Sekunden erfassbar sein - hier braucht man 3 Minuten!"
             }
@@ -1278,11 +1278,11 @@ function showCompletion() {
     // MoMan final celebration
     if (moHost) {
         let finalMessage = "";
-        if (totalScore >= 45) {
+        if (totalScore >= 450) {
             finalMessage = `WOW! Du bist ein echtes Prompt-Talent! ${totalScore} Punkte sind fantastisch! 🏆⭐`;
-        } else if (totalScore >= 35) {
+        } else if (totalScore >= 350) {
             finalMessage = `Sehr beeindruckend! Du hast das Prompting richtig gut drauf! ${totalScore} Punkte! 🌟💫`;
-        } else if (totalScore >= 25) {
+        } else if (totalScore >= 250) {
             finalMessage = `Gut gemacht! Du hast die Grundlagen verstanden! ${totalScore} Punkte! 👏🎯`;
         } else {
             finalMessage = `Hey, das war ein guter Start! ${totalScore} Punkte - Übung macht den Meister! 💪😊`;
@@ -1313,9 +1313,9 @@ function showCompletion() {
 }
 
 function getRank(score) {
-    if (score >= 50) return { title: "Gold", description: "Perfekte Prompt-Meisterschaft!" };
-    if (score >= 40) return { title: "Silber", description: "Sehr gute Leistung!" };
-    if (score >= 25) return { title: "Bronze", description: "Solider Prompt-Anfang!" };
+    if (score >= 500) return { title: "Gold", description: "Perfekte Prompt-Meisterschaft!" };
+    if (score >= 400) return { title: "Silber", description: "Sehr gute Leistung!" };
+    if (score >= 250) return { title: "Bronze", description: "Solider Prompt-Anfang!" };
     return { title: "Kein Rang", description: "Weiter üben!" };
 }
 
