@@ -1996,16 +1996,24 @@ class TxpNpc {
     }
 
     advanceTutorial() {
-        if (this.isPlayerNear && !this.hasShownTutorial) {
-            this.tutorialStep++;
-            if (this.tutorialStep < this.tutorialMessages.length) {
+        if (this.isPlayerNear) {
+            // If tutorial was completed, restart from beginning
+            if (this.hasShownTutorial) {
+                this.tutorialStep = 0;
+                this.hasShownTutorial = false;
                 this.showSpeech(this.tutorialMessages[this.tutorialStep]);
-                // Switch to talk animation
                 this.startAnimation('talk');
             } else {
-                this.hasShownTutorial = true;
-                this.hideSpeech();
-                this.startAnimation('stand');
+                this.tutorialStep++;
+                if (this.tutorialStep < this.tutorialMessages.length) {
+                    this.showSpeech(this.tutorialMessages[this.tutorialStep]);
+                    // Switch to talk animation
+                    this.startAnimation('talk');
+                } else {
+                    this.hasShownTutorial = true;
+                    this.hideSpeech();
+                    this.startAnimation('stand');
+                }
             }
         }
     }
@@ -2126,6 +2134,10 @@ class PlatformerGame {
         this.isMusicPlaying = false;
         this.currentMusic = null; // Track which music is playing
         this.inLavaSection = false;
+
+        // Set volume for both music tracks (0.0 to 1.0)
+        if (this.backgroundMusic) this.backgroundMusic.volume = 0.6;
+        if (this.lavaMusic) this.lavaMusic.volume = 0.4;
 
         // Web Audio API for jump sound
         this.audioContext = null;
@@ -2362,6 +2374,12 @@ class PlatformerGame {
         document.addEventListener('keydown', (e) => {
             this.keys[e.key] = true;
 
+            // Toggle pause menu with 'Escape'
+            if (e.key === 'Escape') {
+                this.togglePauseMenu();
+                return;
+            }
+
             // Toggle hitboxes with 'H'
             if (e.key === 'h' || e.key === 'H') {
                 this.toggleHitboxes();
@@ -2439,6 +2457,34 @@ class PlatformerGame {
                 this.player.isMovingRight = false;
             }
         });
+    }
+
+    togglePauseMenu() {
+        const pauseMenu = document.getElementById('pauseMenu');
+        if (!pauseMenu) return;
+
+        if (pauseMenu.style.display === 'flex') {
+            // Resume game
+            pauseMenu.style.display = 'none';
+            this.isRunning = true;
+            this.lastTime = performance.now();
+            this.gameLoop();
+        } else {
+            // Pause game
+            pauseMenu.style.display = 'flex';
+            this.isRunning = false;
+            if (this.gameLoopId) {
+                cancelAnimationFrame(this.gameLoopId);
+            }
+            // Stop all player movement
+            if (this.player) {
+                this.player.isMovingLeft = false;
+                this.player.isMovingRight = false;
+                this.player.velocityX = 0;
+            }
+            // Clear all keys
+            this.keys = {};
+        }
     }
 
     toggleHitboxes() {
@@ -3786,8 +3832,8 @@ class PlatformerGame {
                 newConcept: '📊 Visualisierung'
             },
             4: {
-                tip: 'Im nächsten Level lernst du, wie du Daten nach bestimmten Kriterien filterst und sortierst.',
-                newConcept: '🔍 Filter & Sortierung'
+                tip: 'Im nächsten Level lernst du, wie du deinen fertigen Prompt mit Kollegen teilen kannst.',
+                newConcept: '🤝 Prompt-Weitergabe'
             },
             5: {
                 tip: 'Im finalen Level lernst du, alle Konzepte zu kombinieren und einen standardisierten Prompt zu erstellen.',
@@ -3835,6 +3881,14 @@ class PlatformerGame {
         const screens = document.querySelectorAll('.game-screen');
         screens.forEach(screen => screen.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
+
+        // Scroll to top when showing level complete screen
+        if (screenId === 'levelCompleteScreen') {
+            const completeContent = document.querySelector('.complete-content');
+            if (completeContent) {
+                completeContent.scrollTop = 0;
+            }
+        }
 
         // Show/hide music toggle button based on screen
         const musicToggle = document.getElementById('musicToggle');
@@ -3998,6 +4052,21 @@ function goToLevelSelectWithAnimation() {
     goToLevelSelect(completedLevel);
 }
 
+// ===== PAUSE MENU FUNCTIONS =====
+function resumeGame() {
+    if (game) {
+        game.togglePauseMenu();
+    }
+}
+
+function returnToLevelSelect() {
+    const pauseMenu = document.getElementById('pauseMenu');
+    if (pauseMenu) {
+        pauseMenu.style.display = 'none';
+    }
+    goToLevelSelect();
+}
+
 // ===== TXP CLICK EASTER EGG =====
 let txpClickTimeout = null;
 
@@ -4028,6 +4097,78 @@ function setupIntroScreen() {
 
     document.addEventListener('keydown', handleKeyPress);
     introScreen.addEventListener('click', handleClick);
+}
+
+// ===== TXP INTRO ANIMATION =====
+function startIntroTxpAnimation() {
+    const introTxpImg = document.getElementById('introTxpImg');
+    const introTxp = document.querySelector('.intro-txp');
+    if (!introTxpImg || !introTxp) return;
+
+    const walkFrames = 24;
+    let currentFrame = 0;
+    const walkBasePath = 'TXP/TXP_Lauf_Pose/TXP Lauf Loop_';
+    const jumpBasePath = 'TXP/TXP_Sprung_Pose/TXP Sprung_';
+
+    let isJumping = false;
+    let walkInterval;
+
+    // Walking animation loop
+    const startWalkAnimation = () => {
+        walkInterval = setInterval(() => {
+            if (!isJumping) {
+                const frameStr = String(currentFrame).padStart(5, '0');
+                introTxpImg.src = `${walkBasePath}${frameStr}.png`;
+                currentFrame = (currentFrame + 1) % walkFrames;
+            }
+        }, 1000 / 36); // 36 FPS (3x faster than 12)
+    };
+
+    // Jump animation
+    const playJumpAnimation = () => {
+        if (isJumping) return;
+        isJumping = true;
+        introTxp.classList.add('jumping');
+
+        let jumpFrame = 0;
+        const totalJumpFrames = 90; // 0-89
+        const jumpAnimDuration = 3000; // 3 seconds
+        const frameTime = jumpAnimDuration / totalJumpFrames;
+
+        const jumpInterval = setInterval(() => {
+            let frameName;
+            if (jumpFrame === 14) {
+                frameName = '00014A';
+            } else if (jumpFrame === 15) {
+                frameName = '00015B';
+            } else if (jumpFrame < 10) {
+                frameName = '0000' + jumpFrame;
+            } else if (jumpFrame < 100) {
+                frameName = '000' + jumpFrame;
+            } else {
+                frameName = '00' + jumpFrame;
+            }
+
+            introTxpImg.src = `${jumpBasePath}${frameName}.png`;
+            jumpFrame++;
+
+            if (jumpFrame >= totalJumpFrames) {
+                clearInterval(jumpInterval);
+                isJumping = false;
+                introTxp.classList.remove('jumping');
+                currentFrame = 0; // Reset walk frame
+            }
+        }, frameTime);
+    };
+
+    // Start walking animation
+    startWalkAnimation();
+
+    // Click handler for jumping
+    introTxp.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent triggering intro screen start
+        playJumpAnimation();
+    });
 }
 
 // ===== WORLD MAP & LEVEL PROGRESSION =====
@@ -4061,12 +4202,21 @@ function setupLevelCards() {
         const statusEl = mapLevel.querySelector('.map-level-status');
         const pointsEl = mapLevel.querySelector('.map-level-points');
 
+        // Check if points have been awarded for this level
+        const levelsAwarded = JSON.parse(localStorage.getItem('levelsAwarded') || '[]');
+        const hasPointsForLevel = levelsAwarded.includes(levelNum);
+
         if (isCompleted) {
             mapLevel.classList.add('completed');
-            if (statusEl) statusEl.textContent = 'Abgeschlossen';
+            if (statusEl) statusEl.textContent = '';
             if (lockEl) lockEl.style.display = 'none';
             if (pointsEl) {
-                pointsEl.textContent = '100 / 100 Punkte';
+                // Show 100/100 if points awarded, otherwise 0/100
+                if (hasPointsForLevel) {
+                    pointsEl.textContent = '100 / 100 Punkte';
+                } else {
+                    pointsEl.textContent = '0 / 100 Punkte';
+                }
                 pointsEl.classList.add('completed');
             }
         } else if (isUnlocked) {
@@ -4128,14 +4278,21 @@ function unlockNextLevel(completedLevel) {
     // Load current progress
     let completedLevels = JSON.parse(localStorage.getItem('completedLevels') || '[]');
 
+    // Track which levels have been awarded points (persists across resets)
+    let levelsAwarded = JSON.parse(localStorage.getItem('levelsAwarded') || '[]');
+
     // Add completed level if not already there
     if (!completedLevels.includes(completedLevel)) {
         completedLevels.push(completedLevel);
         completedLevels.sort((a, b) => a - b);
         localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
 
-        // Award 100 points for completing the level
-        awardPoints(100);
+        // Only award points if this level hasn't been awarded before
+        if (!levelsAwarded.includes(completedLevel)) {
+            awardPoints(100);
+            levelsAwarded.push(completedLevel);
+            localStorage.setItem('levelsAwarded', JSON.stringify(levelsAwarded));
+        }
 
         console.log(`✅ Level ${completedLevel} completed! Unlocked Level ${completedLevel + 1}`);
     }
@@ -4145,6 +4302,10 @@ function unlockNextLevel(completedLevel) {
 function awardPoints(points) {
     let currentPoints = parseInt(localStorage.getItem('playerPoints') || '0');
     currentPoints += points;
+
+    // Cap points at 500 (max possible from 5 levels × 100 points)
+    currentPoints = Math.min(currentPoints, 500);
+
     localStorage.setItem('playerPoints', currentPoints.toString());
 
     // Update highest rank achieved
@@ -4246,6 +4407,14 @@ function updateRankBadge() {
 
     rankLabel.textContent = rankData[highestRank] || '';
     rankIcon.textContent = ''; // No icon
+
+    // Add click event for animation
+    rankBadge.onclick = () => {
+        rankBadge.classList.add('rank-badge-clicked');
+        setTimeout(() => {
+            rankBadge.classList.remove('rank-badge-clicked');
+        }, 1000);
+    };
 }
 
 // ===== INITIALIZATION =====
@@ -4254,6 +4423,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Intro Screen
     setupIntroScreen();
+
+    // Start TXP walking animation in intro
+    startIntroTxpAnimation();
 
     // Level Card Handlers
     setupLevelCards();

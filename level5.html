@@ -17,12 +17,12 @@
 
         <!-- Background Music -->
         <audio id="backgroundMusic" loop>
-            <source src="Cat Mario Soundtrack Extended.mp3" type="audio/mpeg">
+            <source src="Music (lizenziert)/Retro-Chip-Tune-Platform-Game-C22-18868.wav_AdobeStock_1509256706.mp3" type="audio/mpeg">
         </audio>
 
         <!-- Lava Section Music -->
         <audio id="lavaMusic" loop>
-            <source src="Spelunker - Stage 01 Theme (Remix).mp3" type="audio/mpeg">
+            <source src="Music (lizenziert)/Game-On-Sport_AdobeStock_1555243188_1_.mp3" type="audio/mpeg">
         </audio>
 
         <!-- Game HUD -->
@@ -66,6 +66,13 @@
                     <div class="light-beam light-beam-1"></div>
                     <div class="light-beam light-beam-2"></div>
 
+                    <!-- Moon -->
+                    <div class="moon"></div>
+
+                    <!-- TXP Walking on Grass -->
+                    <div class="intro-txp">
+                        <img id="introTxpImg" src="TXP/TXP_Lauf_Pose/TXP Lauf Loop_00000.png" alt="TXP Roboter">
+                    </div>
 
                     <!-- Main Title -->
                     <h1 class="game-title">
@@ -290,6 +297,22 @@
                             </div>
                         </div>
                         <div class="sign-popup-hint">Drücke <span class="key-highlight">E</span> um fortzufahren</div>
+                    </div>
+                </div>
+
+                <!-- Pause Menu -->
+                <div class="pause-menu-overlay" id="pauseMenu" style="display: none;">
+                    <div class="pause-menu-content">
+                        <h2 class="pause-menu-title">⏸️ Pause</h2>
+                        <div class="pause-menu-buttons">
+                            <button class="pause-menu-button" onclick="resumeGame()">
+                                <span>▶ Weiterspielen</span>
+                            </button>
+                            <button class="pause-menu-button" onclick="returnToLevelSelect()">
+                                <span>Zur Level-Auswahl</span>
+                            </button>
+                        </div>
+                        <div class="pause-menu-hint">Drücke <span class="key-highlight">ESC</span> zum Fortfahren</div>
                     </div>
                 </div>
             </div>
