@@ -553,14 +553,14 @@ class MoManPlayer {
             }
         }
 
-        this.x += this.velocityX;
+        this.x += this.velocityX * deltaTime;
 
         // Store previous bottom position (feet position)
         const previousBottom = this.y + GAME_CONFIG.playerHeight;
 
         // Apply gravity
-        this.velocityY += GAME_CONFIG.gravity;
-        this.y += this.velocityY;
+        this.velocityY += GAME_CONFIG.gravity * deltaTime;
+        this.y += this.velocityY * deltaTime;
 
         // Check if grounded (reset before checking)
         this.isGrounded = false;
@@ -2857,11 +2857,7 @@ class PlatformerGame {
     gameLoop(currentTime = performance.now()) {
         if (!this.isRunning) return;
 
-        // Calculate actual time difference in seconds
-        const actualDeltaTime = (currentTime - this.lastTime) / 1000;
-
-        // Normalize to 60fps (1/60 = 0.01667 seconds per frame)
-        let deltaTime = actualDeltaTime / 0.01667;
+        let deltaTime = (currentTime - this.lastTime) / 16.67; // Normalize to 60fps
 
         // Clamp deltaTime to prevent huge jumps during lag spikes
         if (deltaTime > 3) deltaTime = 1; // Cap at 3x normal speed
