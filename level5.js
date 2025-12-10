@@ -4099,6 +4099,17 @@ function setupIntroScreen() {
     introScreen.addEventListener('click', handleClick);
 }
 
+// ===== MOON CLICK HANDLER =====
+function setupMoonClickHandler() {
+    const moon = document.querySelector('.intro-content .moon');
+    if (!moon) return;
+
+    moon.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent triggering intro screen start
+        moon.classList.toggle('red');
+    });
+}
+
 // ===== TXP INTRO ANIMATION =====
 function startIntroTxpAnimation() {
     const introTxpImg = document.getElementById('introTxpImg');
@@ -4426,6 +4437,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start TXP walking animation in intro
     startIntroTxpAnimation();
+
+    // Setup moon click handler
+    setupMoonClickHandler();
 
     // Level Card Handlers
     setupLevelCards();

@@ -351,6 +351,35 @@ body:has(#introScreen.active) .hud-wrapper {
         inset -10px -10px 20px rgba(0, 0, 0, 0.15);
     z-index: 2;
     animation: moonGlow 4s ease-in-out infinite;
+    cursor: pointer;
+    transition: background 0.5s ease, box-shadow 0.5s ease;
+}
+
+.intro-content .moon:hover {
+    transform: scale(1.05);
+}
+
+/* Red Moon State */
+.intro-content .moon.red {
+    background: radial-gradient(circle at 30% 30%, #FF4444 0%, #CC0000 50%, #990000 100%);
+    animation: moonGlowRed 4s ease-in-out infinite;
+}
+
+@keyframes moonGlowRed {
+    0%, 100% {
+        box-shadow:
+            0 0 20px rgba(255, 68, 68, 0.8),
+            0 0 40px rgba(255, 68, 68, 0.5),
+            0 0 60px rgba(255, 68, 68, 0.3),
+            inset -10px -10px 20px rgba(0, 0, 0, 0.15);
+    }
+    50% {
+        box-shadow:
+            0 0 30px rgba(255, 68, 68, 0.9),
+            0 0 50px rgba(255, 68, 68, 0.6),
+            0 0 80px rgba(255, 68, 68, 0.4),
+            inset -10px -10px 20px rgba(0, 0, 0, 0.15);
+    }
 }
 
 /* Moon craters */
