@@ -189,6 +189,14 @@ function getRank(score) {
     return { title: "Kein Rang", description: "Weiter üben!" };
 }
 
+// Calculate Power Automate rank based on total points
+function calculatePowerAutomateRank(totalPoints) {
+    if (totalPoints >= 500) return 'Gold 🥇';
+    if (totalPoints >= 400) return 'Silber 🥈';
+    if (totalPoints >= 300) return 'Bronze 🥉';
+    return 'Kein Rang';
+}
+
 // Load and display level ranks
 function loadLevelRanks() {
     // Load Level 1 progress
@@ -206,14 +214,15 @@ function loadLevelRanks() {
         }
     }
 
-    // Load Level 2 progress
-    const level2Progress = localStorage.getItem('aiBytes_level2_progress');
+    // Load Level 2 progress (Power Automate)
+    const level2Progress = localStorage.getItem('powerAutomateProgress');
     if (level2Progress) {
         const progress = JSON.parse(level2Progress);
-        if (progress.completed && progress.rank) {
+        if (progress.totalPoints !== undefined) {
+            const rank = calculatePowerAutomateRank(progress.totalPoints);
             const level2Status = document.querySelector('.level-2 .level-status');
             if (level2Status) {
-                level2Status.textContent = progress.rank;
+                level2Status.textContent = rank;
                 level2Status.style.background = 'var(--saffron)';
                 level2Status.style.color = 'var(--russian-blue)';
             }
@@ -250,6 +259,81 @@ function loadLevelRanks() {
 
     // Check if secret level should be unlocked
     checkSecretLevel();
+
+    // Update level unlock status
+    updateLevelLocks();
+}
+
+// Update level card locks based on completion
+function updateLevelLocks() {
+    // Level 1 is always unlocked
+    const level1Card = document.querySelector('.level-1');
+    if (level1Card) {
+        level1Card.classList.remove('locked');
+        level1Card.classList.add('available');
+    }
+
+    // Check Level 1 completion for Level 2 unlock
+    const level1Progress = localStorage.getItem('aiBytes_level1_progress');
+    const level2Card = document.querySelector('.level-2');
+    if (level1Progress) {
+        const progress = JSON.parse(level1Progress);
+        if (progress.completed) {
+            if (level2Card) {
+                level2Card.classList.remove('locked');
+                level2Card.classList.add('available');
+            }
+        }
+    } else {
+        if (level2Card) {
+            level2Card.classList.add('locked');
+            level2Card.classList.remove('available');
+        }
+    }
+
+    // Check Level 2 completion for Level 3 unlock
+    const level2Progress = localStorage.getItem('powerAutomateProgress');
+    const level3Card = document.querySelector('.level-3');
+    if (level2Progress) {
+        const progress = JSON.parse(level2Progress);
+        // Level 2 is completed if at least one challenge is done
+        if (progress.completedChallenges && progress.completedChallenges.length > 0) {
+            if (level3Card) {
+                level3Card.classList.remove('locked');
+                level3Card.classList.add('available');
+            }
+        }
+    } else {
+        if (level3Card) {
+            level3Card.classList.add('locked');
+            level3Card.classList.remove('available');
+        }
+    }
+
+    // Update locked cards style
+    const lockedCards = document.querySelectorAll('.level-card.locked');
+    lockedCards.forEach(card => {
+        card.style.opacity = '0.5';
+        card.style.filter = 'grayscale(80%)';
+        card.style.cursor = 'not-allowed';
+        card.style.pointerEvents = 'none';
+
+        const levelStatus = card.querySelector('.level-status');
+        if (levelStatus) {
+            levelStatus.textContent = '🔒 Gesperrt';
+            levelStatus.style.background = '';
+            levelStatus.style.color = '';
+        }
+    });
+
+    // Update available cards style
+    const availableCards = document.querySelectorAll('.level-card.available');
+    availableCards.forEach(card => {
+        card.style.opacity = '1';
+        card.style.filter = 'none';
+        card.style.cursor = 'pointer';
+        card.style.pointerEvents = 'auto';
+    });
 }
 
 // Check if all levels have Gold rank to unlock secret level

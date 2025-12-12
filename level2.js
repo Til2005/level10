@@ -1,131 +1,224 @@
-// Level 2 Game Logic - Bild-KI: "Auch Bilder sind kein Problem"
+// Level 2 - Power Automate - Flow Editor Game Logic
 
-// Mo Man Animation System
-class MoManHost {
-    constructor() {
-        this.element = document.getElementById('moHost');
-        this.img = this.element.querySelector('.mo-host-img');
-        this.speechBubble = document.getElementById('moSpeech');
-        this.speechText = this.speechBubble.querySelector('p');
+// ===== CONSTANTS & CONFIGURATION =====
+const GAME_CONFIG = {
+    gridSize: 40, // Snap-to-grid size in pixels
+    totalChallenges: 5,
+    basePoints: 100,
+    timeBonus: true,
+    snapDistance: 20 // Distance for magnetic snap
+};
 
-        // Animation properties
-        this.currentFrame = 0;
-        this.celebrationFrames = 23;
-        this.speechFrames = 12;
-        this.runFrames = 48;
-        this.animationSpeed = 40;
-        this.speechAnimationSpeed = 80;
-        this.runAnimationSpeed = 18;
-        this.animationInterval = null;
-        this.speechTimeout = null;
-
-        // Typewriter properties
-        this.typewriterInterval = null;
-        this.currentText = '';
-        this.targetText = '';
-        this.typewriterSpeed = 30;
-
-        this.isIdle = true;
-        this.isRunning = false;
-        this.isDragging = false;
-
-        // Interactive features
-        this.autoSpeechTimer = null;
-        this.autoSpeechInterval = 14000;
-        this.lastAutoSpeechTime = Date.now();
-        this.consecutiveCorrect = 0;
-        this.totalAttempts = 0;
-        this.hasSpokenRecently = false;
-
-        // Preload running animation images
-        this.preloadedRunImages = [];
-        this.preloadRunningImages();
-
-        this.startIdleAnimation();
-        this.setupUnderstoodButton();
-        this.startAutoSpeech();
-        this.setupEasterEgg();
+// ===== TXP ANIMATIONS =====
+const TXP_ANIMATIONS = {
+    stand: {
+        path: 'TXP/TXP_Stand_Pose/TXP Stand Pose_',
+        frames: 24,
+        speed: 40
+    },
+    talk: {
+        path: 'TXP/TXP_Talk_Pose/TXP_Talk Pose_',
+        frames: 24,
+        speed: 60
     }
+};
 
-    preloadRunningImages() {
-        for (let i = 0; i < this.runFrames; i++) {
-            const frameNumber = String(i).padStart(5, '0');
-            const img = new Image();
-            img.src = `./Mo%20man%20Lauf%202s%2024fps%2048%20frames/Mo%20man%20Lauf%20Pose_${frameNumber}.png`;
-            this.preloadedRunImages.push(img);
+// ===== CHALLENGE DATA - 5 Challenges =====
+const CHALLENGE_DATA = {
+    1: {
+        name: "E-Mail Benachrichtigung",
+        difficulty: "Einfach",
+        description: "Erstelle einen Flow, der bei neuen E-Mails eine Benachrichtigung sendet",
+        task: "Baue einen Flow: Wenn neue E-Mail → Dann Benachrichtigung senden",
+        blocks: [
+            { id: "trigger-email", icon: "📧", title: "Neue E-Mail", description: "Trigger: Wenn neue E-Mail eintrifft", type: "trigger", puzzleType: "horizontal" },
+            { id: "action-notify", icon: "🔔", title: "Benachrichtigung", description: "Aktion: Benachrichtigung senden", type: "action", puzzleType: "horizontal" },
+            { id: "wrong-save", icon: "💾", title: "Datei speichern", description: "Aktion: E-Mail als Datei speichern", type: "action", puzzleType: "horizontal" },
+            { id: "wrong-delete", icon: "🗑️", title: "E-Mail löschen", description: "Aktion: E-Mail aus Postfach löschen", type: "action", puzzleType: "horizontal" }
+        ],
+        correctConnections: [
+            { from: "trigger-email", to: "action-notify", direction: "horizontal" }
+        ],
+        tutorialMessages: [
+            "Willkommen! Ich bin TXP, dein Assistent. 👋",
+            "In diesem Level lernst du, wie man Flows in Power Automate erstellt.",
+            "Ziehe die Flow-Bausteine von links ins Whiteboard und baue den richtigen Flow!",
+            "Viel Erfolg! 🚀"
+        ],
+        successMessage: "Super! Dein erster Flow funktioniert perfekt! 🎉"
+    },
+
+    2: {
+        name: "Daten filtern",
+        difficulty: "Mittel",
+        description: "Filtere eingehende Daten nach bestimmten Kriterien",
+        task: "Stelle sicher, dass die Daten bei neuen Excel-Zeilen gefiltert werden, bevor sie dauerhaft gespeichert werden",
+        blocks: [
+            { id: "wrong-send-email", icon: "📧", title: "E-Mail senden", description: "Aktion: E-Mail an Empfänger senden", type: "action", puzzleType: "horizontal" },
+            { id: "action-save-db", icon: "💾", title: "In DB speichern", description: "Aktion: In Datenbank speichern", type: "action", puzzleType: "horizontal" },
+            { id: "trigger-excel", icon: "📊", title: "Excel-Zeile", description: "Trigger: Neue Excel-Zeile", type: "trigger", puzzleType: "horizontal" },
+            { id: "action-filter", icon: "🔍", title: "Daten filtern", description: "Aktion: Daten filtern", type: "action", puzzleType: "horizontal" },
+            { id: "wrong-delete-row", icon: "🗑️", title: "Zeile löschen", description: "Aktion: Excel-Zeile entfernen", type: "action", puzzleType: "horizontal" }
+        ],
+        correctConnections: [
+            { from: "trigger-excel", to: "action-filter", direction: "horizontal" },
+            { from: "action-filter", to: "action-save-db", direction: "horizontal" }
+        ],
+        successMessage: "Perfekt! Du kannst jetzt Daten filtern! 📊"
+    },
+
+    3: {
+        name: "Bedingungen & Verzweigungen",
+        difficulty: "Mittel-Schwer",
+        description: "Verwende Bedingungen um den Flow zu steuern",
+        task: "Verarbeite eingehende Formulare automatisch und sorge dafür, dass sie basierend auf einer Prüfung genehmigt oder abgelehnt werden",
+        blocks: [
+            { id: "trigger-form", icon: "📝", title: "Formular gesendet", description: "Trigger: Neues Formular", type: "trigger", puzzleType: "horizontal" },
+            { id: "action-check-data", icon: "🔍", title: "Daten prüfen", description: "Aktion: Ja/Nein-Entscheidung ermitteln", type: "action", puzzleType: "horizontal" },
+            { id: "condition-check", icon: "❓", title: "Bedingung", description: "Bedingung: Wert prüfen", type: "condition", puzzleType: "branch" },
+            { id: "action-approve", icon: "✅", title: "Genehmigen", description: "Aktion: Genehmigen (Wenn ja)", type: "action", puzzleType: "vertical" },
+            { id: "action-reject", icon: "❌", title: "Ablehnen", description: "Aktion: Ablehnen (Wenn nein)", type: "action", puzzleType: "vertical" },
+            { id: "wrong-archive", icon: "📁", title: "Archivieren", description: "Aktion: Formular archivieren", type: "action", puzzleType: "vertical" }
+        ],
+        correctConnections: [
+            { from: "trigger-form", to: "action-check-data", direction: "horizontal" },
+            { from: "action-check-data", to: "condition-check", direction: "horizontal" },
+            { from: "condition-check", to: "action-approve", direction: "vertical-top" },
+            { from: "condition-check", to: "action-reject", direction: "vertical-bottom" }
+        ],
+        successMessage: "Toll! Du beherrschst jetzt Verzweigungen! 🌳"
+    },
+
+    4: {
+        name: "Schleifen & Wiederholungen",
+        difficulty: "Schwer",
+        description: "Wiederhole Aktionen für mehrere Elemente",
+        task: "Bei Änderungen in einer SharePoint-Liste sollen alle Einträge durchlaufen, verarbeitet und per E-Mail verschickt werden",
+        blocks: [
+            { id: "trigger-sharepoint", icon: "📋", title: "SharePoint Liste", description: "Trigger: SharePoint-Änderung", type: "trigger", puzzleType: "horizontal" },
+            { id: "loop-foreach", icon: "🔁", title: "Für jedes Element", description: "Schleife: Alle Elemente durchlaufen", type: "loop", puzzleType: "horizontal" },
+            { id: "action-process", icon: "⚙️", title: "Daten verarbeiten", description: "Aktion: Daten verarbeiten", type: "action", puzzleType: "horizontal" },
+            { id: "action-email", icon: "📧", title: "E-Mail senden", description: "Aktion: E-Mail senden", type: "action", puzzleType: "horizontal" },
+            { id: "wrong-delete-list", icon: "🗑️", title: "Liste löschen", description: "Aktion: SharePoint-Liste entfernen", type: "action", puzzleType: "horizontal" }
+        ],
+        correctConnections: [
+            { from: "trigger-sharepoint", to: "loop-foreach", direction: "horizontal" },
+            { from: "loop-foreach", to: "action-process", direction: "horizontal" },
+            { from: "action-process", to: "action-email", direction: "horizontal" }
+        ],
+        successMessage: "Wow! Schleifen sind kein Problem für dich! 🔁"
+    },
+
+    5: {
+        name: "Komplexer Approval-Flow",
+        difficulty: "Sehr Schwer",
+        description: "Erstelle einen komplexen Genehmigungsworkflow",
+        task: "Baue einen kompletten Approval-Flow mit mehreren Stufen",
+        blocks: [
+            { id: "trigger-request", icon: "📬", title: "Antrag erstellt", description: "Trigger: Neuer Antrag", type: "trigger", puzzleType: "horizontal" },
+            { id: "action-get-manager", icon: "👤", title: "Manager abrufen", description: "Aktion: Vorgesetzten ermitteln", type: "action", puzzleType: "horizontal" },
+            { id: "action-approval", icon: "📝", title: "Genehmigung", description: "Aktion: Genehmigung anfordern", type: "action", puzzleType: "horizontal" },
+            { id: "condition-approved", icon: "❓", title: "Genehmigt?", description: "Bedingung: Genehmigt?", type: "condition", puzzleType: "branch" },
+            { id: "action-notify-yes", icon: "✅", title: "Bestätigung senden", description: "Aktion: Bestätigung an Antragsteller", type: "action", puzzleType: "vertical" },
+            { id: "action-notify-no", icon: "❌", title: "Ablehnung senden", description: "Aktion: Ablehnung an Antragsteller", type: "action", puzzleType: "vertical" },
+            { id: "wrong-archive", icon: "📁", title: "Archivieren", description: "Aktion: Antrag archivieren", type: "action", puzzleType: "vertical" },
+            { id: "wrong-forward", icon: "➡️", title: "Weiterleiten", description: "Aktion: An anderen Empfänger weiterleiten", type: "action", puzzleType: "horizontal" }
+        ],
+        correctConnections: [
+            { from: "trigger-request", to: "action-get-manager", direction: "horizontal" },
+            { from: "action-get-manager", to: "action-approval", direction: "horizontal" },
+            { from: "action-approval", to: "condition-approved", direction: "horizontal" },
+            { from: "condition-approved", to: "action-notify-yes", direction: "vertical-top" },
+            { from: "condition-approved", to: "action-notify-no", direction: "vertical-bottom" }
+        ],
+        tutorialMessages: [
+            "Willkommen zur finalen Challenge! 👑",
+            "Ein Approval-Flow ist ein Genehmigungsprozess: Jemand stellt einen Antrag (z.B. Urlaub, Ausgaben), der von einem Vorgesetzten genehmigt oder abgelehnt werden muss.",
+            "Der Flow läuft automatisch ab: Antrag erstellen → Vorgesetzten ermitteln → Genehmigung anfragen → Entscheidung prüfen → Antragsteller informieren",
+            "Baue diesen kompletten Workflow! Je nachdem ob genehmigt oder abgelehnt wurde, bekommt der Antragsteller eine unterschiedliche Nachricht. Viel Erfolg! 🚀"
+        ],
+        successMessage: "Unglaublich! Du bist ein Power Automate Profi! 👑"
+    }
+};
+
+// ===== TXP ANIMATION CLASS =====
+class TXPAssistant {
+    static preloadedAnimations = {};
+
+    static async preloadFrames() {
+        if (Object.keys(TXPAssistant.preloadedAnimations).length > 0) {
+            return Promise.resolve();
         }
-    }
 
-    startIdleAnimation() {
-        this.stopAnimation();
-        this.isIdle = true;
+        const animations = ['stand', 'talk'];
+        const promises = [];
 
-        this.animationInterval = setInterval(() => {
-            this.currentFrame = (this.currentFrame + 1) % this.celebrationFrames;
-            const frameNumber = String(this.currentFrame).padStart(5, '0');
-            this.img.src = `Mo_man_Stand_Pose/Mo man Stand Pose_${frameNumber}.png`;
-        }, this.animationSpeed);
-    }
+        for (const animName of animations) {
+            const anim = TXP_ANIMATIONS[animName];
+            TXPAssistant.preloadedAnimations[animName] = [];
 
-    speak(text, persistentMode = false) {
-        this.stopSpeaking();
+            for (let i = 0; i < anim.frames; i++) {
+                const img = new Image();
+                const paddedNumber = String(i).padStart(5, '0');
+                img.src = `${anim.path}${paddedNumber}.png`;
+                TXPAssistant.preloadedAnimations[animName][i] = img;
 
-        this.targetText = text;
-        this.currentText = '';
-        this.speechText.textContent = '';
-        this.speechBubble.classList.add('visible');
-
-        this.startSpeechAnimation();
-        this.hasSpokenRecently = true;
-        this.lastAutoSpeechTime = Date.now();
-
-        this.startTypewriter();
-
-        if (!persistentMode) {
-            const totalDuration = (text.length * this.typewriterSpeed) + 4000;
-            clearTimeout(this.speechTimeout);
-            this.speechTimeout = setTimeout(() => {
-                this.stopSpeaking();
-                this.hasSpokenRecently = false;
-            }, totalDuration);
-        }
-    }
-
-    startTypewriter() {
-        let charIndex = 0;
-
-        this.typewriterInterval = setInterval(() => {
-            if (charIndex < this.targetText.length) {
-                this.currentText += this.targetText[charIndex];
-                this.speechText.textContent = this.currentText;
-                charIndex++;
-            } else {
-                clearInterval(this.typewriterInterval);
-                this.typewriterInterval = null;
+                promises.push(new Promise((resolve) => {
+                    img.onload = resolve;
+                    img.onerror = resolve;
+                }));
             }
-        }, this.typewriterSpeed);
+        }
+
+        return Promise.all(promises);
     }
 
-    startSpeechAnimation() {
-        this.stopAnimation();
-        this.isIdle = false;
+    constructor() {
+        this.element = document.getElementById('txpAssistant');
+        this.img = document.getElementById('txpAssistantImg');
+        this.speechElement = document.getElementById('txpSpeech');
+        this.speechText = document.getElementById('txpSpeechText');
+        this.speechContinueHint = this.speechElement ? this.speechElement.querySelector('.speech-continue-hint') : null;
 
-        this.animationInterval = setInterval(() => {
-            this.currentFrame = (this.currentFrame + 1) % this.speechFrames;
-            const frameNumber = String(this.currentFrame).padStart(5, '0');
-            this.img.src = `Moman_speech_animation/Moman Rede_${frameNumber}.png`;
-        }, this.speechAnimationSpeed);
+        this.currentAnimation = 'stand';
+        this.currentFrame = 0;
+        this.animationInterval = null;
+
+        this.tutorialMessages = [];
+        this.currentMessageIndex = 0;
+        this.isInTutorialMode = false;
+
+        this.startAnimation('stand');
+        this.setupClickHandler();
     }
 
-    startCelebrationAnimation() {
+    setupClickHandler() {
+        if (this.element) {
+            this.element.addEventListener('click', () => {
+                this.nextMessage();
+            });
+        }
+        // Also allow clicking on the speech bubble itself
+        if (this.speechElement) {
+            this.speechElement.addEventListener('click', () => {
+                this.nextMessage();
+            });
+            this.speechElement.style.cursor = 'pointer';
+        }
+    }
+
+    startAnimation(animName) {
+        if (this.currentAnimation === animName && this.animationInterval) return;
+
         this.stopAnimation();
-        this.isIdle = false;
+        this.currentAnimation = animName;
+        this.currentFrame = 0;
+        const anim = TXP_ANIMATIONS[animName];
 
         this.animationInterval = setInterval(() => {
-            this.currentFrame = (this.currentFrame + 1) % this.celebrationFrames;
-            const frameNumber = String(this.currentFrame).padStart(5, '0');
-            this.img.src = `Mo_man_Stand_Pose/Mo man Stand Pose_${frameNumber}.png`;
-        }, this.animationSpeed);
+            this.currentFrame = (this.currentFrame + 1) % anim.frames;
+            this.updateFrame();
+        }, anim.speed);
     }
 
     stopAnimation() {
@@ -133,1085 +226,1651 @@ class MoManHost {
             clearInterval(this.animationInterval);
             this.animationInterval = null;
         }
-        this.currentFrame = 0;
     }
 
-    stopSpeaking() {
-        if (this.typewriterInterval) {
-            clearInterval(this.typewriterInterval);
-            this.typewriterInterval = null;
-        }
-
-        if (this.speechTimeout) {
-            clearTimeout(this.speechTimeout);
-            this.speechTimeout = null;
-        }
-
-        this.speechBubble.classList.remove('visible');
-
-        const understoodBtn = document.getElementById('understoodButton');
-        if (understoodBtn) {
-            understoodBtn.style.display = 'none';
-        }
-
-        this.startIdleAnimation();
-    }
-
-    celebrate() {
-        this.stopSpeaking();
-        this.startCelebrationAnimation();
-
-        setTimeout(() => {
-            this.startIdleAnimation();
-        }, 2000);
-    }
-
-    setupUnderstoodButton() {
-        const understoodBtn = document.getElementById('understoodButton');
-        if (understoodBtn) {
-            understoodBtn.addEventListener('click', () => {
-                this.stopSpeaking();
-            });
+    updateFrame() {
+        const frames = TXPAssistant.preloadedAnimations[this.currentAnimation];
+        if (frames && frames[this.currentFrame]) {
+            this.img.src = frames[this.currentFrame].src;
         }
     }
 
-    showUnderstoodButton(callback) {
-        const understoodBtn = document.getElementById('understoodButton');
-        if (understoodBtn) {
-            understoodBtn.style.display = 'block';
-
-            understoodBtn.replaceWith(understoodBtn.cloneNode(true));
-            const newBtn = document.getElementById('understoodButton');
-
-            newBtn.addEventListener('click', () => {
-                newBtn.style.display = 'none';
-                this.stopSpeaking();
-                if (callback) callback();
-            });
+    show() {
+        if (this.element) {
+            this.element.style.display = 'block';
         }
     }
 
-    startAutoSpeech() {
-        this.autoSpeechTimer = setInterval(() => {
-            if (!this.hasSpokenRecently && !this.speechBubble.classList.contains('visible')) {
-                this.speakRandomComment();
+    hide() {
+        if (this.element) {
+            this.element.style.display = 'none';
+        }
+    }
+
+    showSpeech(message, showContinueHint = true) {
+        if (this.speechElement && this.speechText) {
+            this.speechText.textContent = message;
+            this.speechElement.style.display = 'block';
+            this.startAnimation('talk');
+
+            // Show/hide continue hint based on parameter
+            if (this.speechContinueHint) {
+                this.speechContinueHint.style.display = showContinueHint ? 'block' : 'none';
             }
-        }, this.autoSpeechInterval);
-    }
-
-    speakRandomComment() {
-        const comments = this.getContextualComments();
-        if (comments.length > 0) {
-            const randomComment = comments[Math.floor(Math.random() * comments.length)];
-            this.speak(randomComment);
         }
     }
 
-    getContextualComments() {
-        const allComments = [
-            // Bild-KI specific comments
-            "Wusstest du? KI kann heute nicht nur Bilder erkennen, sondern auch erstellen!",
-            "Bei Bild-Prompts ist Präzision alles - je genauer, desto besser das Ergebnis!",
-            "Text-zu-Bild KI wird immer besser. Aber Vorsicht bei Markenrechten!",
-            "KI-Bilder müssen oft gekennzeichnet werden - Transparenz ist wichtig!",
-            "Synthetische Trainingsdaten sparen Zeit und Ressourcen in der Produktion!",
-
-            // Encouragement
-            "Du machst das gut! Bild-Prompts sind eine echte Kunst.",
-            "Achte auf Details wie Stil, Perspektive und Stimmung!",
-            "Denk daran: Ein guter Bild-Prompt beschreibt, was du SIEHST.",
-
-            // Score based
-            ...this.getScoreBasedComments(),
-            ...this.getStreakComments(),
-        ];
-
-        return allComments;
-    }
-
-    getScoreBasedComments() {
-        if (totalScore === 0) {
-            return [
-                "Bereit für die Welt der Bild-KI? Los geht's!",
-                "Lass uns lernen, wie man perfekte Bild-Prompts schreibt!"
-            ];
-        } else if (totalScore >= 30) {
-            return [
-                `${totalScore} Punkte! Du verstehst Bild-KI richtig gut!`,
-                "Du entwickelst ein Auge für gute Bild-Prompts!"
-            ];
-        } else if (totalScore >= 15) {
-            return [
-                `${totalScore} Punkte! Du lernst schnell!`,
-                "Weiter so! Bald bist du Bild-KI Experte!"
-            ];
+    hideSpeech() {
+        if (this.speechElement) {
+            this.speechElement.style.display = 'none';
+            this.startAnimation('stand');
         }
-        return [];
     }
 
-    getStreakComments() {
-        if (this.consecutiveCorrect >= 3) {
-            return [
-                `${this.consecutiveCorrect} richtige in Folge! Du hast den Dreh raus!`,
-                "Beeindruckend! Du erkennst die Muster!"
-            ];
-        } else if (this.consecutiveCorrect >= 2) {
-            return [
-                "Zwei richtige! Du verstehst das Prinzip!"
-            ];
+    startTutorial(messages) {
+        this.isInTutorialMode = true;
+        this.tutorialMessages = messages;
+        this.currentMessageIndex = 0;
+        if (messages.length > 0) {
+            this.showSpeech(messages[0], true);
         }
-        return [];
     }
 
-    updateStats(correct) {
-        this.totalAttempts++;
-        if (correct) {
-            this.consecutiveCorrect++;
+    showSuccessMessage(message) {
+        this.isInTutorialMode = false;
+        this.tutorialMessages = [];
+        this.currentMessageIndex = 0;
+        this.showSpeech(message, false); // No continue hint for success messages
+    }
+
+    nextMessage() {
+        if (this.isInTutorialMode) {
+            this.currentMessageIndex++;
+            if (this.currentMessageIndex < this.tutorialMessages.length) {
+                this.showSpeech(this.tutorialMessages[this.currentMessageIndex], true);
+            } else {
+                this.hideSpeech();
+                this.isInTutorialMode = false;
+            }
         } else {
-            this.consecutiveCorrect = 0;
+            // If not in tutorial mode, restart tutorial from beginning
+            if (this.tutorialMessages.length > 0) {
+                this.isInTutorialMode = true;
+                this.currentMessageIndex = 0;
+                this.showSpeech(this.tutorialMessages[0], true);
+            }
+        }
+    }
+}
+
+// ===== FLOW CANVAS ANIMATION (Titlescreen Background) =====
+class FlowCanvasAnimation {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.nodes = [];
+        this.connections = [];
+        this.animationId = null;
+
+        this.resize();
+        this.init();
+    }
+
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+
+    init() {
+        // Create animated flow nodes
+        const nodeCount = 15;
+        for (let i = 0; i < nodeCount; i++) {
+            this.nodes.push({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                radius: 20 + Math.random() * 20,
+                color: this.getRandomColor()
+            });
+        }
+
+        // Create connections
+        for (let i = 0; i < this.nodes.length; i++) {
+            for (let j = i + 1; j < this.nodes.length; j++) {
+                if (Math.random() > 0.7) {
+                    this.connections.push({ from: i, to: j, opacity: Math.random() });
+                }
+            }
         }
     }
 
-    celebrateCorrectAnswer() {
-        this.celebrate();
-        this.updateStats(true);
-
-        const celebrations = [
-            "Genau richtig! Du erkennst gute Bild-Prompts!",
-            "Perfekt! Das ist der richtige Prompt!",
-            "Super! Du verstehst die Zusammenhänge!",
-            "Exzellent! So sieht Bild-KI Expertise aus!",
-            "Wow! Du hast ein gutes Auge dafür!"
-        ];
-
-        const randomCelebration = celebrations[Math.floor(Math.random() * celebrations.length)];
-        this.speak(randomCelebration);
+    getRandomColor() {
+        const colors = ['#67C7FF', '#A86AFF', '#F5C03B'];
+        return colors[Math.floor(Math.random() * colors.length)];
     }
 
-    encourageAfterWrongAnswer() {
-        this.updateStats(false);
+    animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        const encouragements = [
-            "Nicht ganz! Schau dir die Details genauer an.",
-            "Das war knapp! Achte auf die Beschreibungen.",
-            "Kein Problem! Lass uns schauen warum...",
-            "Fast! Bei Bild-Prompts zählt jedes Detail.",
-            "Guter Versuch! Die Unterschiede sind subtil."
-        ];
+        // Update and draw connections
+        this.connections.forEach(conn => {
+            const from = this.nodes[conn.from];
+            const to = this.nodes[conn.to];
 
-        const randomEncouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
-        this.speak(randomEncouragement);
+            this.ctx.beginPath();
+            this.ctx.moveTo(from.x, from.y);
+            this.ctx.lineTo(to.x, to.y);
+            this.ctx.strokeStyle = `rgba(103, 199, 255, ${conn.opacity * 0.3})`;
+            this.ctx.lineWidth = 2;
+            this.ctx.stroke();
+
+            // Animate opacity
+            conn.opacity += (Math.random() - 0.5) * 0.02;
+            conn.opacity = Math.max(0.1, Math.min(1, conn.opacity));
+        });
+
+        // Update and draw nodes
+        this.nodes.forEach(node => {
+            // Update position
+            node.x += node.vx;
+            node.y += node.vy;
+
+            // Bounce off edges
+            if (node.x < 0 || node.x > this.canvas.width) node.vx *= -1;
+            if (node.y < 0 || node.y > this.canvas.height) node.vy *= -1;
+
+            // Draw node
+            this.ctx.beginPath();
+            this.ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+            this.ctx.fillStyle = node.color + '40';
+            this.ctx.fill();
+            this.ctx.strokeStyle = node.color;
+            this.ctx.lineWidth = 2;
+            this.ctx.stroke();
+        });
+
+        this.animationId = requestAnimationFrame(() => this.animate());
     }
 
-    setupEasterEgg() {
-        this.element.style.cursor = 'move';
-        this.setupDragAndDrop();
-        this.setupKeyboardControls();
+    start() {
+        this.animate();
     }
 
-    setupKeyboardControls() {
-        this.isMovingLeft = false;
-        this.isMovingRight = false;
-        this.moveSpeed = 5;
+    stop() {
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+            this.animationId = null;
+        }
+    }
+}
 
-        document.addEventListener('keydown', (e) => {
-            if (this.isDragging) return;
+// ===== DRAG & DROP MANAGER =====
+class DragDropManager {
+    constructor(game) {
+        this.game = game;
+        this.draggedElement = null;
+        this.draggedBlockId = null;
+        this.isDragging = false;
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.placedBlocks = []; // Blocks placed in whiteboard
 
-            if (e.key === 'ArrowLeft' && !this.isMovingLeft) {
-                this.isMovingLeft = true;
-                this.startMovement('left');
-            } else if (e.key === 'ArrowRight' && !this.isMovingRight) {
-                this.isMovingRight = true;
-                this.startMovement('right');
+        // Multi-select
+        this.selectedBlocks = [];
+        this.isSelecting = false;
+        this.selectionBox = null;
+        this.selectionStart = { x: 0, y: 0 };
+
+        this.setupEventListeners();
+        this.createSelectionBox();
+    }
+
+    setupEventListeners() {
+        // Mouse events
+        document.addEventListener('mousedown', (e) => this.handleDragStart(e));
+        document.addEventListener('mousemove', (e) => this.handleDrag(e));
+        document.addEventListener('mouseup', (e) => this.handleDragEnd(e));
+
+        // Touch events for mobile
+        document.addEventListener('touchstart', (e) => this.handleDragStart(e), { passive: false });
+        document.addEventListener('touchmove', (e) => this.handleDrag(e), { passive: false });
+        document.addEventListener('touchend', (e) => this.handleDragEnd(e));
+    }
+
+    handleDragStart(e) {
+        const target = e.target.closest('.flow-block');
+        if (!target) return;
+
+        // Prevent dragging if game is paused
+        if (this.game.isPaused) return;
+
+        e.preventDefault();
+
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+        const rect = target.getBoundingClientRect();
+        this.offsetX = clientX - rect.left;
+        this.offsetY = clientY - rect.top;
+
+        // Clone the block for dragging
+        this.draggedElement = target.cloneNode(true);
+        this.draggedElement.classList.add('dragging');
+        this.draggedElement.style.position = 'fixed';
+        this.draggedElement.style.width = rect.width + 'px';
+        this.draggedElement.style.pointerEvents = 'none';
+        this.draggedElement.style.zIndex = '9999';
+        this.draggedElement.style.transition = 'none'; // Disable CSS transitions for instant movement
+        document.body.appendChild(this.draggedElement);
+
+        this.draggedBlockId = target.dataset.blockId;
+        this.isDragging = true;
+
+        this.updateDragPosition(clientX, clientY);
+    }
+
+    handleDrag(e) {
+        if (!this.isDragging || !this.draggedElement) return;
+
+        e.preventDefault();
+
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+        this.updateDragPosition(clientX, clientY);
+    }
+
+    updateDragPosition(clientX, clientY) {
+        if (!this.draggedElement) return;
+
+        this.draggedElement.style.left = (clientX - this.offsetX) + 'px';
+        this.draggedElement.style.top = (clientY - this.offsetY) + 'px';
+    }
+
+    handleDragEnd(e) {
+        if (!this.isDragging || !this.draggedElement) return;
+
+        e.preventDefault();
+
+        const clientX = e.clientX || (e.changedTouches && e.changedTouches[0].clientX);
+        const clientY = e.clientY || (e.changedTouches && e.changedTouches[0].clientY);
+
+        // Check if dropped on whiteboard
+        const whiteboard = document.getElementById('whiteboardContent');
+        const whiteboardRect = whiteboard.getBoundingClientRect();
+
+        if (this.isPointInRect(clientX, clientY, whiteboardRect)) {
+            // Calculate position relative to whiteboard
+            const x = clientX - whiteboardRect.left - this.offsetX;
+            const y = clientY - whiteboardRect.top - this.offsetY;
+
+            // Snap to grid
+            const snappedX = this.snapToGrid(x);
+            const snappedY = this.snapToGrid(y);
+
+            this.placeBlock(this.draggedBlockId, snappedX, snappedY);
+        }
+
+        // Cleanup
+        if (this.draggedElement && this.draggedElement.parentNode) {
+            this.draggedElement.parentNode.removeChild(this.draggedElement);
+        }
+        this.draggedElement = null;
+        this.draggedBlockId = null;
+        this.isDragging = false;
+    }
+
+    isPointInRect(x, y, rect) {
+        return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    }
+
+    snapToGrid(value) {
+        return Math.round(value / GAME_CONFIG.gridSize) * GAME_CONFIG.gridSize;
+    }
+
+    checkAndConnectBlocks(blockId) {
+        const draggedBlock = this.placedBlocks.find(b => b.id === blockId);
+        if (!draggedBlock) return;
+
+        const SNAP_THRESHOLD = 150; // Detection distance
+        const SNAP_TOLERANCE = 5; // Precision for connected state
+
+        let bestSnapTarget = null;
+        let bestSnapDistance = SNAP_THRESHOLD;
+        let bestSnapType = null;
+
+        // Find the best snap target
+        this.placedBlocks.forEach(targetBlock => {
+            if (targetBlock.id === draggedBlock.id) return;
+
+            const yDiff = Math.abs(draggedBlock.y - targetBlock.y);
+
+            // HORIZONTAL SNAPPING: Check if dragged can snap to LEFT of target
+            if ((draggedBlock.puzzleType === 'horizontal' || draggedBlock.puzzleType === 'branch') && yDiff < 30) {
+                const draggedRight = draggedBlock.x + draggedBlock.element.offsetWidth;
+                const targetLeft = targetBlock.x;
+                const xDistance = Math.abs(draggedRight - targetLeft);
+
+                if (xDistance < bestSnapDistance) {
+                    bestSnapDistance = xDistance;
+                    bestSnapTarget = targetBlock;
+                    bestSnapType = 'snap-to-left-of-target';
+                }
+            }
+
+            // HORIZONTAL SNAPPING: Check if dragged can snap to RIGHT of target
+            if ((targetBlock.puzzleType === 'horizontal' || targetBlock.puzzleType === 'branch') && yDiff < 30) {
+                const targetRight = targetBlock.x + targetBlock.element.offsetWidth;
+                const draggedLeft = draggedBlock.x;
+                const xDistance = Math.abs(targetRight - draggedLeft);
+
+                if (xDistance < bestSnapDistance) {
+                    bestSnapDistance = xDistance;
+                    bestSnapTarget = targetBlock;
+                    bestSnapType = 'snap-to-right-of-target';
+                }
+            }
+
+            // VERTICAL SNAPPING
+            const draggedCenterX = draggedBlock.x + draggedBlock.element.offsetWidth / 2;
+            const targetCenterX = targetBlock.x + targetBlock.element.offsetWidth / 2;
+            const xDiff = Math.abs(draggedCenterX - targetCenterX);
+
+            // VERTICAL SNAPPING: Vertical Block to Branch Top Tab
+            if (draggedBlock.puzzleType === 'vertical' && targetBlock.puzzleType === 'branch' && xDiff < 50) {
+                const targetTop = targetBlock.y;
+                const draggedBottom = draggedBlock.y + draggedBlock.element.offsetHeight;
+                const yDistance = Math.abs(targetTop - draggedBottom);
+
+                if (yDistance < bestSnapDistance) {
+                    bestSnapDistance = yDistance;
+                    bestSnapTarget = targetBlock;
+                    bestSnapType = 'snap-vertical-to-branch-top';
+                }
+            }
+
+            // VERTICAL SNAPPING: Vertical Block to Branch Bottom Tab
+            if (draggedBlock.puzzleType === 'vertical' && targetBlock.puzzleType === 'branch' && xDiff < 50) {
+                const targetBottom = targetBlock.y + targetBlock.element.offsetHeight;
+                const draggedTop = draggedBlock.y;
+                const yDistance = Math.abs(targetBottom - draggedTop);
+
+                if (yDistance < bestSnapDistance) {
+                    bestSnapDistance = yDistance;
+                    bestSnapTarget = targetBlock;
+                    bestSnapType = 'snap-vertical-to-branch-bottom';
+                }
             }
         });
 
-        document.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft') {
-                this.isMovingLeft = false;
-                if (!this.isMovingRight) this.stopMovement();
-            } else if (e.key === 'ArrowRight') {
-                this.isMovingRight = false;
-                if (!this.isMovingLeft) this.stopMovement();
-            }
+        // Apply snap if we found a good target
+        if (bestSnapTarget && bestSnapType) {
+            // Add visual feedback
+            draggedBlock.element.classList.add('snapping');
+
+            setTimeout(() => {
+                switch (bestSnapType) {
+                    case 'snap-to-left-of-target':
+                        // Position dragged block to the LEFT of target
+                        draggedBlock.x = bestSnapTarget.x - draggedBlock.element.offsetWidth;
+                        draggedBlock.y = bestSnapTarget.y;
+                        break;
+                    case 'snap-to-right-of-target':
+                        // Position dragged block to the RIGHT of target
+                        draggedBlock.x = bestSnapTarget.x + bestSnapTarget.element.offsetWidth;
+                        draggedBlock.y = bestSnapTarget.y;
+                        break;
+                    case 'snap-vertical-to-branch-top':
+                        // Vertical block connects ABOVE the branch block (to the top tab)
+                        draggedBlock.y = bestSnapTarget.y - draggedBlock.element.offsetHeight;
+                        draggedBlock.x = bestSnapTarget.x + (bestSnapTarget.element.offsetWidth / 2) - (draggedBlock.element.offsetWidth / 2);
+                        break;
+                    case 'snap-vertical-to-branch-bottom':
+                        // Vertical block connects BELOW the branch block (to the bottom tab)
+                        draggedBlock.y = bestSnapTarget.y + bestSnapTarget.element.offsetHeight;
+                        draggedBlock.x = bestSnapTarget.x + (bestSnapTarget.element.offsetWidth / 2) - (draggedBlock.element.offsetWidth / 2);
+                        break;
+                }
+
+                draggedBlock.element.style.left = draggedBlock.x + 'px';
+                draggedBlock.element.style.top = draggedBlock.y + 'px';
+                draggedBlock.element.classList.remove('snapping');
+                draggedBlock.element.classList.add('snap-animation');
+
+                setTimeout(() => draggedBlock.element.classList.remove('snap-animation'), 300);
+
+                // Rebuild connections AFTER snap position is updated
+                this.rebuildAllConnections();
+            }, 50);
+        } else {
+            // No snap happened, rebuild connections immediately
+            this.rebuildAllConnections();
+        }
+    }
+
+    rebuildAllConnections() {
+        // Clear all connections
+        this.placedBlocks.forEach(b => b.connectedTo = []);
+
+        // Very tight tolerance - blocks must be perfectly aligned (within 5px)
+        // This ensures only snapped blocks are considered connected
+        const CONNECTION_TOLERANCE = 5;
+
+        console.log('=== REBUILD CONNECTIONS ===');
+
+        // Build connections based on precise positioning
+        this.placedBlocks.forEach(currentBlock => {
+            this.placedBlocks.forEach(otherBlock => {
+                if (otherBlock.id === currentBlock.id) return;
+
+                // Horizontal connections
+                if (currentBlock.puzzleType === 'horizontal' || currentBlock.puzzleType === 'branch') {
+                    const rightEdge = currentBlock.x + currentBlock.element.offsetWidth;
+                    const leftEdge = otherBlock.x;
+                    const yAlign = Math.abs(currentBlock.y - otherBlock.y);
+                    const xDiff = Math.abs(rightEdge - leftEdge);
+
+                    console.log(`Checking ${currentBlock.id} -> ${otherBlock.id}:`, {
+                        currentX: currentBlock.x,
+                        currentWidth: currentBlock.element.offsetWidth,
+                        rightEdge: rightEdge,
+                        otherX: otherBlock.x,
+                        leftEdge: leftEdge,
+                        xDiff: xDiff,
+                        yAlign: yAlign,
+                        connected: xDiff < CONNECTION_TOLERANCE && yAlign < CONNECTION_TOLERANCE
+                    });
+
+                    if (xDiff < CONNECTION_TOLERANCE && yAlign < CONNECTION_TOLERANCE) {
+                        currentBlock.connectedTo.push({ id: otherBlock.id, direction: 'horizontal' });
+                        console.log(`✓ Connection added: ${currentBlock.id} -> ${otherBlock.id}`);
+                    }
+                }
+
+                // Vertical connections from branch blocks
+                if (currentBlock.puzzleType === 'branch') {
+                    const currentCenterX = currentBlock.x + currentBlock.element.offsetWidth / 2;
+                    const otherCenterX = otherBlock.x + otherBlock.element.offsetWidth / 2;
+                    const xAlign = Math.abs(currentCenterX - otherCenterX);
+
+                    // Top connection
+                    const currentBottom = currentBlock.y + currentBlock.element.offsetHeight;
+                    const otherTop = otherBlock.y;
+                    if (Math.abs(currentBottom - otherTop) < CONNECTION_TOLERANCE && xAlign < CONNECTION_TOLERANCE) {
+                        currentBlock.connectedTo.push({ id: otherBlock.id, direction: 'vertical-bottom' });
+                    }
+
+                    // Bottom connection - FIXED: dragged block is ABOVE
+                    const currentTop = currentBlock.y;
+                    const otherBottom = otherBlock.y + otherBlock.element.offsetHeight;
+                    if (Math.abs(currentTop - otherBottom) < CONNECTION_TOLERANCE && xAlign < CONNECTION_TOLERANCE) {
+                        currentBlock.connectedTo.push({ id: otherBlock.id, direction: 'vertical-top' });
+                    }
+                }
+            });
+        });
+
+        // Update visual connection states (hide tabs/notches at connections)
+        this.updateConnectionVisuals();
+    }
+
+    updateConnectionVisuals() {
+        // First, remove all connection classes
+        this.placedBlocks.forEach(block => {
+            block.element.classList.remove('connected-right', 'connected-left', 'connected-top', 'connected-bottom');
+        });
+
+        // Then add connection classes based on current connections
+        this.placedBlocks.forEach(block => {
+            block.connectedTo.forEach(connection => {
+                if (connection.direction === 'horizontal') {
+                    // Current block is connected on the right
+                    block.element.classList.add('connected-right');
+
+                    // Find the connected block and mark its left as connected
+                    const connectedBlock = this.placedBlocks.find(b => b.id === connection.id);
+                    if (connectedBlock) {
+                        connectedBlock.element.classList.add('connected-left');
+                    }
+                } else if (connection.direction === 'vertical-top') {
+                    // Current block (branch) is connected on top
+                    block.element.classList.add('connected-top');
+
+                    // Find the connected block and mark its bottom as connected
+                    const connectedBlock = this.placedBlocks.find(b => b.id === connection.id);
+                    if (connectedBlock) {
+                        connectedBlock.element.classList.add('connected-bottom');
+                    }
+                } else if (connection.direction === 'vertical-bottom') {
+                    // Current block (branch) is connected on bottom
+                    block.element.classList.add('connected-bottom');
+
+                    // Find the connected block and mark its top as connected
+                    const connectedBlock = this.placedBlocks.find(b => b.id === connection.id);
+                    if (connectedBlock) {
+                        connectedBlock.element.classList.add('connected-top');
+                    }
+                }
+            });
         });
     }
 
-    startMovement(direction) {
-        if (this.isRunning) return;
+    placeBlock(blockId, x, y) {
+        const challengeData = CHALLENGE_DATA[this.game.currentChallenge];
+        const blockData = challengeData.blocks.find(b => b.id === blockId);
+        if (!blockData) return;
 
-        this.isRunning = true;
-        this.currentDirection = direction;
-        this.stopAnimation();
+        // Create placed block element using game's createPuzzleBlockElement
+        const blockElement = this.game.createPuzzleBlockElement(blockData);
+        blockElement.classList.add('placed');
+        blockElement.style.position = 'absolute';
+        blockElement.style.left = x + 'px';
+        blockElement.style.top = y + 'px';
 
-        this.animationInterval = setInterval(() => {
-            this.currentFrame = (this.currentFrame + 1) % this.runFrames;
-            if (this.preloadedRunImages[this.currentFrame]) {
-                this.img.src = this.preloadedRunImages[this.currentFrame].src;
-            }
-        }, this.runAnimationSpeed);
+        // Remove description from placed blocks (keep icon and title only)
+        const description = blockElement.querySelector('.flow-block-description');
+        if (description) description.remove();
 
-        if (direction === 'left') {
-            this.img.style.transform = 'scaleX(-1)';
-        } else {
-            this.img.style.transform = 'scaleX(1)';
-        }
+        // Make it moveable
+        this.makePlacedBlockDraggable(blockElement);
 
-        const move = () => {
-            if (!this.isRunning) return;
+        // Add to whiteboard
+        const whiteboard = document.getElementById('whiteboardContent');
+        whiteboard.appendChild(blockElement);
 
-            const container = this.element.parentElement;
-            const currentLeft = parseInt(container.style.left || '60');
+        // Track placed block
+        this.placedBlocks.push({
+            id: blockId,
+            element: blockElement,
+            x: x,
+            y: y,
+            puzzleType: blockData.puzzleType,
+            connectedTo: [] // Track connections
+        });
 
-            if (direction === 'left' && this.isMovingLeft) {
-                const newLeft = Math.max(0, currentLeft - this.moveSpeed);
-                container.style.left = newLeft + 'px';
-            } else if (direction === 'right' && this.isMovingRight) {
-                const maxRight = window.innerWidth - 150;
-                const newLeft = Math.min(maxRight, currentLeft + this.moveSpeed);
-                container.style.left = newLeft + 'px';
-            }
-
-            if (this.isRunning) {
-                requestAnimationFrame(move);
-            }
-        };
-
-        move();
+        // Try to auto-connect nearby blocks
+        this.checkAndConnectBlocks(blockId);
     }
 
-    stopMovement() {
-        this.isRunning = false;
-        this.stopAnimation();
-        this.img.style.transform = 'scaleX(1)';
-        this.startIdleAnimation();
-    }
-
-    setupDragAndDrop() {
-        const container = this.element.parentElement;
+    makePlacedBlockDraggable(element) {
         let isDragging = false;
-        let offsetX, offsetY;
+        let startX, startY, initialX, initialY;
+        let onMouseMove, onMouseUp;
 
         const onMouseDown = (e) => {
-            if (this.isRunning) return;
-
+            if (this.game.isPaused) return;
             isDragging = true;
-            this.isDragging = true;
-
-            const rect = container.getBoundingClientRect();
-
-            offsetX = e.clientX - rect.left;
-            offsetY = e.clientY - rect.top;
-
-            this.element.style.cursor = 'grabbing';
+            startX = e.clientX || (e.touches && e.touches[0].clientX);
+            startY = e.clientY || (e.touches && e.touches[0].clientY);
+            initialX = parseInt(element.style.left);
+            initialY = parseInt(element.style.top);
+            element.style.zIndex = '100';
+            element.style.cursor = 'grabbing';
+            element.style.transition = 'none'; // Disable transition for instant movement
             e.preventDefault();
+            e.stopPropagation();
+
+            // Add move and up listeners only when dragging starts
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('touchmove', onMouseMove, { passive: false });
+            document.addEventListener('mouseup', onMouseUp);
+            document.addEventListener('touchend', onMouseUp);
         };
 
-        const onMouseMove = (e) => {
+        onMouseMove = (e) => {
             if (!isDragging) return;
+            e.preventDefault();
+            const currentX = e.clientX || (e.touches && e.touches[0].clientX);
+            const currentY = e.clientY || (e.touches && e.touches[0].clientY);
+            const deltaX = currentX - startX;
+            const deltaY = currentY - startY;
 
-            const newX = e.clientX - offsetX;
-            const newY = e.clientY - offsetY;
+            // Calculate new position
+            let newX = initialX + deltaX;
+            let newY = initialY + deltaY;
 
-            container.style.left = newX + 'px';
-            container.style.top = newY + 'px';
-            container.style.bottom = 'auto';
-        };
+            // Get whiteboard bounds
+            const whiteboard = document.getElementById('whiteboardContent');
+            const whiteboardRect = whiteboard.getBoundingClientRect();
+            const elementRect = element.getBoundingClientRect();
 
-        const onMouseUp = () => {
-            if (isDragging) {
-                isDragging = false;
-                this.element.style.cursor = 'move';
+            // Check if this block is selected and move all selected blocks together
+            const blockId = element.dataset.blockId;
+            const currentBlock = this.placedBlocks.find(b => b.id === blockId && b.element === element);
+            const isSelected = currentBlock && this.selectedBlocks.includes(currentBlock);
 
-                setTimeout(() => {
-                    this.isDragging = false;
-                }, 100);
+            // Constrain within whiteboard boundaries
+            const minX = 0;
+            const minY = 0;
+            const maxX = whiteboardRect.width - elementRect.width;
+            const maxY = whiteboardRect.height - elementRect.height;
+
+            newX = Math.max(minX, Math.min(maxX, newX));
+            newY = Math.max(minY, Math.min(maxY, newY));
+
+            // Use transform for smoother performance
+            const constrainedDeltaX = newX - initialX;
+            const constrainedDeltaY = newY - initialY;
+            element.style.transform = `translate(${constrainedDeltaX}px, ${constrainedDeltaY}px)`;
+
+            // If block is selected, move all selected blocks together
+            if (isSelected && this.selectedBlocks.length > 1) {
+                this.selectedBlocks.forEach(block => {
+                    if (block.element !== element) {
+                        const blockNewX = block.x + constrainedDeltaX;
+                        const blockNewY = block.y + constrainedDeltaY;
+                        block.element.style.transform = `translate(${constrainedDeltaX}px, ${constrainedDeltaY}px)`;
+                    }
+                });
             }
+
+            // Check if over trash zone
+            this.checkTrashZoneHover(currentX, currentY);
         };
 
-        this.element.addEventListener('mousedown', onMouseDown);
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
+        onMouseUp = (e) => {
+            if (!isDragging) return;
+            isDragging = false;
 
-        this.dragCleanup = () => {
+            // Remove listeners immediately
             document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('touchmove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
+            document.removeEventListener('touchend', onMouseUp);
+
+            // Calculate final position
+            const currentX = e.clientX || (e.changedTouches && e.changedTouches[0].clientX);
+            const currentY = e.clientY || (e.changedTouches && e.changedTouches[0].clientY);
+
+            // Check if dropped on trash zone
+            const trashZone = document.getElementById('trashZone');
+            if (trashZone) {
+                trashZone.classList.remove('drag-over');
+                const trashRect = trashZone.getBoundingClientRect();
+                if (currentX >= trashRect.left && currentX <= trashRect.right &&
+                    currentY >= trashRect.top && currentY <= trashRect.bottom) {
+                    // Element dropped on trash zone - remove it
+                    const blockId = element.dataset.blockId;
+                    const block = this.placedBlocks.find(b => b.id === blockId && b.element === element);
+                    const isSelected = block && this.selectedBlocks.includes(block);
+
+                    // If block is selected, remove all selected blocks
+                    if (isSelected && this.selectedBlocks.length > 1) {
+                        const blocksToRemove = [...this.selectedBlocks];
+                        blocksToRemove.forEach(selectedBlock => {
+                            this.removeBlock(selectedBlock.element);
+                        });
+                    } else {
+                        this.removeBlock(element);
+                    }
+                    return;
+                }
+            }
+
+            const deltaX = currentX - startX;
+            const deltaY = currentY - startY;
+            let newX = initialX + deltaX;
+            let newY = initialY + deltaY;
+
+            // Get whiteboard bounds for constraining
+            const whiteboard = document.getElementById('whiteboardContent');
+            const whiteboardRect = whiteboard.getBoundingClientRect();
+            const elementRect = element.getBoundingClientRect();
+
+            // Constrain within boundaries
+            const minX = 0;
+            const minY = 0;
+            const maxX = whiteboardRect.width - elementRect.width;
+            const maxY = whiteboardRect.height - elementRect.height;
+
+            newX = Math.max(minX, Math.min(maxX, newX));
+            newY = Math.max(minY, Math.min(maxY, newY));
+
+            // Snap to grid
+            const snappedX = this.snapToGrid(newX);
+            const snappedY = this.snapToGrid(newY);
+
+            // Apply final position and remove transform
+            element.style.transform = '';
+            element.style.left = snappedX + 'px';
+            element.style.top = snappedY + 'px';
+            element.style.zIndex = '1';
+            element.style.cursor = 'move';
+            element.style.transition = ''; // Re-enable transitions
+
+            // Update placed blocks array
+            const blockId = element.dataset.blockId;
+            const block = this.placedBlocks.find(b => b.id === blockId && b.element === element);
+            if (block) {
+                block.x = snappedX;
+                block.y = snappedY;
+            }
+
+            // If block is selected, update all selected blocks positions
+            const isSelected = block && this.selectedBlocks.includes(block);
+            if (isSelected && this.selectedBlocks.length > 1) {
+                const deltaX = snappedX - initialX;
+                const deltaY = snappedY - initialY;
+
+                this.selectedBlocks.forEach(selectedBlock => {
+                    if (selectedBlock.element !== element) {
+                        const newBlockX = this.snapToGrid(selectedBlock.x + deltaX);
+                        const newBlockY = this.snapToGrid(selectedBlock.y + deltaY);
+
+                        selectedBlock.element.style.transform = '';
+                        selectedBlock.element.style.left = newBlockX + 'px';
+                        selectedBlock.element.style.top = newBlockY + 'px';
+                        selectedBlock.x = newBlockX;
+                        selectedBlock.y = newBlockY;
+                    }
+                });
+            }
+
+            // Check for connections with other blocks
+            this.checkAndConnectBlocks(blockId);
+        };
+
+        element.addEventListener('mousedown', onMouseDown);
+        element.addEventListener('touchstart', onMouseDown, { passive: false });
+
+        // Double-click to remove
+        element.addEventListener('dblclick', () => {
+            if (this.game.isPaused) return;
+            this.removeBlock(element);
+        });
+    }
+
+    removeBlock(element) {
+        const blockId = element.dataset.blockId;
+        const block = this.placedBlocks.find(b => b.element === element);
+
+        // Remove from selected blocks if selected
+        if (block && this.selectedBlocks.includes(block)) {
+            this.deselectBlock(block);
+        }
+
+        this.placedBlocks = this.placedBlocks.filter(b => b.element !== element);
+        element.remove();
+        // Rebuild connections after removing
+        this.rebuildAllConnections();
+    }
+
+    checkTrashZoneHover(mouseX, mouseY) {
+        const trashZone = document.getElementById('trashZone');
+        if (!trashZone) return;
+
+        const trashRect = trashZone.getBoundingClientRect();
+        const isOver = mouseX >= trashRect.left && mouseX <= trashRect.right &&
+                       mouseY >= trashRect.top && mouseY <= trashRect.bottom;
+
+        if (isOver) {
+            trashZone.classList.add('drag-over');
+        } else {
+            trashZone.classList.remove('drag-over');
+        }
+    }
+
+    getPlacedSequence() {
+        // Sort blocks by X position (left to right) for horizontal flows
+        const sortedBlocks = [...this.placedBlocks].sort((a, b) => a.x - b.x);
+        return sortedBlocks.map(block => block.id);
+    }
+
+    clearWhiteboard() {
+        this.placedBlocks.forEach(block => {
+            if (block.element && block.element.parentNode) {
+                block.element.remove();
+            }
+        });
+        this.placedBlocks = [];
+        this.clearSelection();
+    }
+
+    // ===== MULTI-SELECT FUNCTIONALITY =====
+    createSelectionBox() {
+        this.selectionBox = document.createElement('div');
+        this.selectionBox.className = 'selection-box';
+        const whiteboard = document.getElementById('whiteboardContent');
+        if (whiteboard) {
+            whiteboard.appendChild(this.selectionBox);
+
+            // Add mousedown listener to whiteboard for selection
+            whiteboard.addEventListener('mousedown', (e) => {
+                // Only start selection if clicking on whiteboard itself (not on a block)
+                if (e.target.closest('.flow-block') || this.game.isPaused) return;
+                this.startSelection(e);
+            });
+        }
+    }
+
+    startSelection(e) {
+        const whiteboard = document.getElementById('whiteboardContent');
+        const rect = whiteboard.getBoundingClientRect();
+
+        this.isSelecting = true;
+        this.selectionStart = {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+
+        // Clear previous selection
+        this.clearSelection();
+
+        this.selectionBox.style.left = this.selectionStart.x + 'px';
+        this.selectionBox.style.top = this.selectionStart.y + 'px';
+        this.selectionBox.style.width = '0px';
+        this.selectionBox.style.height = '0px';
+        this.selectionBox.style.display = 'block';
+
+        // Add move and up listeners
+        const onMove = (e) => this.updateSelection(e);
+        const onUp = (e) => {
+            this.endSelection(e);
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onUp);
+        };
+
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+    }
+
+    updateSelection(e) {
+        if (!this.isSelecting) return;
+
+        const whiteboard = document.getElementById('whiteboardContent');
+        const rect = whiteboard.getBoundingClientRect();
+
+        const currentX = e.clientX - rect.left;
+        const currentY = e.clientY - rect.top;
+
+        const width = Math.abs(currentX - this.selectionStart.x);
+        const height = Math.abs(currentY - this.selectionStart.y);
+        const left = Math.min(currentX, this.selectionStart.x);
+        const top = Math.min(currentY, this.selectionStart.y);
+
+        this.selectionBox.style.left = left + 'px';
+        this.selectionBox.style.top = top + 'px';
+        this.selectionBox.style.width = width + 'px';
+        this.selectionBox.style.height = height + 'px';
+    }
+
+    endSelection(e) {
+        if (!this.isSelecting) return;
+
+        this.isSelecting = false;
+        this.selectionBox.style.display = 'none';
+
+        // Get selection box bounds
+        const selectionRect = {
+            left: parseFloat(this.selectionBox.style.left),
+            top: parseFloat(this.selectionBox.style.top),
+            width: parseFloat(this.selectionBox.style.width),
+            height: parseFloat(this.selectionBox.style.height)
+        };
+        selectionRect.right = selectionRect.left + selectionRect.width;
+        selectionRect.bottom = selectionRect.top + selectionRect.height;
+
+        // Check which blocks are in selection
+        this.placedBlocks.forEach(block => {
+            const blockRect = {
+                left: block.x,
+                top: block.y,
+                width: block.element.offsetWidth,
+                height: block.element.offsetHeight
+            };
+            blockRect.right = blockRect.left + blockRect.width;
+            blockRect.bottom = blockRect.top + blockRect.height;
+
+            // Check if block intersects with selection
+            const intersects = !(
+                blockRect.right < selectionRect.left ||
+                blockRect.left > selectionRect.right ||
+                blockRect.bottom < selectionRect.top ||
+                blockRect.top > selectionRect.bottom
+            );
+
+            if (intersects) {
+                this.selectBlock(block);
+            }
+        });
+    }
+
+    selectBlock(block) {
+        if (!this.selectedBlocks.includes(block)) {
+            this.selectedBlocks.push(block);
+            block.element.classList.add('selected');
+        }
+    }
+
+    deselectBlock(block) {
+        const index = this.selectedBlocks.indexOf(block);
+        if (index > -1) {
+            this.selectedBlocks.splice(index, 1);
+            block.element.classList.remove('selected');
+        }
+    }
+
+    clearSelection() {
+        this.selectedBlocks.forEach(block => {
+            block.element.classList.remove('selected');
+        });
+        this.selectedBlocks = [];
+    }
+}
+
+// ===== MAIN GAME CLASS =====
+class PowerAutomateGame {
+    constructor() {
+        // Game state
+        this.currentChallenge = 1;
+        this.currentScreen = 'intro';
+        this.isPaused = false;
+        this.totalPoints = 0;
+        this.startTime = null;
+        this.challengeStartTime = null;
+        this.completedChallenges = [];
+
+        // Game objects
+        this.txp = null;
+        this.dragDropManager = null;
+        this.flowCanvas = null;
+
+        this.setupInputHandlers();
+        this.loadProgress();
+        this.init();
+    }
+
+    async init() {
+        // Show intro screen
+        this.showScreen('introScreen');
+
+        // Initialize flow canvas animation
+        const canvas = document.getElementById('flowCanvas');
+        if (canvas) {
+            this.flowCanvas = new FlowCanvasAnimation(canvas);
+            this.flowCanvas.start();
+        }
+
+        // Setup intro screen interactions (keyboard + mouse/touch)
+        this.setupIntroHandlers();
+
+        // Update rank badge on init
+        this.updateRankBadge();
+    }
+
+    setupIntroHandlers() {
+        const introContent = document.querySelector('.intro-content');
+        const pressKeyElement = document.getElementById('pressKey');
+
+        const startGame = async () => {
+            // Remove event listeners
+            document.removeEventListener('keydown', onKeyPress);
+            if (introContent) {
+                introContent.removeEventListener('click', onIntroClick);
+            }
+            if (pressKeyElement) {
+                pressKeyElement.removeEventListener('click', onPressKeyClick);
+            }
+
+            if (this.flowCanvas) this.flowCanvas.stop();
+            await this.startLoading();
+        };
+
+        const onKeyPress = (e) => {
+            startGame();
+        };
+
+        const onIntroClick = () => {
+            startGame();
+        };
+
+        const onPressKeyClick = (e) => {
+            e.stopPropagation();
+            startGame();
+        };
+
+        // Keyboard
+        document.addEventListener('keydown', onKeyPress);
+
+        // Mouse/Touch on whole intro content
+        if (introContent) {
+            introContent.addEventListener('click', onIntroClick);
+        }
+
+        // Extra listener on press-key element for clarity
+        if (pressKeyElement) {
+            pressKeyElement.addEventListener('click', onPressKeyClick);
+            pressKeyElement.style.cursor = 'pointer';
+        }
+    }
+
+    async startLoading() {
+        this.showScreen('loadingScreen');
+
+        // Preload TXP animations
+        await TXPAssistant.preloadFrames();
+
+        // Simulate loading
+        const loadingBar = document.getElementById('loadingBar');
+        const loadingText = document.getElementById('loadingText');
+
+        let progress = 0;
+        const loadingInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(loadingInterval);
+                setTimeout(() => this.showLevelSelect(), 500);
+            }
+            if (loadingBar) loadingBar.style.width = progress + '%';
+            if (loadingText) loadingText.textContent = Math.floor(progress) + '%';
+        }, 100);
+    }
+
+    showLevelSelect() {
+        this.showScreen('levelSelectScreen');
+        this.updateLevelSelectUI();
+        this.setupLevelClickHandlers();
+        this.updateRankBadge(); // Show rank badge in level select
+    }
+
+    updateLevelSelectUI() {
+        console.log('=== UPDATE LEVEL SELECT UI ===');
+        console.log('Total Points:', this.totalPoints);
+        console.log('Completed Challenges:', this.completedChallenges);
+
+        // Update total points display
+        const totalPointsDisplay = document.getElementById('totalPointsDisplay');
+        const currentRankDisplay = document.getElementById('currentRankDisplay');
+
+        if (totalPointsDisplay) {
+            totalPointsDisplay.textContent = `${this.totalPoints} / 500`;
+        }
+
+        if (currentRankDisplay) {
+            const rank = this.calculateTotalRank();
+            currentRankDisplay.textContent = rank;
+        }
+
+        // Update challenge cards status
+        for (let i = 1; i <= GAME_CONFIG.totalChallenges; i++) {
+            const cardElement = document.querySelector(`.challenge-card[data-level="${i}"]`);
+            if (!cardElement) continue;
+
+            const isUnlocked = this.isChallengeUnlocked(i);
+            const isCompleted = this.isChallengeCompleted(i);
+
+            console.log(`Challenge ${i}: unlocked=${isUnlocked}, completed=${isCompleted}`);
+
+            // Update points display
+            const pointsElement = cardElement.querySelector('.challenge-points');
+            if (pointsElement) {
+                pointsElement.textContent = isCompleted ? '100/100 Punkte' : '0/100 Punkte';
+            }
+
+            // Update unlock status
+            if (isUnlocked) {
+                cardElement.classList.remove('locked');
+                cardElement.classList.add('unlocked');
+                cardElement.style.opacity = '1';
+                cardElement.style.filter = 'none';
+                cardElement.style.cursor = 'pointer';
+                cardElement.style.pointerEvents = 'auto';
+
+                const statusElement = cardElement.querySelector('.challenge-status');
+                if (statusElement && !isCompleted) {
+                    statusElement.textContent = '▶ Starten';
+                    statusElement.style.color = 'var(--success-color)';
+                }
+            } else {
+                cardElement.classList.add('locked');
+                cardElement.classList.remove('unlocked');
+                cardElement.style.opacity = '0.5';
+                cardElement.style.filter = 'grayscale(80%)';
+                cardElement.style.cursor = 'not-allowed';
+                cardElement.style.pointerEvents = 'none';
+
+                const statusElement = cardElement.querySelector('.challenge-status');
+                if (statusElement) {
+                    statusElement.textContent = '🔒 Gesperrt';
+                    statusElement.style.color = 'rgba(255, 255, 255, 0.5)';
+                }
+            }
+
+            // Update completed status
+            if (isCompleted) {
+                cardElement.classList.add('completed');
+                const statusElement = cardElement.querySelector('.challenge-status');
+                if (statusElement) {
+                    statusElement.textContent = '✓ Abgeschlossen';
+                    statusElement.style.color = 'var(--success-color)';
+                }
+            }
+        }
+    }
+
+    isChallengeUnlocked(challengeNum) {
+        if (challengeNum === 1) return true;
+        return this.isChallengeCompleted(challengeNum - 1);
+    }
+
+    isChallengeCompleted(challengeNum) {
+        return this.completedChallenges && this.completedChallenges.includes(challengeNum);
+    }
+
+    setupLevelClickHandlers() {
+        const challengeCards = document.querySelectorAll('.challenge-card');
+        challengeCards.forEach(cardElement => {
+            cardElement.addEventListener('click', () => {
+                const level = parseInt(cardElement.dataset.level);
+                if (this.isChallengeUnlocked(level)) {
+                    this.startChallenge(level);
+                }
+            });
+        });
+    }
+
+    startChallenge(challengeNum) {
+        this.currentChallenge = challengeNum;
+        this.challengeStartTime = Date.now();
+
+        // Show editor screen
+        this.showScreen('editorScreen');
+
+        // Initialize TXP
+        if (!this.txp) {
+            this.txp = new TXPAssistant();
+        }
+        this.txp.show();
+
+        // Initialize drag & drop
+        if (!this.dragDropManager) {
+            this.dragDropManager = new DragDropManager(this);
+        } else {
+            this.dragDropManager.clearWhiteboard();
+        }
+
+        // Load challenge data
+        this.loadChallengeUI();
+
+        // Show tutorial messages if available
+        const challengeData = CHALLENGE_DATA[challengeNum];
+        if (challengeData.tutorialMessages && challengeData.tutorialMessages.length > 0) {
+            // Show tutorial overlay only for Challenge 1
+            if (challengeNum === 1) {
+                this.showTutorial();
+            }
+            this.txp.startTutorial(challengeData.tutorialMessages);
+        }
+
+        // Update HUD
+        this.updateHUD();
+    }
+
+    createPuzzleBlockElement(blockData) {
+        const blockElement = document.createElement('div');
+        blockElement.className = 'flow-block puzzle-' + blockData.puzzleType;
+        blockElement.dataset.blockId = blockData.id;
+        blockElement.dataset.puzzleType = blockData.puzzleType;
+
+        // Background layer - rendered first so z-index works correctly
+        let innerHTML = `<div class="flow-block-background"></div>`;
+
+        // Base content
+        innerHTML += `
+            <div class="flow-block-icon">${blockData.icon}</div>
+            <div class="flow-block-title">${blockData.title}</div>
+            <div class="flow-block-description">${blockData.description}</div>
+        `;
+
+        // Add branch labels for condition blocks
+        if (blockData.puzzleType === 'branch') {
+            innerHTML += `
+                <div class="branch-labels">
+                    <div>↑ Wenn ja</div>
+                    <div>↓ Wenn nein</div>
+                </div>
+            `;
+        }
+
+        // Add tabs/notches for branch type
+        if (blockData.puzzleType === 'branch') {
+            innerHTML += `
+                <div class="branch-tab-top"></div>
+                <div class="branch-tab-bottom"></div>
+            `;
+        }
+
+        // Add tabs/notches for vertical type
+        if (blockData.puzzleType === 'vertical') {
+            innerHTML += `
+                <div class="vertical-notch-top"></div>
+                <div class="vertical-notch-bottom"></div>
+            `;
+        }
+
+        blockElement.innerHTML = innerHTML;
+        return blockElement;
+    }
+
+    loadChallengeUI() {
+        const challengeData = CHALLENGE_DATA[this.currentChallenge];
+
+        // Update challenge display
+        const challengeDisplay = document.getElementById('challengeDisplay');
+        const challengeText = document.getElementById('challengeText');
+        if (challengeDisplay && challengeText) {
+            challengeDisplay.style.display = 'flex';
+            challengeText.textContent = challengeData.task;
+        }
+
+        // Load flow blocks into palette
+        const paletteItems = document.getElementById('paletteItems');
+        if (paletteItems) {
+            paletteItems.innerHTML = '';
+            challengeData.blocks.forEach(block => {
+                const blockElement = this.createPuzzleBlockElement(block);
+                paletteItems.appendChild(blockElement);
+            });
+        }
+
+        // Setup buttons
+        const clearBtn = document.getElementById('clearBtn');
+        const validateBtn = document.getElementById('validateBtn');
+
+        if (clearBtn) {
+            clearBtn.onclick = () => this.clearWhiteboard();
+        }
+
+        if (validateBtn) {
+            validateBtn.onclick = () => this.validateFlow();
+        }
+    }
+
+    showTutorial() {
+        const tutorialOverlay = document.getElementById('tutorialOverlay');
+        if (tutorialOverlay) {
+            tutorialOverlay.style.display = 'flex';
+        }
+    }
+
+    clearWhiteboard() {
+        if (this.dragDropManager) {
+            this.dragDropManager.clearWhiteboard();
+        }
+    }
+
+    validateFlow() {
+        if (!this.dragDropManager) return;
+
+        const challengeData = CHALLENGE_DATA[this.currentChallenge];
+
+        // DEBUG: Log placed blocks and their connections
+        console.log('=== VALIDATION DEBUG ===');
+        console.log('Placed blocks:', this.dragDropManager.placedBlocks.map(b => ({
+            id: b.id,
+            x: b.x,
+            y: b.y,
+            connectedTo: b.connectedTo
+        })));
+        console.log('Required connections:', challengeData.correctConnections);
+
+        // All levels now use connections validation
+        const isCorrect = this.validateConnections(challengeData.correctConnections);
+
+        console.log('Validation result:', isCorrect);
+        console.log('======================');
+
+        if (isCorrect) {
+            this.onChallengeSuccess();
+        } else {
+            this.onChallengeFail();
+        }
+    }
+
+    validateConnections(correctConnections) {
+        const placedBlocks = this.dragDropManager.placedBlocks;
+
+        // Check if all required connections exist
+        for (const required of correctConnections) {
+            const fromBlock = placedBlocks.find(b => b.id === required.from);
+            if (!fromBlock) return false;
+
+            // Check if this block has the required connection
+            const hasConnection = fromBlock.connectedTo.some(conn =>
+                conn.id === required.to && conn.direction === required.direction
+            );
+
+            if (!hasConnection) return false;
+        }
+
+        return true;
+    }
+
+    arraysEqual(a, b) {
+        if (a.length !== b.length) return false;
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) return false;
+        }
+        return true;
+    }
+
+    onChallengeSuccess() {
+        // Award 100 points only if challenge not yet completed
+        const wasAlreadyCompleted = this.isChallengeCompleted(this.currentChallenge);
+        let points = 0;
+
+        if (!wasAlreadyCompleted) {
+            points = 100; // Always 100 points per level
+            this.totalPoints += points;
+        }
+
+        // Show success message from TXP
+        const challengeData = CHALLENGE_DATA[this.currentChallenge];
+        if (this.txp) {
+            this.txp.showSuccessMessage(challengeData.successMessage);
+            setTimeout(() => {
+                this.txp.hideSpeech();
+                this.showChallengeComplete();
+            }, 2000);
+        } else {
+            this.showChallengeComplete();
+        }
+
+        // Save progress (mark as completed) - this also saves to localStorage
+        this.markChallengeCompleted(this.currentChallenge);
+    }
+
+    onChallengeFail() {
+        // Show error feedback
+        if (this.txp) {
+            this.txp.showSuccessMessage("❌ Das ist noch nicht richtig. Überprüfe die Reihenfolge!");
+            setTimeout(() => {
+                this.txp.hideSpeech();
+            }, 2000);
+        }
+
+        // Visual feedback
+        const whiteboard = document.getElementById('whiteboardContent');
+        if (whiteboard) {
+            whiteboard.style.borderColor = '#FF4444';
+            setTimeout(() => {
+                whiteboard.style.borderColor = '';
+            }, 500);
+        }
+    }
+
+    showChallengeComplete() {
+        this.showScreen('challengeCompleteScreen');
+
+        // Show flow visualization
+        this.showFlowVisualization();
+
+        // Update rank badge
+        this.updateRankBadge();
+
+        // Hide "Next Challenge" button if this is the last challenge
+        const nextChallengeBtn = document.querySelector('.next-level-button');
+        const menuButton = document.querySelector('.menu-button');
+
+        if (this.currentChallenge >= GAME_CONFIG.totalChallenges) {
+            // Last challenge - hide next button, center menu button
+            if (nextChallengeBtn) {
+                nextChallengeBtn.style.display = 'none';
+            }
+            if (menuButton) {
+                menuButton.style.margin = '0 auto';
+            }
+        } else {
+            // Not last challenge - show both buttons
+            if (nextChallengeBtn) {
+                nextChallengeBtn.style.display = 'flex';
+            }
+            if (menuButton) {
+                menuButton.style.margin = '';
+            }
+        }
+    }
+
+    showFlowVisualization() {
+        const flowVisualization = document.getElementById('flowVisualization');
+        if (!flowVisualization || !this.dragDropManager) return;
+
+        flowVisualization.innerHTML = '';
+
+        const placedSequence = this.dragDropManager.getPlacedSequence();
+        const challengeData = CHALLENGE_DATA[this.currentChallenge];
+
+        placedSequence.forEach((blockId, index) => {
+            const blockData = challengeData.blocks.find(b => b.id === blockId);
+            if (!blockData) return;
+
+            // Create flow step
+            const stepElement = document.createElement('div');
+            stepElement.className = 'flow-step';
+            stepElement.innerHTML = `
+                <div class="flow-step-icon">${blockData.icon}</div>
+                <div class="flow-step-text">${blockData.title}</div>
+            `;
+            flowVisualization.appendChild(stepElement);
+
+            // Add arrow between steps
+            if (index < placedSequence.length - 1) {
+                const arrow = document.createElement('div');
+                arrow.className = 'flow-arrow';
+                arrow.textContent = '⬇';
+                flowVisualization.appendChild(arrow);
+            }
+        });
+    }
+
+    updateHUD() {
+        // Update rank badge
+        this.updateRankBadge();
+    }
+
+    updateRankBadge() {
+        // Update rank badge - 1:1 from Level 5
+        const rankBadge = document.getElementById('rankBadge');
+        const rankIcon = document.getElementById('rankIcon');
+        const rankLabel = document.getElementById('rankLabel');
+
+        if (!rankBadge || !rankIcon || !rankLabel) return;
+
+        const rank = this.calculateTotalRank();
+        const rankClass = rank.toLowerCase(); // 'gold', 'silber', 'bronze', 'kein rang'
+
+        if (rank === 'Kein Rang') {
+            rankBadge.style.display = 'none';
+            return;
+        }
+
+        // Show badge
+        rankBadge.style.display = 'flex';
+        rankBadge.className = `rank-badge ${rankClass}`;
+
+        // Set label based on rank (no icon, just like Level 5)
+        rankLabel.textContent = rank;
+        rankIcon.textContent = ''; // No icon
+
+        // Add click event for animation
+        rankBadge.onclick = () => {
+            rankBadge.classList.add('rank-badge-clicked');
+            setTimeout(() => {
+                rankBadge.classList.remove('rank-badge-clicked');
+            }, 1000);
         };
     }
 
-    destroy() {
-        this.stopAnimation();
-        if (this.speechTimeout) {
-            clearTimeout(this.speechTimeout);
+    calculateTotalRank() {
+        if (this.totalPoints >= 500) return 'Gold';
+        if (this.totalPoints >= 400) return 'Silber';
+        if (this.totalPoints >= 300) return 'Bronze';
+        return 'Kein Rang';
+    }
+
+    getRankIcon(rank) {
+        const icons = {
+            'Gold': '🥇',
+            'Silber': '🥈',
+            'Bronze': '🥉',
+            'Kein Rang': ''
+        };
+        return icons[rank] || '';
+    }
+
+    markChallengeCompleted(challengeNum) {
+        const progress = this.getProgress();
+        if (!progress.completedChallenges) {
+            progress.completedChallenges = [];
         }
-        if (this.typewriterInterval) {
-            clearInterval(this.typewriterInterval);
+        if (!progress.completedChallenges.includes(challengeNum)) {
+            progress.completedChallenges.push(challengeNum);
         }
-        if (this.autoSpeechTimer) {
-            clearInterval(this.autoSpeechTimer);
+
+        // Update the game instance's completedChallenges
+        this.completedChallenges = progress.completedChallenges;
+
+        // Save to localStorage
+        localStorage.setItem('powerAutomateProgress', JSON.stringify({
+            currentChallenge: this.currentChallenge,
+            totalPoints: this.totalPoints,
+            completedChallenges: this.completedChallenges
+        }));
+    }
+
+    // ===== SCREEN MANAGEMENT =====
+    showScreen(screenId) {
+        const screens = document.querySelectorAll('.game-screen');
+        screens.forEach(screen => screen.classList.remove('active'));
+
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+            targetScreen.classList.add('active');
+            this.currentScreen = screenId;
         }
-        if (this.dragCleanup) {
-            this.dragCleanup();
+
+        // Show/hide HUD based on screen
+        const hudWrapper = document.querySelector('.hud-wrapper');
+        if (hudWrapper) {
+            hudWrapper.style.display = (screenId === 'editorScreen') ? 'flex' : 'none';
         }
     }
-}
 
-let currentChallenge = 0;
-let totalScore = 0;
-let gameState = 'intro';
-let moHost;
-let selectedChallenges = [];
-const MAX_CHALLENGES = 5;
-
-// Tutorial Data
-const tutorials = [
-    {
-        id: 1,
-        title: "Tutorial",
-        concept: "Die 3 goldenen Regeln für Bild-KI Prompts",
-        examples: [
-            {
-                situation: "Beispiel: Du möchtest ein Bild einer modernen, nachhaltigen Fabrik für eine Präsentation",
-                badPrompt: "Fabrik",
-                badPoints: "0 Punkte",
-                whyBad: "Viel zu vage - welche Art Fabrik? Welcher Stil? Welche Stimmung?",
-                mediumPrompt: "Moderne Autofabrik mit Solardach",
-                mediumPoints: "3 Punkte",
-                whyMedium: "Besser! Aber Stil, Perspektive und Details fehlen noch.",
-                goodPrompt: "Fotorealistische moderne Produktionshalle, nachhaltig mit Solardach und Grünflächen, helle Beleuchtung, Vogelperspektive, Mercedes-Benz Stil",
-                goodPoints: "10 Punkte",
-                whyGood: "Perfekt! Stil, Perspektive, Stimmung und spezifische Details definiert."
+    // ===== INPUT HANDLERS =====
+    setupInputHandlers() {
+        document.addEventListener('keydown', (e) => {
+            // Escape to toggle pause
+            if (e.key === 'Escape' && this.currentScreen === 'editorScreen') {
+                this.togglePauseMenu();
             }
-        ],
-        principle: "Die drei goldenen Regeln: Visuell konkret sein • Stil & Perspektive definieren • Grenzen kennen (Marken, Kennzeichnung)"
-    }
-];
-
-// Challenge Data - 8 Challenges for random selection
-const challenges = [
-    {
-        id: 1,
-        title: "Challenge 1: Nachhaltige Fabrik der Zukunft",
-        description: "Du siehst ein KI-generiertes Bild einer modernen, nachhaltigen Produktionshalle. Welcher Prompt hat dieses Bild erzeugt?",
-        image: "placeholder_factory.png",
-        imageDescription: "Moderne Produktionshalle mit Solardach, viel Glas, grünen Pflanzen, heller Beleuchtung, saubere Linien",
-        prompts: [
-            {
-                text: "Fabrik mit Autos",
-                quality: "poor",
-                score: 0,
-                explanation: "Viel zu vage! 'Fabrik mit Autos' sagt nichts über Stil, Nachhaltigkeit, Beleuchtung oder Perspektive. Die KI würde ein völlig anderes, generisches Bild erzeugen."
-            },
-            {
-                text: "Moderne Autofabrik, nachhaltig",
-                quality: "good",
-                score: 3,
-                explanation: "Auf dem richtigen Weg! Aber es fehlen wichtige visuelle Details: Welcher Stil? Welche Perspektive? Welche Beleuchtung? Das Ergebnis wäre unvorhersehbar."
-            },
-            {
-                text: "Fotorealistische moderne Produktionshalle mit Solardach, Glasfassade, integrierten Grünflächen, helle natürliche Beleuchtung, saubere Architektur, Weitwinkel-Perspektive",
-                quality: "excellent",
-                score: 10,
-                explanation: "Perfekt! Alle visuellen Elemente sind definiert: Stil (fotorealistisch), Architektur (Solardach, Glas, Grünflächen), Beleuchtung (hell, natürlich), Perspektive (Weitwinkel). So entsteht genau dieses Bild!"
-            }
-        ],
-        hint: "Achte auf die visuellen Details im Bild: Beleuchtung, Architekturelemente, Perspektive. Ein guter Prompt beschreibt all das!"
-    },
-    {
-        id: 2,
-        title: "Challenge 2: Produktionshalle mit Robotern",
-        description: "Dieses Bild zeigt eine futuristische Produktionshalle mit Robotern und holografischen Displays. Welcher Prompt passt?",
-        image: "placeholder_robots.png",
-        imageDescription: "Futuristische Halle mit Industrierobotern, holografischen Anzeigen, blaues Licht, High-Tech Atmosphäre",
-        prompts: [
-            {
-                text: "Futuristische Mercedes-Benz Produktionshalle, Industrieroboter bei der Arbeit, holografische Displays mit Produktionsdaten, blaue LED-Beleuchtung, High-Tech Atmosphäre, cinematische Perspektive",
-                quality: "excellent",
-                score: 10,
-                explanation: "Exzellent! Der Prompt beschreibt exakt das Bild: Roboter, Holografie, blaue Beleuchtung, High-Tech Stil, und sogar die cinematische Perspektive. Alle visuellen Elemente sind abgedeckt!"
-            },
-            {
-                text: "Roboter in Fabrik",
-                quality: "poor",
-                score: 0,
-                explanation: "Viel zu simpel! Welche Art Roboter? Welche Fabrik? Welche Atmosphäre? Das Ergebnis wäre komplett zufällig und würde nicht so aussehen."
-            },
-            {
-                text: "Moderne Fabrikhalle mit Robotern und Displays",
-                quality: "good",
-                score: 3,
-                explanation: "Okay, aber zu unspezifisch! Es fehlen: Beleuchtungsfarbe, Stil (futuristisch), Art der Displays (holografisch), Perspektive. Das Bild würde anders aussehen."
-            }
-        ],
-        hint: "Schau dir die Beleuchtung und Atmosphäre genau an - das sind wichtige Hinweise für den richtigen Prompt!"
-    },
-    {
-        id: 3,
-        title: "Challenge 3: Was kann schiefgehen?",
-        description: "Dieses Bild zeigt einen 'Mercedes Sportwagen' - aber etwas stimmt nicht. Das Auto sieht nicht wirklich nach Mercedes aus. Welcher Prompt hat das verursacht?",
-        image: "placeholder_wrong_car.png",
-        imageDescription: "Sportwagen der entfernt wie ein Mercedes aussehen soll, aber falsche Details hat (falsches Logo-Design, untypische Proportionen)",
-        prompts: [
-            {
-                text: "Mercedes Sportwagen, sportlich, schnell",
-                quality: "poor",
-                score: 0,
-                explanation: "Das ist das Problem! Ohne genaue Markenspezifikationen erfindet die KI etwas, das 'wie Mercedes aussehen soll' - aber Markendetails falsch interpretiert. KI kennt keine Markenrechte!"
-            },
-            {
-                text: "Generischer Sportwagen im Premium-Segment, elegantes Design, silbermetallic, Studiobeleuchtung",
-                quality: "excellent",
-                score: 10,
-                explanation: "Das ist der sichere Weg! Statt Markennamen zu verwenden, beschreibst du den STIL: Premium, elegant, Farbe, Beleuchtung. So vermeidest du Markenrechtsprobleme und bekommst trotzdem ein hochwertiges Ergebnis!"
-            },
-            {
-                text: "Sportwagen",
-                quality: "good",
-                score: 3,
-                explanation: "Zu vage, aber immerhin ohne Markenrisiko. Das Ergebnis wäre sehr zufällig - könntest jeden Sportwagen bekommen."
-            }
-        ],
-        hint: "Vorsicht bei Markennamen! KI kann Logos und markenspezifische Details falsch darstellen. Beschreibe lieber den STIL!"
-    },
-    {
-        id: 4,
-        title: "Challenge 4: Synthetische Fehlerbilder",
-        description: "Dieses Bild zeigt einen Lackschaden auf einer Motorhaube - aber es ist KI-generiert für Trainingszwecke. Welcher Prompt erzeugt solche synthetischen Trainingsdaten?",
-        image: "placeholder_scratch.png",
-        imageDescription: "Nahaufnahme einer Motorhaube mit realistischem Kratzer, professionelle Studiobeleuchtung, technische Dokumentationsperspektive",
-        prompts: [
-            {
-                text: "Kratzer auf Auto",
-                quality: "poor",
-                score: 0,
-                explanation: "Viel zu unspezifisch für Trainingsdaten! Wo genau? Welche Perspektive? Welche Beleuchtung? Für KI-Training braucht man konsistente, präzise Bilder."
-            },
-            {
-                text: "Fotorealistische Nahaufnahme einer schwarzen Motorhaube mit linearem Kratzer (5cm), Studiobeleuchtung von links, technische Dokumentationsperspektive, hohe Auflösung, für QS-Training",
-                quality: "excellent",
-                score: 10,
-                explanation: "Perfekt für Trainingsdaten! Exakte Spezifikationen: Bauteil (Motorhaube), Fehlerart (linearer Kratzer), Größe (5cm), Beleuchtung, Perspektive, Zweck. So entstehen konsistente Trainingsbilder!"
-            },
-            {
-                text: "Motorhaube mit Kratzer, Nahaufnahme",
-                quality: "good",
-                score: 3,
-                explanation: "Grundidee stimmt, aber für Trainingsdaten zu ungenau. Welche Kratzergröße? Welche Beleuchtung? Trainingsdaten müssen konsistent sein!"
-            }
-        ],
-        hint: "Für synthetische Trainingsdaten braucht man sehr präzise Prompts - Bauteil, Fehlerart, Größe, Beleuchtung, Perspektive!"
-    },
-    {
-        id: 5,
-        title: "Challenge 5: KI-Kennzeichnung",
-        description: "Du siehst zwei Bilder: Eine fotorealistische Büro-Szene und eine Comic-Stil Illustration. Welches Bild muss als KI-generiert gekennzeichnet werden?",
-        image: "placeholder_office.png",
-        imageDescription: "Zwei Bilder nebeneinander: Links fotorealistisches Büro, rechts Comic-Stil Büro",
-        prompts: [
-            {
-                text: "Nur das fotorealistische Bild - bei offensichtlich künstlerischen Darstellungen wie Comic-Stil kann die Kennzeichnung entfallen",
-                quality: "excellent",
-                score: 10,
-                explanation: "Richtig! Fotorealistische KI-Bilder müssen gekennzeichnet werden, da sie mit echten Fotos verwechselt werden können. Bei offensichtlich künstlerischen Stilen (Comic, Illustration) ist die KI-Herkunft erkennbar - Kennzeichnung kann entfallen."
-            },
-            {
-                text: "Beide Bilder müssen immer gekennzeichnet werden",
-                quality: "good",
-                score: 3,
-                explanation: "Nicht ganz! Generell ist Transparenz wichtig, aber bei offensichtlich künstlerischen Darstellungen (Comic, Cartoon) ist die Nicht-Echtheit erkennbar. Die Kennzeichnungspflicht bezieht sich vor allem auf fotorealistische Inhalte."
-            },
-            {
-                text: "Keines - KI-Bilder müssen nie gekennzeichnet werden",
-                quality: "poor",
-                score: 0,
-                explanation: "Falsch! KI-generierte Inhalte müssen in vielen Kontexten gekennzeichnet werden - besonders fotorealistische Bilder. Transparenz verhindert Missverständnisse und erfüllt gesetzliche Vorschriften!"
-            }
-        ],
-        hint: "Denke darüber nach, wann jemand ein Bild für 'echt' halten könnte - das ist der Schlüssel zur Kennzeichnungspflicht!"
-    },
-    {
-        id: 6,
-        title: "Challenge 6: Studio-Erweiterung mit KI",
-        description: "Ein Foto aus einem Studio wurde mit KI nach links und rechts erweitert. Welcher Prompt erzeugt eine passende, konsistente Erweiterung?",
-        image: "placeholder_studio.png",
-        imageDescription: "Studiofoto in der Mitte, links und rechts KI-generierte Erweiterungen mit passenden Elementen, gleichem Stil und Beleuchtung",
-        prompts: [
-            {
-                text: "Erweitere das Bild",
-                quality: "poor",
-                score: 0,
-                explanation: "Viel zu vage! Die KI weiß nicht, in welchem Stil, mit welcher Beleuchtung oder welchen Elementen. Das Ergebnis würde nicht zum Originalbild passen."
-            },
-            {
-                text: "Erweitere das Studiofoto horizontal, behalte gleiche Beleuchtung (Softbox von oben), füge passende Studio-Equipment hinzu, gleicher Hintergrund-Farbton, konsistenter fotografischer Stil",
-                quality: "excellent",
-                score: 10,
-                explanation: "Perfekt! Alle wichtigen Konsistenz-Faktoren sind definiert: Richtung (horizontal), Beleuchtung (Softbox), Inhalt (Studio-Equipment), Farbton, Stil. So passt die Erweiterung nahtlos!"
-            },
-            {
-                text: "Studio-Erweiterung mit Equipment",
-                quality: "good",
-                score: 3,
-                explanation: "Richtige Idee, aber zu wenig Details! Ohne Beleuchtungs- und Stilangaben könnte die Erweiterung visuell abweichen und nicht zum Original passen."
-            }
-        ],
-        hint: "Bei Bild-Erweiterungen ist Konsistenz alles - Beleuchtung, Stil und Farbton müssen zum Original passen!"
-    },
-    {
-        id: 7,
-        title: "Challenge 7: Qualitätskontrolle - Kabelbaum",
-        description: "Dieses Bild zeigt einen Kabelbaum zur Qualitätsprüfung. Ein Kabel ist falsch verlegt. Welcher Prompt würde die KI trainieren, solche Fehler zu erkennen?",
-        image: "placeholder_cables.png",
-        imageDescription: "Kabelbaum im Fahrzeug, ein Kabel ist sichtbar falsch verlegt, technische Beleuchtung, Inspektionsperspektive",
-        prompts: [
-            {
-                text: "Technische Aufnahme Kabelbaum in Fahrzeug-Innenraum, ein Kabel fehlerhaft verlegt (überkreuzt), Rest korrekt, gleichmäßige Inspektionsbeleuchtung, Dokumentationsperspektive, für QS-Training",
-                quality: "excellent",
-                score: 10,
-                explanation: "Perfekt für QS-Training! Präzise Spezifikation: Bauteil (Kabelbaum), Fehlerart (überkreuzt), Kontext (Rest korrekt), Beleuchtung, Perspektive und Zweck. So lernt die KI genau diese Fehlerart!"
-            },
-            {
-                text: "Kabel im Auto",
-                quality: "poor",
-                score: 0,
-                explanation: "Viel zu unspezifisch! Für Qualitätskontroll-Training braucht man exakte Fehlerbeschreibungen, Perspektiven und Kontexte. 'Kabel im Auto' ist nutzlos für Training."
-            },
-            {
-                text: "Kabelbaum mit Fehler, Nahaufnahme",
-                quality: "good",
-                score: 3,
-                explanation: "Grundidee stimmt, aber: Welcher Fehler genau? Welche Beleuchtung? Für konsistentes Training braucht man mehr Details über die Fehlerart."
-            }
-        ],
-        hint: "Für Qualitätskontroll-Training muss die Fehlerart exakt beschrieben werden - sonst lernt die KI das Falsche!"
-    },
-    {
-        id: 8,
-        title: "Challenge 8: Heatmap-Analyse",
-        description: "Du siehst eine Heatmap, die zeigt, wo auf einer Motorhaube die meisten Kratzer auftreten. Welcher Prompt hat diese Visualisierung erzeugt?",
-        image: "placeholder_heatmap.png",
-        imageDescription: "Motorhauben-Silhouette mit farbiger Heatmap (rot = häufige Kratzer, blau = selten), klare Legende, technischer Stil",
-        prompts: [
-            {
-                text: "Motorhaube mit Kratzern",
-                quality: "poor",
-                score: 0,
-                explanation: "Das würde ein Foto mit Kratzern erzeugen - keine Heatmap! Für Datenvisualisierungen braucht man völlig andere Prompts."
-            },
-            {
-                text: "Technische Heatmap-Visualisierung einer Motorhauben-Silhouette, Farbskala rot-gelb-blau für Kratzer-Häufigkeit, klare Legende, weißer Hintergrund, Daten-Analyse Stil",
-                quality: "excellent",
-                score: 10,
-                explanation: "Perfekt! Der Prompt beschreibt eine VISUALISIERUNG, nicht ein Foto: Heatmap-Typ, Farbskala, Legende, Hintergrund, Stil. So entsteht eine klare Datenvisualisierung!"
-            },
-            {
-                text: "Kratzer-Statistik Motorhaube",
-                quality: "good",
-                score: 3,
-                explanation: "Richtige Richtung - es geht um Daten, nicht Fotos. Aber ohne Angabe des Visualisierungstyps (Heatmap), Farbskala und Stil wäre das Ergebnis unvorhersehbar."
-            }
-        ],
-        hint: "Für Datenvisualisierungen (Heatmaps, Diagramme) brauchst du andere Prompts als für Fotos - beschreibe den VISUALISIERUNGSTYP!"
-    }
-];
-
-// Function to select 5 random challenges from the pool
-function selectRandomChallenges() {
-    const allChallenges = [...challenges];
-
-    // Shuffle array using Fisher-Yates algorithm
-    for (let i = allChallenges.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [allChallenges[i], allChallenges[j]] = [allChallenges[j], allChallenges[i]];
-    }
-
-    selectedChallenges = allChallenges.slice(0, MAX_CHALLENGES);
-}
-
-// Game Functions
-function startGame() {
-    currentChallenge = 0;
-    totalScore = 0;
-    gameState = 'tutorial';
-
-    selectRandomChallenges();
-
-    if (moHost) {
-        moHost.speak("Super! Lass uns die Welt der Bild-KI erkunden!");
-    }
-
-    updateScore(0);
-    showTutorial();
-}
-
-function showTutorial() {
-    const tutorial = tutorials[0];
-
-    document.querySelectorAll('.game-screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
-
-    document.getElementById('tutorialScreen').classList.add('active');
-
-    document.getElementById('tutorialTitle').textContent = tutorial.title;
-    document.getElementById('tutorialConcept').textContent = tutorial.concept;
-
-    createTutorialExamples(tutorial);
-    createGoldenRules();
-    updateProgress();
-}
-
-function createTutorialExamples(tutorial) {
-    const container = document.getElementById('tutorialExamples');
-    container.innerHTML = '';
-
-    tutorial.examples.forEach((example) => {
-        const exampleCard = document.createElement('div');
-        exampleCard.className = 'example-card';
-
-        exampleCard.innerHTML = `
-            <div class="example-situation">${example.situation}</div>
-            <div class="prompt-comparison">
-                <div class="bad-prompt">
-                    <div class="prompt-label">❌ Schlechter Prompt:</div>
-                    <div class="prompt-text">"${example.badPrompt}"</div>
-                    <div class="prompt-explanation">${example.whyBad}</div>
-                    <div class="prompt-points">${example.badPoints}</div>
-                </div>
-                <div class="medium-prompt">
-                    <div class="prompt-label">⚠️ Mittlerer Prompt:</div>
-                    <div class="prompt-text">"${example.mediumPrompt}"</div>
-                    <div class="prompt-explanation">${example.whyMedium}</div>
-                    <div class="prompt-points">${example.mediumPoints}</div>
-                </div>
-                <div class="good-prompt">
-                    <div class="prompt-label">✅ Guter Prompt:</div>
-                    <div class="prompt-text">"${example.goodPrompt}"</div>
-                    <div class="prompt-explanation">${example.whyGood}</div>
-                    <div class="prompt-points">${example.goodPoints}</div>
-                </div>
-            </div>
-        `;
-
-        container.appendChild(exampleCard);
-    });
-}
-
-function createGoldenRules() {
-    const container = document.getElementById('goldenRules');
-    container.innerHTML = '';
-
-    const rules = [
-        {
-            number: 1,
-            title: "Visuell konkret sein"
-        },
-        {
-            number: 2,
-            title: "Stil & Perspektive definieren"
-        },
-        {
-            number: 3,
-            title: "Grenzen kennen"
-        }
-    ];
-
-    rules.forEach((rule) => {
-        const ruleCard = document.createElement('div');
-        ruleCard.className = 'golden-rule-card';
-
-        ruleCard.innerHTML = `
-            <div class="golden-rule-number">Regel ${rule.number}:</div>
-            <div class="golden-rule-title">${rule.title}</div>
-        `;
-
-        container.appendChild(ruleCard);
-    });
-}
-
-function startChallenge() {
-    gameState = 'challenge';
-    document.getElementById('tutorialScreen').classList.remove('active');
-    showChallenge();
-}
-
-function showChallenge() {
-    if (currentChallenge >= selectedChallenges.length) {
-        showCompletion();
-        return;
-    }
-
-    const challenge = selectedChallenges[currentChallenge];
-
-    document.querySelectorAll('.game-screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
-
-    document.getElementById('challengeScreen').classList.add('active');
-
-    // Update challenge content
-    const displayNumber = currentChallenge + 1;
-    const titleWithCorrectNumber = challenge.title.replace(/Challenge \d+:/, `Challenge ${displayNumber}:`);
-
-    const titleElement = document.getElementById('challengeTitle');
-    titleElement.innerHTML = titleWithCorrectNumber.split('').map(char => {
-        if (char === ' ') {
-            return '<span class="letter-space">&nbsp;</span>';
-        }
-        return `<span class="letter-char">${char}</span>`;
-    }).join('');
-
-    document.getElementById('challengeDescription').textContent = challenge.description;
-
-    // Show image placeholder with description
-    const imagePlaceholder = document.getElementById('imagePlaceholder');
-    const generatedImage = document.getElementById('generatedImage');
-
-    // For now, show description as placeholder (would be replaced with actual images)
-    imagePlaceholder.innerHTML = `
-        <div class="image-icon">🖼️</div>
-        <p style="font-size: 0.8rem; padding: 10px; text-align: left;">${challenge.imageDescription}</p>
-    `;
-    imagePlaceholder.style.display = 'block';
-    generatedImage.style.display = 'none';
-
-    updateProgress();
-    createPromptOptions(challenge);
-    hideHint();
-
-    // Reset submit button
-    const submitButton = document.getElementById('submitButton');
-    if (submitButton) {
-        submitButton.textContent = 'Auswahl bestätigen';
-        submitButton.classList.remove('continue-btn-style');
-        submitButton.onclick = submitPrompt;
-        disableSubmitButton();
-    }
-}
-
-function createPromptOptions(challenge) {
-    const container = document.getElementById('promptOptions');
-    container.innerHTML = '';
-
-    challenge.prompts.forEach((prompt, index) => {
-        const option = document.createElement('div');
-        option.className = 'prompt-option';
-        option.innerHTML = `
-            <input type="radio" name="promptChoice" value="${index}" id="prompt${index}">
-            <label for="prompt${index}">${prompt.text}</label>
-        `;
-
-        option.addEventListener('click', () => {
-            document.querySelectorAll('.prompt-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-
-            option.classList.add('selected');
-            option.querySelector('input[type="radio"]').checked = true;
-            enableSubmitButton();
         });
-
-        container.appendChild(option);
-    });
-}
-
-function enableSubmitButton() {
-    const submitButton = document.getElementById('submitButton');
-    if (submitButton) {
-        submitButton.classList.remove('disabled');
-        submitButton.classList.add('enabled');
-        submitButton.disabled = false;
-    }
-}
-
-function disableSubmitButton() {
-    const submitButton = document.getElementById('submitButton');
-    if (submitButton) {
-        submitButton.classList.remove('enabled');
-        submitButton.classList.add('disabled');
-        submitButton.disabled = true;
-    }
-}
-
-function submitPrompt() {
-    const selectedPrompt = document.querySelector('input[name="promptChoice"]:checked');
-
-    if (!selectedPrompt) {
-        alert('Bitte wähle einen Prompt aus!');
-        return;
     }
 
-    const promptIndex = parseInt(selectedPrompt.value);
-    const chosenPrompt = selectedChallenges[currentChallenge].prompts[promptIndex];
-    const score = chosenPrompt.score;
+    togglePauseMenu() {
+        const pauseMenu = document.getElementById('pauseMenu');
+        if (!pauseMenu) return;
 
-    showResults(score, chosenPrompt);
-}
+        this.isPaused = !this.isPaused;
+        pauseMenu.style.display = this.isPaused ? 'flex' : 'none';
+    }
 
-function showResults(score, chosenPrompt) {
-    totalScore += score;
-    updateScore(totalScore);
+    // ===== PROGRESS MANAGEMENT =====
+    saveProgress() {
+        const progress = {
+            currentChallenge: this.currentChallenge,
+            totalPoints: this.totalPoints,
+            completedChallenges: this.getProgress().completedChallenges || []
+        };
+        localStorage.setItem('powerAutomateProgress', JSON.stringify(progress));
+    }
 
-    if (moHost) {
-        if (score > 0) {
-            moHost.celebrateCorrectAnswer();
-        } else {
-            moHost.encourageAfterWrongAnswer();
+    loadProgress() {
+        const saved = localStorage.getItem('powerAutomateProgress');
+        if (saved) {
+            const progress = JSON.parse(saved);
+            this.currentChallenge = progress.currentChallenge || 1;
+            this.totalPoints = progress.totalPoints || 0;
+            this.completedChallenges = progress.completedChallenges || [];
         }
     }
 
-    document.getElementById('challengeScreen').classList.remove('active');
-    document.getElementById('resultsScreen').classList.add('active');
+    getProgress() {
+        const saved = localStorage.getItem('powerAutomateProgress');
+        return saved ? JSON.parse(saved) : {};
+    }
 
-    document.getElementById('resultsTitle').textContent = `Challenge ${currentChallenge + 1} Abgeschlossen!`;
-    document.getElementById('scoreEarned').textContent = `+${score} Punkte!`;
-    document.getElementById('explanationText').textContent = chosenPrompt.explanation;
+    resetProgress() {
+        localStorage.removeItem('powerAutomateProgress');
+        this.currentChallenge = 1;
+        this.totalPoints = 0;
+        this.completedChallenges = [];
+        location.reload();
+    }
+}
+
+// ===== GLOBAL FUNCTIONS (Called from HTML) =====
+function closeTutorial() {
+    const tutorialOverlay = document.getElementById('tutorialOverlay');
+    if (tutorialOverlay) {
+        tutorialOverlay.style.display = 'none';
+    }
+}
+
+function resumeGame() {
+    if (window.gameInstance) {
+        window.gameInstance.togglePauseMenu();
+    }
+}
+
+function returnToLevelSelect() {
+    if (window.gameInstance) {
+        window.gameInstance.showLevelSelect();
+        window.gameInstance.isPaused = false;
+        const pauseMenu = document.getElementById('pauseMenu');
+        if (pauseMenu) pauseMenu.style.display = 'none';
+    }
 }
 
 function nextChallenge() {
-    currentChallenge++;
-
-    if (moHost) {
-        const transitionMessages = [
-            "Weiter geht's! Die nächste Bild-Challenge wartet!",
-            "Du lernst schnell! Bereit für mehr?",
-            "Sehr gut! Lass uns weitermachen!",
-            "Auf zur nächsten Challenge!",
-            "Du wirst immer besser!"
-        ];
-        const randomMessage = transitionMessages[Math.floor(Math.random() * transitionMessages.length)];
-        moHost.speak(randomMessage);
-    }
-
-    document.getElementById('resultsScreen').classList.remove('active');
-    showChallenge();
-}
-
-function showCompletion() {
-    gameState = 'completion';
-
-    if (moHost) {
-        let finalMessage = "";
-        if (totalScore >= 45) {
-            finalMessage = `Unglaublich! ${totalScore} Punkte! Du bist ein Bild-KI Experte!`;
-        } else if (totalScore >= 35) {
-            finalMessage = `Sehr gut! ${totalScore} Punkte! Du verstehst Bild-KI richtig gut!`;
-        } else if (totalScore >= 25) {
-            finalMessage = `Gut gemacht! ${totalScore} Punkte! Solide Grundlagen!`;
+    if (window.gameInstance) {
+        const nextLevel = window.gameInstance.currentChallenge + 1;
+        if (nextLevel <= GAME_CONFIG.totalChallenges) {
+            window.gameInstance.startChallenge(nextLevel);
         } else {
-            finalMessage = `${totalScore} Punkte - ein guter Start! Übung macht den Meister!`;
-        }
-        moHost.speak(finalMessage);
-    }
-
-    document.querySelectorAll('.game-screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
-
-    document.getElementById('completionScreen').classList.add('active');
-
-    updateProgress();
-
-    document.getElementById('finalScore').textContent = totalScore;
-    document.getElementById('rankValue').textContent = getRank(totalScore).title;
-
-    saveProgress();
-    triggerCelebration();
-}
-
-function getRank(score) {
-    if (score >= 50) return { title: "Gold", description: "Bild-KI Meister!" };
-    if (score >= 40) return { title: "Silber", description: "Sehr gute Leistung!" };
-    if (score >= 25) return { title: "Bronze", description: "Solide Grundlagen!" };
-    return { title: "Kein Rang", description: "Weiter üben!" };
-}
-
-function triggerCelebration() {
-    document.querySelector('.completion-title').style.animation = 'celebration 2s ease-in-out infinite alternate';
-    createConfetti();
-}
-
-function createConfetti() {
-    for (let i = 0; i < 50; i++) {
-        setTimeout(() => {
-            const confetti = document.createElement('div');
-            confetti.style.position = 'fixed';
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.top = '-10px';
-            confetti.style.width = '10px';
-            confetti.style.height = '10px';
-            confetti.style.background = ['#F5C03B', '#00CED1', '#20B2AA'][Math.floor(Math.random() * 3)];
-            confetti.style.borderRadius = '50%';
-            confetti.style.pointerEvents = 'none';
-            confetti.style.zIndex = '9999';
-            confetti.style.animation = 'fall 3s linear forwards';
-
-            document.body.appendChild(confetti);
-
-            setTimeout(() => {
-                confetti.remove();
-            }, 3000);
-        }, i * 100);
-    }
-}
-
-// Add CSS for confetti animation
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fall {
-        to {
-            transform: translateY(100vh) rotate(360deg);
-            opacity: 0;
+            window.gameInstance.showLevelSelect();
         }
     }
-`;
-document.head.appendChild(style);
-
-function restartGame() {
-    currentChallenge = 0;
-    totalScore = 0;
-    gameState = 'intro';
-    selectedChallenges = [];
-
-    document.querySelectorAll('.game-screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
-
-    document.getElementById('introScreen').classList.add('active');
-
-    updateScore(0);
-    updateProgress();
-    displayRankBadge();
 }
 
-function updateScore(score) {
-    const scoreElement = document.getElementById('scoreValue');
-    scoreElement.textContent = score;
-
-    scoreElement.classList.add('updated');
-    setTimeout(() => {
-        scoreElement.classList.remove('updated');
-    }, 500);
-}
-
-function updateProgress() {
-    const progressFill = document.getElementById('progressFill');
-    const progressText = document.getElementById('progressText');
-
-    if (gameState === 'intro' || gameState === 'tutorial') {
-        progressText.textContent = '';
-        progressFill.style.width = '0%';
-        return;
-    }
-
-    const progress = ((currentChallenge) / MAX_CHALLENGES) * 100;
-    progressFill.style.width = progress + '%';
-
-    if (currentChallenge >= MAX_CHALLENGES) {
-        progressText.textContent = 'Geschafft!';
-    } else {
-        const displayChallenge = Math.min(currentChallenge + 1, MAX_CHALLENGES);
-        progressText.textContent = `Challenge ${displayChallenge}/${MAX_CHALLENGES}`;
+function goToLevelSelectWithAnimation() {
+    if (window.gameInstance) {
+        window.gameInstance.showLevelSelect();
     }
 }
 
-function showHint() {
-    const hintBox = document.getElementById('hintBox');
-    const hintText = document.getElementById('hintText');
-
-    hintText.textContent = selectedChallenges[currentChallenge].hint;
-    hintBox.classList.add('show');
-}
-
-function hideHint() {
-    const hintBox = document.getElementById('hintBox');
-    hintBox.classList.remove('show');
-}
-
-function saveProgress() {
-    const currentRank = getRank(totalScore);
-    const existingProgress = loadProgress();
-
-    const rankValues = {
-        "Kein Rang": 0,
-        "Bronze": 1,
-        "Silber": 2,
-        "Gold": 3
-    };
-
-    let rankToSave = currentRank.title;
-    let scoreToSave = totalScore;
-
-    if (existingProgress && existingProgress.rank) {
-        const existingRankValue = rankValues[existingProgress.rank] || 0;
-        const currentRankValue = rankValues[currentRank.title] || 0;
-
-        if (existingRankValue > currentRankValue) {
-            rankToSave = existingProgress.rank;
-        }
-
-        if (existingProgress.score > totalScore) {
-            scoreToSave = existingProgress.score;
-        }
-    }
-
-    const progress = {
-        level: 2,
-        completed: true,
-        score: scoreToSave,
-        rank: rankToSave,
-        timestamp: new Date().toISOString()
-    };
-
-    localStorage.setItem('aiBytes_level2_progress', JSON.stringify(progress));
-}
-
-function loadProgress() {
-    const saved = localStorage.getItem('aiBytes_level2_progress');
-    if (saved) {
-        return JSON.parse(saved);
-    }
-    return null;
-}
-
-function displayRankBadge() {
-    const progress = loadProgress();
-    const rankBadge = document.getElementById('rankBadge');
-
-    if (!rankBadge) return;
-
-    if (progress && progress.rank && progress.rank !== "Kein Rang") {
-        rankBadge.style.display = 'inline-block';
-
-        let rankText = progress.rank;
-        rankBadge.textContent = rankText;
-
-        rankBadge.classList.remove('bronze', 'silver', 'gold');
-
-        if (rankText === 'Bronze') {
-            rankBadge.classList.add('bronze');
-        } else if (rankText === 'Silber') {
-            rankBadge.classList.add('silver');
-        } else if (rankText === 'Gold') {
-            rankBadge.classList.add('gold');
-        }
-    } else {
-        rankBadge.style.display = 'none';
+function showResetConfirmation() {
+    const resetPopup = document.getElementById('resetPopup');
+    if (resetPopup) {
+        resetPopup.style.display = 'flex';
     }
 }
 
-// Initialize game when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    moHost = new MoManHost();
+function hideResetConfirmation() {
+    const resetPopup = document.getElementById('resetPopup');
+    if (resetPopup) {
+        resetPopup.style.display = 'none';
+    }
+}
 
-    // Show welcome message
-    setTimeout(() => {
-        moHost.speak("Hey! Willkommen zum Bild-KI Training! Hier lernst du, wie KI Bilder versteht und generiert!", true);
-        moHost.showUnderstoodButton(() => {
-            // Button clicked, speech will be hidden
-        });
-    }, 500);
+function confirmReset() {
+    if (window.gameInstance) {
+        window.gameInstance.resetProgress();
+    }
+}
 
-    // Display rank badge if player has played before
-    displayRankBadge();
+// ===== INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', () => {
+    window.gameInstance = new PowerAutomateGame();
 });
