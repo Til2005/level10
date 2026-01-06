@@ -13,6 +13,10 @@ body {
     background: #151037 !important;
     background-image: none !important;
     overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 /* AI Bytes Color Palette */
@@ -1170,6 +1174,7 @@ body:has(#introScreen.active) .hud-wrapper {
     z-index: 1; /* Above tabs (z-index: -1), below content (z-index: 2) */
 }
 
+
 /* Horizontal Puzzle: Left Notch (Einbuchtung), Right Tab (Ausbuchtung) */
 .flow-block.puzzle-horizontal::before {
     content: '';
@@ -1179,9 +1184,10 @@ body:has(#introScreen.active) .hud-wrapper {
     transform: translateY(-50%);
     width: 25px;
     height: 35px;
-    background: var(--editor-bg);
+    background: var(--russian-blue);
+    border: 3px solid var(--maya-blue);
+    border-left: none;
     border-radius: 0 50% 50% 0;
-    box-shadow: inset -2px 0 4px rgba(0, 0, 0, 0.3);
     z-index: 3;
 }
 
@@ -1195,7 +1201,7 @@ body:has(#introScreen.active) .hud-wrapper {
     position: absolute;
     right: -27px;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(-50%) rotate(180deg);
     width: 25px;
     height: 35px;
     background: linear-gradient(135deg, var(--persian-blue), var(--indigo));
@@ -1218,9 +1224,10 @@ body:has(#introScreen.active) .hud-wrapper {
     transform: translateY(-50%);
     width: 25px;
     height: 35px;
-    background: var(--editor-bg);
+    background: var(--russian-blue);
+    border: 3px solid var(--maya-blue);
+    border-left: none;
     border-radius: 0 50% 50% 0;
-    box-shadow: inset -2px 0 4px rgba(0, 0, 0, 0.3);
     z-index: 3;
 }
 
@@ -1273,9 +1280,10 @@ body:has(#introScreen.active) .hud-wrapper {
     transform: translateX(-50%);
     width: 35px;
     height: 25px;
-    background: var(--editor-bg);
+    background: var(--russian-blue);
+    border: 3px solid var(--maya-blue);
+    border-top: none;
     border-radius: 0 0 50% 50%;
-    box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.3);
     z-index: 3;
 }
 
@@ -1291,9 +1299,10 @@ body:has(#introScreen.active) .hud-wrapper {
     transform: translateX(-50%);
     width: 35px;
     height: 25px;
-    background: var(--editor-bg);
+    background: var(--russian-blue);
+    border: 3px solid var(--maya-blue);
+    border-bottom: none;
     border-radius: 50% 50% 0 0;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
     z-index: 3;
 }
 
@@ -1519,6 +1528,17 @@ body:has(#introScreen.active) .hud-wrapper {
 .flow-block.placed.selected {
     box-shadow: 0 0 0 3px var(--saffron), 0 4px 12px rgba(0, 0, 0, 0.3);
     z-index: 50;
+}
+
+/* Change notch background to editor background when placed */
+.flow-block.placed.puzzle-horizontal::before,
+.flow-block.placed.puzzle-branch::before {
+    background: #363494;
+}
+
+.flow-block.placed.puzzle-vertical .vertical-notch-top,
+.flow-block.placed.puzzle-vertical .vertical-notch-bottom {
+    background: #363494;
 }
 
 /* Selection Box */

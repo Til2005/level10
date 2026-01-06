@@ -64,6 +64,12 @@ const CHALLENGE_DATA = {
             { from: "trigger-excel", to: "action-filter", direction: "horizontal" },
             { from: "action-filter", to: "action-save-db", direction: "horizontal" }
         ],
+        tutorialMessages: [
+            "Willkommen zu Challenge 2! 📊",
+            "Beim Arbeiten mit Daten ist es wichtig, nur relevante Informationen weiterzuverarbeiten.",
+            "Denk daran: Erst der Trigger (neue Excel-Zeile), dann filtern, dann speichern!",
+            "Tipp: Nicht alle Bausteine gehören in den Flow. Wähle nur die richtigen aus! 💡"
+        ],
         successMessage: "Perfekt! Du kannst jetzt Daten filtern! 📊"
     },
 
@@ -86,27 +92,42 @@ const CHALLENGE_DATA = {
             { from: "condition-check", to: "action-approve", direction: "vertical-top" },
             { from: "condition-check", to: "action-reject", direction: "vertical-bottom" }
         ],
+        tutorialMessages: [
+            "Challenge 3 wird spannend! 🌳",
+            "Hier lernst du Verzweigungen: Der Flow teilt sich in zwei Pfade, 'Wenn ja' und 'Wenn nein'.",
+            "Achte auf die Puzzle-Form: Der Bedingungsblock hat oben und unten Verbindungen!"
+        ],
         successMessage: "Toll! Du beherrschst jetzt Verzweigungen! 🌳"
     },
 
     4: {
-        name: "Schleifen & Wiederholungen",
+        name: "Wiederkehrende Automatisierung",
         difficulty: "Schwer",
-        description: "Wiederhole Aktionen für mehrere Elemente",
-        task: "Bei Änderungen in einer SharePoint-Liste sollen alle Einträge durchlaufen, verarbeitet und per E-Mail verschickt werden",
+        description: "Erstelle automatisierte Flows, die regelmäßig ausgeführt werden",
+        task: "Täglich um 9 Uhr sollen alle offenen Tickets aus der SharePoint-Liste abgerufen, verarbeitet und per E-Mail versendet werden",
         blocks: [
-            { id: "trigger-sharepoint", icon: "📋", title: "SharePoint Liste", description: "Trigger: SharePoint-Änderung", type: "trigger", puzzleType: "horizontal" },
-            { id: "loop-foreach", icon: "🔁", title: "Für jedes Element", description: "Schleife: Alle Elemente durchlaufen", type: "loop", puzzleType: "horizontal" },
-            { id: "action-process", icon: "⚙️", title: "Daten verarbeiten", description: "Aktion: Daten verarbeiten", type: "action", puzzleType: "horizontal" },
-            { id: "action-email", icon: "📧", title: "E-Mail senden", description: "Aktion: E-Mail senden", type: "action", puzzleType: "horizontal" },
-            { id: "wrong-delete-list", icon: "🗑️", title: "Liste löschen", description: "Aktion: SharePoint-Liste entfernen", type: "action", puzzleType: "horizontal" }
+            { id: "wrong-create-item", icon: "➕", title: "Eintrag erstellen", description: "Aktion: Neuen Eintrag anlegen", type: "action", puzzleType: "horizontal" },
+            { id: "action-process", icon: "⚙️", title: "Daten verarbeiten", description: "Aktion: Ticket-Info formatieren", type: "action", puzzleType: "horizontal" },
+            { id: "wrong-delete-list", icon: "🗑️", title: "Liste löschen", description: "Aktion: SharePoint-Liste entfernen", type: "action", puzzleType: "horizontal" },
+            { id: "action-email", icon: "📧", title: "E-Mail senden", description: "Aktion: E-Mail an Zuständigen", type: "action", puzzleType: "horizontal" },
+            { id: "trigger-scheduled", icon: "🔁", title: "Zeitgesteuert", description: "Wiederholt täglich um 9:00 Uhr", type: "trigger", puzzleType: "horizontal" },
+            { id: "wrong-condition", icon: "❓", title: "Bedingung prüfen", description: "Bedingung: Wenn-Dann-Verzweigung", type: "condition", puzzleType: "branch" },
+            { id: "action-get-items", icon: "📋", title: "Einträge abrufen", description: "Aktion: SharePoint-Einträge laden", type: "action", puzzleType: "horizontal" },
+            { id: "wrong-update-item", icon: "✏️", title: "Eintrag aktualisieren", description: "Aktion: SharePoint-Eintrag bearbeiten", type: "action", puzzleType: "horizontal" }
         ],
         correctConnections: [
-            { from: "trigger-sharepoint", to: "loop-foreach", direction: "horizontal" },
-            { from: "loop-foreach", to: "action-process", direction: "horizontal" },
+            { from: "trigger-scheduled", to: "action-get-items", direction: "horizontal" },
+            { from: "action-get-items", to: "action-process", direction: "horizontal" },
             { from: "action-process", to: "action-email", direction: "horizontal" }
         ],
-        successMessage: "Wow! Schleifen sind kein Problem für dich! 🔁"
+        tutorialMessages: [
+            "Jetzt wird's fortgeschritten! 🔁",
+            "Zeitgesteuerte Flows sind super praktisch: Sie laufen automatisch zu festgelegten Zeiten!",
+            "Der Flow wiederholt sich JEDEN Tag zur gleichen Zeit, das spart viel manuelle Arbeit! 🚀",
+            "Wichtig: In diesem Fall ist 'Zeitgesteuert' der Trigger, es startet den Flow. Deshalb kommt es zuerst!",
+            "Tipp: Nicht alle Bausteine gehören in den Flow. Wähle nur die richtigen aus! 💡"
+        ],
+        successMessage: "Perfekt! Du beherrschst wiederkehrende Automatisierung! 🔁"
     },
 
     5: {
@@ -115,14 +136,17 @@ const CHALLENGE_DATA = {
         description: "Erstelle einen komplexen Genehmigungsworkflow",
         task: "Baue einen kompletten Approval-Flow mit mehreren Stufen",
         blocks: [
-            { id: "trigger-request", icon: "📬", title: "Antrag erstellt", description: "Trigger: Neuer Antrag", type: "trigger", puzzleType: "horizontal" },
-            { id: "action-get-manager", icon: "👤", title: "Manager abrufen", description: "Aktion: Vorgesetzten ermitteln", type: "action", puzzleType: "horizontal" },
-            { id: "action-approval", icon: "📝", title: "Genehmigung", description: "Aktion: Genehmigung anfordern", type: "action", puzzleType: "horizontal" },
-            { id: "condition-approved", icon: "❓", title: "Genehmigt?", description: "Bedingung: Genehmigt?", type: "condition", puzzleType: "branch" },
+            { id: "wrong-send-email", icon: "📧", title: "E-Mail senden", description: "Aktion: E-Mail versenden", type: "action", puzzleType: "horizontal" },
             { id: "action-notify-yes", icon: "✅", title: "Bestätigung senden", description: "Aktion: Bestätigung an Antragsteller", type: "action", puzzleType: "vertical" },
-            { id: "action-notify-no", icon: "❌", title: "Ablehnung senden", description: "Aktion: Ablehnung an Antragsteller", type: "action", puzzleType: "vertical" },
+            { id: "trigger-request", icon: "📬", title: "Antrag erstellt", description: "Trigger: Neuer Antrag", type: "trigger", puzzleType: "horizontal" },
             { id: "wrong-archive", icon: "📁", title: "Archivieren", description: "Aktion: Antrag archivieren", type: "action", puzzleType: "vertical" },
-            { id: "wrong-forward", icon: "➡️", title: "Weiterleiten", description: "Aktion: An anderen Empfänger weiterleiten", type: "action", puzzleType: "horizontal" }
+            { id: "action-get-manager", icon: "👤", title: "Manager abrufen", description: "Aktion: Vorgesetzten ermitteln", type: "action", puzzleType: "horizontal" },
+            { id: "wrong-save-db", icon: "💾", title: "In DB speichern", description: "Aktion: In Datenbank speichern", type: "action", puzzleType: "horizontal" },
+            { id: "condition-approved", icon: "❓", title: "Genehmigt?", description: "Bedingung: Genehmigt?", type: "condition", puzzleType: "branch" },
+            { id: "action-approval", icon: "📝", title: "Genehmigung", description: "Aktion: Genehmigung anfordern", type: "action", puzzleType: "horizontal" },
+            { id: "action-notify-no", icon: "❌", title: "Ablehnung senden", description: "Aktion: Ablehnung an Antragsteller", type: "action", puzzleType: "vertical" },
+            { id: "wrong-forward", icon: "➡️", title: "Weiterleiten", description: "Aktion: An anderen Empfänger weiterleiten", type: "action", puzzleType: "horizontal" },
+            { id: "wrong-scheduled", icon: "⏰", title: "Zeitgesteuert", description: "Trigger: Täglich wiederholen", type: "trigger", puzzleType: "horizontal" }
         ],
         correctConnections: [
             { from: "trigger-request", to: "action-get-manager", direction: "horizontal" },
@@ -134,7 +158,6 @@ const CHALLENGE_DATA = {
         tutorialMessages: [
             "Willkommen zur finalen Challenge! 👑",
             "Ein Approval-Flow ist ein Genehmigungsprozess: Jemand stellt einen Antrag (z.B. Urlaub, Ausgaben), der von einem Vorgesetzten genehmigt oder abgelehnt werden muss.",
-            "Der Flow läuft automatisch ab: Antrag erstellen → Vorgesetzten ermitteln → Genehmigung anfragen → Entscheidung prüfen → Antragsteller informieren",
             "Baue diesen kompletten Workflow! Je nachdem ob genehmigt oder abgelehnt wurde, bekommt der Antragsteller eine unterschiedliche Nachricht. Viel Erfolg! 🚀"
         ],
         successMessage: "Unglaublich! Du bist ein Power Automate Profi! 👑"
@@ -415,12 +438,17 @@ class DragDropManager {
         this.offsetX = 0;
         this.offsetY = 0;
         this.placedBlocks = []; // Blocks placed in whiteboard
+        this.nextInstanceId = 0; // Counter for unique instance IDs
 
         // Multi-select
         this.selectedBlocks = [];
         this.isSelecting = false;
         this.selectionBox = null;
         this.selectionStart = { x: 0, y: 0 };
+
+        // Easter egg: Track block placement/removal
+        this.blockPlacementCounter = {}; // {blockId: count}
+        this.easterEggTriggered = {};
 
         this.setupEventListeners();
         this.createSelectionBox();
@@ -529,8 +557,8 @@ class DragDropManager {
         return Math.round(value / GAME_CONFIG.gridSize) * GAME_CONFIG.gridSize;
     }
 
-    checkAndConnectBlocks(blockId) {
-        const draggedBlock = this.placedBlocks.find(b => b.id === blockId);
+    checkAndConnectBlocks(instanceId) {
+        const draggedBlock = this.placedBlocks.find(b => b.instanceId === instanceId);
         if (!draggedBlock) return;
 
         const SNAP_THRESHOLD = 150; // Detection distance
@@ -542,7 +570,7 @@ class DragDropManager {
 
         // Find the best snap target
         this.placedBlocks.forEach(targetBlock => {
-            if (targetBlock.id === draggedBlock.id) return;
+            if (targetBlock.instanceId === draggedBlock.instanceId) return;
 
             const yDiff = Math.abs(draggedBlock.y - targetBlock.y);
 
@@ -662,7 +690,7 @@ class DragDropManager {
         // Build connections based on precise positioning
         this.placedBlocks.forEach(currentBlock => {
             this.placedBlocks.forEach(otherBlock => {
-                if (otherBlock.id === currentBlock.id) return;
+                if (otherBlock.instanceId === currentBlock.instanceId) return;
 
                 // Horizontal connections
                 if (currentBlock.puzzleType === 'horizontal' || currentBlock.puzzleType === 'branch') {
@@ -683,7 +711,7 @@ class DragDropManager {
                     });
 
                     if (xDiff < CONNECTION_TOLERANCE && yAlign < CONNECTION_TOLERANCE) {
-                        currentBlock.connectedTo.push({ id: otherBlock.id, direction: 'horizontal' });
+                        currentBlock.connectedTo.push({ instanceId: otherBlock.instanceId, direction: 'horizontal' });
                         console.log(`✓ Connection added: ${currentBlock.id} -> ${otherBlock.id}`);
                     }
                 }
@@ -698,14 +726,14 @@ class DragDropManager {
                     const currentBottom = currentBlock.y + currentBlock.element.offsetHeight;
                     const otherTop = otherBlock.y;
                     if (Math.abs(currentBottom - otherTop) < CONNECTION_TOLERANCE && xAlign < CONNECTION_TOLERANCE) {
-                        currentBlock.connectedTo.push({ id: otherBlock.id, direction: 'vertical-bottom' });
+                        currentBlock.connectedTo.push({ instanceId: otherBlock.instanceId, direction: 'vertical-bottom' });
                     }
 
                     // Bottom connection - FIXED: dragged block is ABOVE
                     const currentTop = currentBlock.y;
                     const otherBottom = otherBlock.y + otherBlock.element.offsetHeight;
                     if (Math.abs(currentTop - otherBottom) < CONNECTION_TOLERANCE && xAlign < CONNECTION_TOLERANCE) {
-                        currentBlock.connectedTo.push({ id: otherBlock.id, direction: 'vertical-top' });
+                        currentBlock.connectedTo.push({ instanceId: otherBlock.instanceId, direction: 'vertical-top' });
                     }
                 }
             });
@@ -729,7 +757,7 @@ class DragDropManager {
                     block.element.classList.add('connected-right');
 
                     // Find the connected block and mark its left as connected
-                    const connectedBlock = this.placedBlocks.find(b => b.id === connection.id);
+                    const connectedBlock = this.placedBlocks.find(b => b.instanceId === connection.instanceId);
                     if (connectedBlock) {
                         connectedBlock.element.classList.add('connected-left');
                     }
@@ -738,7 +766,7 @@ class DragDropManager {
                     block.element.classList.add('connected-top');
 
                     // Find the connected block and mark its bottom as connected
-                    const connectedBlock = this.placedBlocks.find(b => b.id === connection.id);
+                    const connectedBlock = this.placedBlocks.find(b => b.instanceId === connection.instanceId);
                     if (connectedBlock) {
                         connectedBlock.element.classList.add('connected-bottom');
                     }
@@ -747,7 +775,7 @@ class DragDropManager {
                     block.element.classList.add('connected-bottom');
 
                     // Find the connected block and mark its top as connected
-                    const connectedBlock = this.placedBlocks.find(b => b.id === connection.id);
+                    const connectedBlock = this.placedBlocks.find(b => b.instanceId === connection.instanceId);
                     if (connectedBlock) {
                         connectedBlock.element.classList.add('connected-top');
                     }
@@ -761,12 +789,16 @@ class DragDropManager {
         const blockData = challengeData.blocks.find(b => b.id === blockId);
         if (!blockData) return;
 
+        // Create unique instance ID
+        const instanceId = `instance-${this.nextInstanceId++}`;
+
         // Create placed block element using game's createPuzzleBlockElement
         const blockElement = this.game.createPuzzleBlockElement(blockData);
         blockElement.classList.add('placed');
         blockElement.style.position = 'absolute';
         blockElement.style.left = x + 'px';
         blockElement.style.top = y + 'px';
+        blockElement.dataset.instanceId = instanceId; // Store unique instance ID
 
         // Remove description from placed blocks (keep icon and title only)
         const description = blockElement.querySelector('.flow-block-description');
@@ -781,7 +813,8 @@ class DragDropManager {
 
         // Track placed block
         this.placedBlocks.push({
-            id: blockId,
+            id: blockId, // Original block type ID
+            instanceId: instanceId, // Unique instance ID
             element: blockElement,
             x: x,
             y: y,
@@ -789,8 +822,20 @@ class DragDropManager {
             connectedTo: [] // Track connections
         });
 
+        // Easter egg: Track block placement
+        if (!this.blockPlacementCounter[blockId]) {
+            this.blockPlacementCounter[blockId] = 0;
+        }
+        this.blockPlacementCounter[blockId]++;
+
+        // Easter egg: Trigger when same block placed 2+ times
+        if (this.blockPlacementCounter[blockId] >= 2 && !this.easterEggTriggered[blockId]) {
+            this.easterEggTriggered[blockId] = true;
+            this.triggerBlockEasterEgg(blockId);
+        }
+
         // Try to auto-connect nearby blocks
-        this.checkAndConnectBlocks(blockId);
+        this.checkAndConnectBlocks(instanceId);
     }
 
     makePlacedBlockDraggable(element) {
@@ -836,8 +881,8 @@ class DragDropManager {
             const elementRect = element.getBoundingClientRect();
 
             // Check if this block is selected and move all selected blocks together
-            const blockId = element.dataset.blockId;
-            const currentBlock = this.placedBlocks.find(b => b.id === blockId && b.element === element);
+            const instanceId = element.dataset.instanceId;
+            const currentBlock = this.placedBlocks.find(b => b.instanceId === instanceId && b.element === element);
             const isSelected = currentBlock && this.selectedBlocks.includes(currentBlock);
 
             // Constrain within whiteboard boundaries
@@ -891,8 +936,8 @@ class DragDropManager {
                 if (currentX >= trashRect.left && currentX <= trashRect.right &&
                     currentY >= trashRect.top && currentY <= trashRect.bottom) {
                     // Element dropped on trash zone - remove it
-                    const blockId = element.dataset.blockId;
-                    const block = this.placedBlocks.find(b => b.id === blockId && b.element === element);
+                    const instanceId = element.dataset.instanceId;
+                    const block = this.placedBlocks.find(b => b.instanceId === instanceId && b.element === element);
                     const isSelected = block && this.selectedBlocks.includes(block);
 
                     // If block is selected, remove all selected blocks
@@ -940,8 +985,8 @@ class DragDropManager {
             element.style.transition = ''; // Re-enable transitions
 
             // Update placed blocks array
-            const blockId = element.dataset.blockId;
-            const block = this.placedBlocks.find(b => b.id === blockId && b.element === element);
+            const instanceId = element.dataset.instanceId;
+            const block = this.placedBlocks.find(b => b.instanceId === instanceId && b.element === element);
             if (block) {
                 block.x = snappedX;
                 block.y = snappedY;
@@ -968,7 +1013,7 @@ class DragDropManager {
             }
 
             // Check for connections with other blocks
-            this.checkAndConnectBlocks(blockId);
+            this.checkAndConnectBlocks(instanceId);
         };
 
         element.addEventListener('mousedown', onMouseDown);
@@ -982,8 +1027,8 @@ class DragDropManager {
     }
 
     removeBlock(element) {
-        const blockId = element.dataset.blockId;
-        const block = this.placedBlocks.find(b => b.element === element);
+        const instanceId = element.dataset.instanceId;
+        const block = this.placedBlocks.find(b => b.instanceId === instanceId && b.element === element);
 
         // Remove from selected blocks if selected
         if (block && this.selectedBlocks.includes(block)) {
@@ -994,6 +1039,22 @@ class DragDropManager {
         element.remove();
         // Rebuild connections after removing
         this.rebuildAllConnections();
+    }
+
+    triggerBlockEasterEgg(blockId) {
+        if (this.game.txp) {
+            const messages = [
+                "Du magst diesen Block wohl besonders! 😉",
+                "Dieser Block gefällt dir, oder? 🤔",
+                "Vielleicht probierst du mal einen anderen Block? 😄",
+                "Okay, ich habe verstanden - das ist dein Lieblingsblock! ❤️"
+            ];
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            this.game.txp.showSuccessMessage(randomMessage);
+            setTimeout(() => {
+                if (this.game.txp) this.game.txp.hideSpeech();
+            }, 3000);
+        }
     }
 
     checkTrashZoneHover(mouseX, mouseY) {
@@ -1273,6 +1334,71 @@ class PowerAutomateGame {
         this.updateLevelSelectUI();
         this.setupLevelClickHandlers();
         this.updateRankBadge(); // Show rank badge in level select
+        this.setupLevelSelectEasterEgg(); // Easter egg: Fireworks on empty clicks
+    }
+
+    setupLevelSelectEasterEgg() {
+        const levelSelectContainer = document.querySelector('.level-select-container');
+        if (!levelSelectContainer) return;
+
+        levelSelectContainer.addEventListener('click', (e) => {
+            // Check if click is on empty area (not on a card or button)
+            if (e.target.classList.contains('level-select-container') ||
+                e.target.closest('.level-select-title') ||
+                e.target.closest('.level-select-subtitle')) {
+                this.createFireworks(e.clientX, e.clientY);
+            }
+        });
+    }
+
+    createFireworks(x, y) {
+        const colors = ['#67C7FF', '#A86AFF', '#F5C03B'];
+        const particleCount = 20;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.style.position = 'fixed';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.width = '6px';
+            particle.style.height = '6px';
+            particle.style.borderRadius = '50%';
+            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '9999';
+            particle.style.boxShadow = `0 0 10px ${particle.style.backgroundColor}`;
+
+            document.body.appendChild(particle);
+
+            const angle = (Math.PI * 2 * i) / particleCount;
+            const velocity = 3 + Math.random() * 2;
+            const vx = Math.cos(angle) * velocity;
+            const vy = Math.sin(angle) * velocity;
+
+            let posX = x;
+            let posY = y;
+            let opacity = 1;
+            let velocityY = vy;
+
+            const animate = () => {
+                posX += vx;
+                posY += velocityY;
+                velocityY += 0.2; // gravity
+                opacity -= 0.02;
+
+                particle.style.left = posX + 'px';
+                particle.style.top = posY + 'px';
+                particle.style.opacity = opacity;
+
+                if (opacity > 0) {
+                    requestAnimationFrame(animate);
+                } else {
+                    particle.remove();
+                }
+            };
+
+            animate();
+        }
     }
 
     updateLevelSelectUI() {
@@ -1434,7 +1560,7 @@ class PowerAutomateGame {
             `;
         }
 
-        // Add tabs/notches for branch type
+        // Add tabs for branch type
         if (blockData.puzzleType === 'branch') {
             innerHTML += `
                 <div class="branch-tab-top"></div>
@@ -1442,7 +1568,7 @@ class PowerAutomateGame {
             `;
         }
 
-        // Add tabs/notches for vertical type
+        // Add notches for vertical type
         if (blockData.puzzleType === 'vertical') {
             innerHTML += `
                 <div class="vertical-notch-top"></div>
@@ -1538,9 +1664,11 @@ class PowerAutomateGame {
             if (!fromBlock) return false;
 
             // Check if this block has the required connection
-            const hasConnection = fromBlock.connectedTo.some(conn =>
-                conn.id === required.to && conn.direction === required.direction
-            );
+            // Note: connections now use instanceId, so we need to look up the block type
+            const hasConnection = fromBlock.connectedTo.some(conn => {
+                const connectedBlock = placedBlocks.find(b => b.instanceId === conn.instanceId);
+                return connectedBlock && connectedBlock.id === required.to && conn.direction === required.direction;
+            });
 
             if (!hasConnection) return false;
         }

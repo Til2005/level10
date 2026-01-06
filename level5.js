@@ -272,8 +272,7 @@ const LEVEL_DATA = {
             { x: 1830, y: 310, id: "zeig-alles", text: "zeig alles", type: "bad" },
             { x: 2110, y: 360, id: "egal-wie", text: "egal wie", type: "bad" },
             { x: 2400, y: 410, id: "mach-was", text: "mach was", type: "bad" },
-            { x: 2730, y: 480, id: "irgendwie", text: "irgendwie", type: "bad" },
-            { x: 4320, y: 430, id: "ohne-details", text: "ohne Details", type: "bad" }
+            { x: 2730, y: 480, id: "irgendwie", text: "irgendwie", type: "bad" }
         ],
         // Special collectible: Note to share with colleagues
         notePosition: { x: 2000, y: 200 },
@@ -1389,8 +1388,8 @@ class Enemy {
             this.element.style.transform = 'scaleX(1)';
         }
 
-        // Animation
-        this.frameCounter++;
+        // Animation - scaled with deltaTime for consistent speed across different framerates
+        this.frameCounter += deltaTime;
         if (this.frameCounter >= ANIMATIONS.enemy.speed) {
             this.frameCounter = 0;
             this.currentFrame = (this.currentFrame + 1) % ANIMATIONS.enemy.frames;
@@ -1561,10 +1560,10 @@ class JumpingEnemy {
             this.jumpTimer = 0;
         }
 
-        // Jump physics
+        // Jump physics - scaled with deltaTime for consistent speed across different framerates
         if (this.isJumping) {
-            this.jumpVelocity += 0.4; // Niedrigere Gravity für langsameren Fall
-            this.y += this.jumpVelocity;
+            this.jumpVelocity += 0.4 * deltaTime; // Gravity scaled with deltaTime
+            this.y += this.jumpVelocity * deltaTime;
 
             // Landed
             if (this.y >= this.baseY) {
@@ -1574,8 +1573,8 @@ class JumpingEnemy {
             }
         }
 
-        // Animation
-        this.frameCounter++;
+        // Animation - scaled with deltaTime for consistent speed across different framerates
+        this.frameCounter += deltaTime;
         if (this.frameCounter >= ANIMATIONS.jumpingEnemy.speed) {
             this.frameCounter = 0;
             this.currentFrame = (this.currentFrame + 1) % ANIMATIONS.jumpingEnemy.frames;
@@ -2857,10 +2856,19 @@ class PlatformerGame {
     gameLoop(currentTime = performance.now()) {
         if (!this.isRunning) return;
 
-        let deltaTime = (currentTime - this.lastTime) / 16.67; // Normalize to 60fps
+        // Calculate deltaTime - time elapsed since last frame in milliseconds
+        const deltaMs = currentTime - this.lastTime;
 
-        // Clamp deltaTime to prevent huge jumps during lag spikes
-        if (deltaTime > 3) deltaTime = 1; // Cap at 3x normal speed
+        // Normalize to 60fps baseline (1.0 = normal speed at 60fps)
+        // This makes movement consistent across different refresh rates
+        let deltaTime = deltaMs * 60 / 1000;
+
+        // Clamp deltaTime to prevent huge jumps during lag spikes or tab switches
+        // If deltaTime is too large (> 3 frames worth), cap it to prevent teleporting
+        if (deltaTime > 3) deltaTime = 1;
+
+        // If deltaTime is too small or negative (can happen on first frame), set to 1
+        if (deltaTime <= 0) deltaTime = 1;
 
         this.lastTime = currentTime;
 
