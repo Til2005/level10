@@ -210,6 +210,7 @@ class TXPAssistant {
         this.tutorialMessages = [];
         this.currentMessageIndex = 0;
         this.isInTutorialMode = false;
+        this.onDialogCompleteCallback = null;
 
         this.startAnimation('stand');
         this.setupClickHandler();
@@ -290,10 +291,11 @@ class TXPAssistant {
         }
     }
 
-    startTutorial(messages) {
+    startTutorial(messages, onComplete = null) {
         this.isInTutorialMode = true;
         this.tutorialMessages = messages;
         this.currentMessageIndex = 0;
+        this.onDialogCompleteCallback = onComplete;
         if (messages.length > 0) {
             this.showSpeech(messages[0], true);
         }
@@ -314,6 +316,11 @@ class TXPAssistant {
             } else {
                 this.hideSpeech();
                 this.isInTutorialMode = false;
+                // Call the callback when dialog is complete
+                if (this.onDialogCompleteCallback) {
+                    this.onDialogCompleteCallback();
+                    this.onDialogCompleteCallback = null;
+                }
             }
         } else {
             // If not in tutorial mode, restart tutorial from beginning
@@ -1520,18 +1527,39 @@ class PowerAutomateGame {
         // Load challenge data
         this.loadChallengeUI();
 
+        // Show overlay to darken screen while TXP talks
+        const overlay = document.getElementById('txpIntroOverlay');
+        if (overlay) {
+            overlay.style.display = 'block';
+        }
+
         // Show tutorial messages if available
         const challengeData = CHALLENGE_DATA[challengeNum];
         if (challengeData.tutorialMessages && challengeData.tutorialMessages.length > 0) {
-            // Show tutorial overlay only for Challenge 1
-            if (challengeNum === 1) {
-                this.showTutorial();
-            }
-            this.txp.startTutorial(challengeData.tutorialMessages);
+            // Start TXP dialog with callback to hide overlay when done
+            this.txp.startTutorial(challengeData.tutorialMessages, () => {
+                this.onTXPDialogComplete(challengeNum);
+            });
+        } else {
+            // No dialog, hide overlay immediately
+            this.onTXPDialogComplete(challengeNum);
         }
 
         // Update HUD
         this.updateHUD();
+    }
+
+    onTXPDialogComplete(challengeNum) {
+        // Hide the overlay
+        const overlay = document.getElementById('txpIntroOverlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+
+        // For Challenge 1, show tutorial overlay now (after TXP dialog)
+        if (challengeNum === 1) {
+            this.showTutorial();
+        }
     }
 
     createPuzzleBlockElement(blockData) {
@@ -1944,6 +1972,12 @@ function closeTutorial() {
     if (tutorialOverlay) {
         tutorialOverlay.style.display = 'none';
     }
+
+    // Hide the TXP intro overlay as well
+    const txpOverlay = document.getElementById('txpIntroOverlay');
+    if (txpOverlay) {
+        txpOverlay.style.display = 'none';
+    }
 }
 
 function resumeGame() {
@@ -1954,6 +1988,15 @@ function resumeGame() {
 
 function returnToLevelSelect() {
     if (window.gameInstance) {
+        // Stop the game if running
+        if (window.gameInstance.isGameRunning) {
+            window.gameInstance.isGameRunning = false;
+            if (window.gameInstance.challengeTimer) {
+                clearTimeout(window.gameInstance.challengeTimer);
+                window.gameInstance.challengeTimer = null;
+            }
+        }
+
         window.gameInstance.showLevelSelect();
         window.gameInstance.isPaused = false;
         const pauseMenu = document.getElementById('pauseMenu');

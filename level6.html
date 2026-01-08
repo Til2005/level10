@@ -3,25 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Automatisiere deinen Alltag</title>
+    <title>Copilot</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="level2.css">
+    <link rel="stylesheet" href="level6.css">
 </head>
 <body>
     <div class="container">
 
         <!-- Game HUD -->
         <div class="hud-wrapper">
-            <!-- Challenge Anzeige (nur im Editor sichtbar) -->
-            <div class="challenge-display" id="challengeDisplay" style="display: none;">
-                <div class="challenge-label">Aufgabe:</div>
-                <div class="challenge-text" id="challengeText">
-                    <!-- Wird dynamisch gefüllt -->
-                </div>
+            <!-- Timer Display (nur im Gameplay sichtbar) -->
+            <div class="timer-display" id="timerDisplay" style="display: none;">
+                <div class="timer-icon">⏱️</div>
+                <div class="timer-text" id="timerText">02:30</div>
+            </div>
+
+            <!-- Streak Display -->
+            <div class="streak-display" id="streakDisplay" style="display: none;">
+                <div class="streak-icon">🔥</div>
+                <div class="streak-text"><span id="streakCount">0</span>x Streak</div>
+            </div>
+
+            <!-- Score Display -->
+            <div class="score-display" id="scoreDisplay" style="display: none;">
+                <div class="score-label">Punkte:</div>
+                <div class="score-text" id="scoreText">0</div>
             </div>
         </div>
 
-        <!-- Rank Badge (Top Left) -->
+        <!-- Rank Badge (Top Right) -->
         <div class="rank-badge" id="rankBadge" style="display: none;">
             <span class="rank-icon" id="rankIcon"></span>
             <span class="rank-label" id="rankLabel"></span>
@@ -33,24 +43,23 @@
             <!-- Intro Screen -->
             <div class="game-screen active" id="introScreen">
                 <div class="intro-content">
-                    <!-- Animated Flow Background -->
-                    <canvas class="flow-canvas" id="flowCanvas"></canvas>
+                    <!-- Animated Background -->
+                    <canvas class="office-canvas" id="officeCanvas"></canvas>
 
                     <!-- Scanlines Effect -->
                     <div class="scanlines"></div>
 
                     <!-- Main Title -->
-                    <h1 class="game-title">
-                        <span class="title-line-1">
-                            <span class="letter" data-letter="0">A</span><span class="letter" data-letter="1">u</span><span class="letter" data-letter="2">t</span><span class="letter" data-letter="3">o</span><span class="letter" data-letter="4">m</span><span class="letter" data-letter="5">a</span><span class="letter" data-letter="6">t</span><span class="letter" data-letter="7">i</span><span class="letter" data-letter="8">s</span><span class="letter" data-letter="9">i</span><span class="letter" data-letter="10">e</span><span class="letter" data-letter="11">r</span><span class="letter" data-letter="12">e</span>
-                        </span>
-                        <span class="title-line-2">
-                            <span class="letter" data-letter="13">d</span><span class="letter" data-letter="14">e</span><span class="letter" data-letter="15">i</span><span class="letter" data-letter="16">n</span><span class="letter" data-letter="17">e</span><span class="letter" data-letter="18">n</span> <span class="letter" data-letter="19">A</span><span class="letter" data-letter="20">l</span><span class="letter" data-letter="21">l</span><span class="letter" data-letter="22">t</span><span class="letter" data-letter="23">a</span><span class="letter" data-letter="24">g</span>
-                        </span>
-                    </h1>
-
-                    <!-- Subtitle -->
-                    <div class="game-subtitle">Baue automatisierte Workflows</div>
+                    <div class="title-container">
+                        <div class="title-border-top"></div>
+                        <h1 class="game-title">
+                            <span class="title-main" id="titleMain">
+                                <span class="letter" data-letter="0">C</span><span class="letter" data-letter="1">O</span><span class="letter" data-letter="2">P</span><span class="letter" data-letter="3">I</span><span class="letter" data-letter="4">L</span><span class="letter" data-letter="5">O</span><span class="letter" data-letter="6">T</span>
+                            </span>
+                            <div class="title-glitch" aria-hidden="true">COPILOT</div>
+                        </h1>
+                        <div class="title-border-bottom"></div>
+                    </div>
 
                     <!-- Press Any Key or Click -->
                     <div class="press-key" id="pressKey">Drücke eine beliebige Taste</div>
@@ -71,19 +80,20 @@
                 </div>
             </div>
 
-            <!-- Level Selection Screen - Simple & Clean -->
+            <!-- Level Selection Screen -->
             <div class="game-screen" id="levelSelectScreen">
                 <div class="level-select-container">
-                    <h2 class="level-select-title">Automatisiere deinen Alltag</h2>
-                    <div class="level-select-subtitle">Wähle deine Challenge</div>
+                    <h2 class="level-select-title">Copilot</h2>
+                    <div class="level-select-subtitle">Wähle deinen Bürotag</div>
 
                     <!-- Challenge Grid -->
                     <div class="challenges-grid">
                         <!-- Challenge 1 -->
                         <div class="challenge-card unlocked" data-level="1">
                             <div class="challenge-number">1</div>
-                            <div class="challenge-icon">📧</div>
-                            <div class="challenge-name">E-Mail Benachrichtigung</div>
+                            <div class="challenge-icon">😊</div>
+                            <div class="challenge-name">Montag</div>
+                            <div class="challenge-difficulty">Einfach</div>
                             <div class="challenge-points">0/100 Punkte</div>
                             <div class="challenge-status">▶ Starten</div>
                         </div>
@@ -91,8 +101,9 @@
                         <!-- Challenge 2 -->
                         <div class="challenge-card locked" data-level="2">
                             <div class="challenge-number">2</div>
-                            <div class="challenge-icon">📊</div>
-                            <div class="challenge-name">Daten filtern</div>
+                            <div class="challenge-icon">😐</div>
+                            <div class="challenge-name">Dienstag</div>
+                            <div class="challenge-difficulty">Mittel</div>
                             <div class="challenge-points">0/100 Punkte</div>
                             <div class="challenge-status">🔒 Gesperrt</div>
                         </div>
@@ -100,8 +111,9 @@
                         <!-- Challenge 3 -->
                         <div class="challenge-card locked" data-level="3">
                             <div class="challenge-number">3</div>
-                            <div class="challenge-icon">❓</div>
-                            <div class="challenge-name">Bedingungen & Verzweigungen</div>
+                            <div class="challenge-icon">😅</div>
+                            <div class="challenge-name">Mittwoch</div>
+                            <div class="challenge-difficulty">Mittel-Schwer</div>
                             <div class="challenge-points">0/100 Punkte</div>
                             <div class="challenge-status">🔒 Gesperrt</div>
                         </div>
@@ -109,8 +121,9 @@
                         <!-- Challenge 4 -->
                         <div class="challenge-card locked" data-level="4">
                             <div class="challenge-number">4</div>
-                            <div class="challenge-icon">🔁</div>
-                            <div class="challenge-name">Schleifen & Wiederholungen</div>
+                            <div class="challenge-icon">😰</div>
+                            <div class="challenge-name">Donnerstag</div>
+                            <div class="challenge-difficulty">Schwer</div>
                             <div class="challenge-points">0/100 Punkte</div>
                             <div class="challenge-status">🔒 Gesperrt</div>
                         </div>
@@ -118,8 +131,9 @@
                         <!-- Challenge 5 -->
                         <div class="challenge-card locked final-challenge" data-level="5">
                             <div class="challenge-number">5</div>
-                            <div class="challenge-icon">👑</div>
-                            <div class="challenge-name">Komplexer Approval-Flow</div>
+                            <div class="challenge-icon">🔥</div>
+                            <div class="challenge-name">Freitag</div>
+                            <div class="challenge-difficulty">Sehr Schwer</div>
                             <div class="challenge-points">0/100 Punkte</div>
                             <div class="challenge-status">🔒 Gesperrt</div>
                         </div>
@@ -138,9 +152,9 @@
                             </div>
                         </div>
                         <div class="rank-info">
-                            <div class="rank-item">🥉 Bronze: 300 Punkte</div>
-                            <div class="rank-item">🥈 Silber: 400 Punkte</div>
-                            <div class="rank-item">🥇 Gold: 500 Punkte</div>
+                            <div class="rank-item">Bronze: 300 Punkte</div>
+                            <div class="rank-item">Silber: 400 Punkte</div>
+                            <div class="rank-item">Gold: 500 Punkte</div>
                         </div>
                     </div>
 
@@ -168,13 +182,24 @@
                 </div>
             </div>
 
-            <!-- Flow Editor Screen -->
-            <div class="game-screen" id="editorScreen">
+            <!-- Unlock Requirements Popup -->
+            <div class="reset-popup-overlay" id="unlockRequirementPopup" style="display: none;">
+                <div class="reset-popup">
+                    <h3>🔒 Challenge noch nicht freigeschaltet</h3>
+                    <p id="unlockRequirementText"></p>
+                    <div class="reset-popup-actions">
+                        <button class="reset-cancel-btn" onclick="hideUnlockRequirementPopup()">Verstanden</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gameplay Screen -->
+            <div class="game-screen" id="gameplayScreen">
 
                 <!-- TXP Intro Overlay (darkens screen until dialog is done) -->
                 <div class="txp-intro-overlay" id="txpIntroOverlay" style="display: none;"></div>
 
-                <!-- TXP Tutorial Assistant (Bottom Left) -->
+                <!-- TXP Assistant (Bottom Left) -->
                 <div class="txp-assistant" id="txpAssistant" style="display: none;">
                     <img id="txpAssistantImg" src="TXP/TXP_Stand_Pose/TXP Stand Pose_00000.png" alt="TXP Roboter">
                 </div>
@@ -187,43 +212,21 @@
                     </div>
                 </div>
 
-                <!-- Flow Palette (Left Side) -->
-                <div class="flow-palette" id="flowPalette">
-                    <div class="palette-header">
-                        <div class="palette-title">Flow-Bausteine</div>
-                        <div class="palette-subtitle">Ziehe die Bausteine ins Whiteboard</div>
-                    </div>
-                    <div class="palette-items" id="paletteItems">
-                        <!-- Wird dynamisch gefüllt -->
+                <!-- Task Queue Area (Top) -->
+                <div class="task-queue-area" id="taskQueueArea">
+                    <div class="task-queue-label">Aufgaben:</div>
+                    <div class="task-queue" id="taskQueue">
+                        <!-- Tasks werden dynamisch hinzugefügt -->
                     </div>
                 </div>
 
-                <!-- Whiteboard (Center) -->
-                <div class="whiteboard" id="whiteboard">
-                    <div class="whiteboard-grid"></div>
-                    <div class="whiteboard-header">
-                        <div class="whiteboard-title">Flow-Editor</div>
-                        <div class="whiteboard-actions">
-                            <button class="action-btn back-btn" onclick="returnToLevelSelect()" title="Zurück zur Levelauswahl">
-                                ← Zurück
-                            </button>
-                            <button class="action-btn clear-btn" id="clearBtn" title="Whiteboard leeren">
-                                🗑️ Leeren
-                            </button>
-                            <button class="action-btn validate-btn" id="validateBtn" title="Flow überprüfen">
-                                ✓ Prüfen
-                            </button>
-                        </div>
+                <!-- Copilot Actions Bar (Center) -->
+                <div class="copilot-actions-container">
+                    <div class="copilot-actions-label">Copilot Aktionen:</div>
+                    <div class="copilot-actions-bar" id="copilotActionsBar">
+                        <!-- Wird dynamisch gefüllt -->
                     </div>
-                    <div class="whiteboard-content" id="whiteboardContent">
-                        <!-- Flow-Elemente werden hier per Drag & Drop platziert -->
-
-                        <!-- Trash Zone (Bottom Right) -->
-                        <div class="trash-zone" id="trashZone">
-                            <div class="trash-icon">🗑️</div>
-                            <div class="trash-label">Hierher ziehen zum Löschen</div>
-                        </div>
-                    </div>
+                    <div class="copilot-actions-hint">Klicke auf eine Aufgabe, dann auf die passende Aktion</div>
                 </div>
 
                 <!-- Tutorial Overlay (Challenge 1 only) -->
@@ -233,19 +236,19 @@
                         <div class="tutorial-steps">
                             <div class="tutorial-step">
                                 <span class="tutorial-number">1</span>
-                                <span class="tutorial-text">Ziehe die Flow-Bausteine aus der linken Palette</span>
+                                <span class="tutorial-text">Aufgaben erscheinen oben mit Timer ⏰</span>
                             </div>
                             <div class="tutorial-step">
                                 <span class="tutorial-number">2</span>
-                                <span class="tutorial-text">Platziere sie im Whiteboard in der richtigen Reihenfolge</span>
+                                <span class="tutorial-text">Klicke auf eine Aufgabe, um Details zu sehen</span>
                             </div>
                             <div class="tutorial-step">
                                 <span class="tutorial-number">3</span>
-                                <span class="tutorial-text">Die Bausteine rasten automatisch ein (Snap-to-Grid)</span>
+                                <span class="tutorial-text">Wähle die richtige Copilot-Aktion</span>
                             </div>
                             <div class="tutorial-step">
                                 <span class="tutorial-number">4</span>
-                                <span class="tutorial-text">Klicke auf "Prüfen" wenn du fertig bist</span>
+                                <span class="tutorial-text">Schaffe so viele Aufgaben wie möglich!</span>
                             </div>
                         </div>
                         <button class="tutorial-close-btn" onclick="closeTutorial()">Verstanden!</button>
@@ -267,6 +270,12 @@
                         <div class="pause-menu-hint">Drücke <span class="key-highlight">ESC</span> zum Fortfahren</div>
                     </div>
                 </div>
+
+                <!-- Action Feedback (Center) -->
+                <div class="action-feedback" id="actionFeedback" style="display: none;">
+                    <div class="feedback-icon" id="feedbackIcon"></div>
+                    <div class="feedback-text" id="feedbackText"></div>
+                </div>
             </div>
 
             <!-- Challenge Complete Screen -->
@@ -274,17 +283,30 @@
                 <div class="complete-content">
                     <h2 class="complete-title">🎉 Challenge Geschafft!</h2>
 
-                    <!-- Flow Visualization -->
-                    <div class="flow-result">
-                        <h3>Dein erstellter Flow:</h3>
-                        <div class="flow-visualization" id="flowVisualization">
-                            <!-- Wird dynamisch gefüllt -->
+                    <!-- Stats Display -->
+                    <div class="complete-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Aufgaben erledigt:</div>
+                            <div class="stat-value" id="tasksCompleted">0</div>
                         </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Bester Streak:</div>
+                            <div class="stat-value" id="bestStreak">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Punkte:</div>
+                            <div class="stat-value" id="finalScore">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div class="success-message" id="successMessage">
+                        <!-- Wird dynamisch gefüllt -->
                     </div>
 
                     <div class="complete-actions">
                         <button class="next-level-button" onclick="nextChallenge()"><span>Nächste Challenge</span></button>
-                        <button class="menu-button" onclick="goToLevelSelectWithAnimation()"><span>Challenge-Auswahl</span></button>
+                        <button class="menu-button" onclick="goToLevelSelect()"><span>Challenge-Auswahl</span></button>
                     </div>
                 </div>
             </div>
@@ -294,6 +316,6 @@
     </div>
 
     <script src="script.js"></script>
-    <script src="level2.js"></script>
+    <script src="level6.js"></script>
 </body>
 </html>
