@@ -197,63 +197,252 @@ function calculatePowerAutomateRank(totalPoints) {
     return 'Kein Rang';
 }
 
+// Calculate rank from points (500 point system)
+function calculateRankFromPoints(points) {
+    if (points >= 500) return 'Gold 🥇';
+    if (points >= 400) return 'Silber 🥈';
+    if (points >= 300) return 'Bronze 🥉';
+    return 'Kein Rang';
+}
+
 // Load and display level ranks
 function loadLevelRanks() {
-    // Load Level 1 progress
-    const level1Progress = localStorage.getItem('aiBytes_level1_progress');
-    if (level1Progress) {
-        const progress = JSON.parse(level1Progress);
-        if (progress.completed && progress.score !== undefined) {
-            const rank = getRank(progress.score);
-            const level1Status = document.querySelector('.level-1 .level-status');
-            if (level1Status) {
-                level1Status.textContent = rank.title;
+    // Level 1: Schummeln erlaubt (level5.html)
+    const playerPoints = localStorage.getItem('playerPoints');
+    const highestRank = localStorage.getItem('highestRank');
+    const level1Status = document.querySelector('.level-1 .level-status');
+
+    if (playerPoints) {
+        const points = parseInt(playerPoints) || 0;
+        let rankText = 'Kein Rang';
+        if (highestRank === 'gold') rankText = 'Gold 🥇';
+        else if (highestRank === 'silver') rankText = 'Silber 🥈';
+        else if (highestRank === 'bronze') rankText = 'Bronze 🥉';
+
+        if (level1Status) {
+            level1Status.textContent = `${rankText} - ${points}/500 Punkte`;
+            if (rankText !== 'Kein Rang') {
                 level1Status.style.background = 'var(--saffron)';
                 level1Status.style.color = 'var(--russian-blue)';
+            } else {
+                level1Status.style.background = '#666';
+                level1Status.style.color = '#ccc';
             }
+        }
+    } else {
+        if (level1Status) {
+            level1Status.textContent = 'Kein Rang - 0/500 Punkte';
+            level1Status.style.background = '#666';
+            level1Status.style.color = '#ccc';
         }
     }
 
-    // Load Level 2 progress (Power Automate)
-    const level2Progress = localStorage.getItem('powerAutomateProgress');
-    if (level2Progress) {
-        const progress = JSON.parse(level2Progress);
-        if (progress.totalPoints !== undefined) {
-            const rank = calculatePowerAutomateRank(progress.totalPoints);
-            const level2Status = document.querySelector('.level-2 .level-status');
-            if (level2Status) {
-                level2Status.textContent = rank;
-                level2Status.style.background = 'var(--saffron)';
-                level2Status.style.color = 'var(--russian-blue)';
-            }
-        }
-    }
-
-    // Load Level 3 progress
-    const level3Progress = localStorage.getItem('aiBytes_level3_progress');
-    if (level3Progress) {
-        const progress = JSON.parse(level3Progress);
-        if (progress.completed && progress.rank) {
-            const level3Status = document.querySelector('.level-3 .level-status');
-            if (level3Status) {
-                level3Status.textContent = progress.rank;
-                level3Status.style.background = 'var(--saffron)';
-                level3Status.style.color = 'var(--russian-blue)';
-            }
-        }
-    }
-
-    // Load Level 4 progress
+    // Level 2: Auch Bilder sind kein Problem (level4.html)
     const level4Progress = localStorage.getItem('aiBytes_level4_progress');
+    const level2Status = document.querySelector('.level-2 .level-status');
+
     if (level4Progress) {
         const progress = JSON.parse(level4Progress);
-        if (progress.completed && progress.rank) {
-            const level4Status = document.querySelector('.level-4 .level-status');
-            if (level4Status) {
-                level4Status.textContent = progress.rank;
+        const points = progress.score || 0;
+        const rank = calculateRankFromPoints(points);
+        if (level2Status) {
+            level2Status.textContent = `${rank} - ${points}/500 Punkte`;
+            if (rank !== 'Kein Rang') {
+                level2Status.style.background = 'var(--saffron)';
+                level2Status.style.color = 'var(--russian-blue)';
+            } else {
+                level2Status.style.background = '#666';
+                level2Status.style.color = '#ccc';
+            }
+        }
+    } else {
+        if (level2Status) {
+            level2Status.textContent = 'Kein Rang - 0/500 Punkte';
+            level2Status.style.background = '#666';
+            level2Status.style.color = '#ccc';
+        }
+    }
+
+    // Level 3: Nicht suchen, Prompten! (level1.html)
+    const level1Progress = localStorage.getItem('aiBytes_level1_progress');
+    const level3Status = document.querySelector('.level-3 .level-status');
+
+    if (level1Progress) {
+        const progress = JSON.parse(level1Progress);
+        const points = progress.score || 0;
+        const rank = calculateRankFromPoints(points);
+        if (level3Status) {
+            level3Status.textContent = `${rank} - ${points}/500 Punkte`;
+            if (rank !== 'Kein Rang') {
+                level3Status.style.background = 'var(--saffron)';
+                level3Status.style.color = 'var(--russian-blue)';
+            } else {
+                level3Status.style.background = '#666';
+                level3Status.style.color = '#ccc';
+            }
+        }
+    } else {
+        // Kein Progress vorhanden - zeige 0 Punkte
+        if (level3Status) {
+            level3Status.textContent = 'Kein Rang - 0/500 Punkte';
+            level3Status.style.background = '#666';
+            level3Status.style.color = '#ccc';
+        }
+    }
+
+    // Level 4: Automatisiere deinen Alltag (level2.html)
+    const level2Progress = localStorage.getItem('powerAutomateProgress');
+    const level4Status = document.querySelector('.level-4 .level-status');
+
+    if (level2Progress) {
+        const progress = JSON.parse(level2Progress);
+        const points = progress.totalPoints || 0;
+        const rank = calculateRankFromPoints(points);
+        if (level4Status) {
+            level4Status.textContent = `${rank} - ${points}/500 Punkte`;
+            if (rank !== 'Kein Rang') {
                 level4Status.style.background = 'var(--saffron)';
                 level4Status.style.color = 'var(--russian-blue)';
+            } else {
+                level4Status.style.background = '#666';
+                level4Status.style.color = '#ccc';
             }
+        }
+    } else {
+        if (level4Status) {
+            level4Status.textContent = 'Kein Rang - 0/500 Punkte';
+            level4Status.style.background = '#666';
+            level4Status.style.color = '#ccc';
+        }
+    }
+
+    // Level 5: Copilot (level6.html)
+    const level6Progress = localStorage.getItem('aiBytes_level6_progress');
+    const level5Status = document.querySelector('.level-5 .level-status');
+
+    if (level6Progress) {
+        const progress = JSON.parse(level6Progress);
+        const points = progress.totalPoints || 0;
+        const rank = calculateRankFromPoints(points);
+        if (level5Status) {
+            level5Status.textContent = `${rank} - ${points}/500 Punkte`;
+            if (rank !== 'Kein Rang') {
+                level5Status.style.background = 'var(--saffron)';
+                level5Status.style.color = 'var(--russian-blue)';
+            } else {
+                level5Status.style.background = '#666';
+                level5Status.style.color = '#ccc';
+            }
+        }
+    } else {
+        if (level5Status) {
+            level5Status.textContent = 'Kein Rang - 0/500 Punkte';
+            level5Status.style.background = '#666';
+            level5Status.style.color = '#ccc';
+        }
+    }
+
+    // Level 6: Advanced Prompting
+    const level6ProgressData = localStorage.getItem('aiBytes_level6_progress_data');
+    const level6Status = document.querySelector('.level-6 .level-status');
+
+    if (level6ProgressData) {
+        const progress = JSON.parse(level6ProgressData);
+        const points = progress.totalPoints || progress.score || 0;
+        const rank = calculateRankFromPoints(points);
+        if (level6Status) {
+            level6Status.textContent = `${rank} - ${points}/500 Punkte`;
+            if (rank !== 'Kein Rang') {
+                level6Status.style.background = 'var(--saffron)';
+                level6Status.style.color = 'var(--russian-blue)';
+            } else {
+                level6Status.style.background = '#666';
+                level6Status.style.color = '#ccc';
+            }
+        }
+    } else {
+        if (level6Status) {
+            level6Status.textContent = 'Kein Rang - 0/500 Punkte';
+            level6Status.style.background = '#666';
+            level6Status.style.color = '#ccc';
+        }
+    }
+
+    // Level 7: Daten-Spezialist
+    const level7Progress = localStorage.getItem('aiBytes_level7_progress');
+    const level7Status = document.querySelector('.level-7 .level-status');
+
+    if (level7Progress) {
+        const progress = JSON.parse(level7Progress);
+        const points = progress.totalPoints || progress.score || 0;
+        const rank = calculateRankFromPoints(points);
+        if (level7Status) {
+            level7Status.textContent = `${rank} - ${points}/500 Punkte`;
+            if (rank !== 'Kein Rang') {
+                level7Status.style.background = 'var(--saffron)';
+                level7Status.style.color = 'var(--russian-blue)';
+            } else {
+                level7Status.style.background = '#666';
+                level7Status.style.color = '#ccc';
+            }
+        }
+    } else {
+        if (level7Status) {
+            level7Status.textContent = 'Kein Rang - 0/500 Punkte';
+            level7Status.style.background = '#666';
+            level7Status.style.color = '#ccc';
+        }
+    }
+
+    // Level 8: Gute Ergebnisse sind kein Zufall
+    const level8Progress = localStorage.getItem('aiBytes_level8_progress');
+    const level8Status = document.querySelector('.level-8 .level-status');
+
+    if (level8Progress) {
+        const progress = JSON.parse(level8Progress);
+        const points = progress.totalPoints || progress.score || 0;
+        const rank = calculateRankFromPoints(points);
+        if (level8Status) {
+            level8Status.textContent = `${rank} - ${points}/500 Punkte`;
+            if (rank !== 'Kein Rang') {
+                level8Status.style.background = 'var(--saffron)';
+                level8Status.style.color = 'var(--russian-blue)';
+            } else {
+                level8Status.style.background = '#666';
+                level8Status.style.color = '#ccc';
+            }
+        }
+    } else {
+        if (level8Status) {
+            level8Status.textContent = 'Kein Rang - 0/500 Punkte';
+            level8Status.style.background = '#666';
+            level8Status.style.color = '#ccc';
+        }
+    }
+
+    // Level 9: KI für Dich!
+    const level9Progress = localStorage.getItem('aiBytes_level9_progress');
+    const level9Status = document.querySelector('.level-9 .level-status');
+
+    if (level9Progress) {
+        const progress = JSON.parse(level9Progress);
+        const points = progress.totalPoints || progress.score || 0;
+        const rank = calculateRankFromPoints(points);
+        if (level9Status) {
+            level9Status.textContent = `${rank} - ${points}/500 Punkte`;
+            if (rank !== 'Kein Rang') {
+                level9Status.style.background = 'var(--saffron)';
+                level9Status.style.color = 'var(--russian-blue)';
+            } else {
+                level9Status.style.background = '#666';
+                level9Status.style.color = '#ccc';
+            }
+        }
+    } else {
+        if (level9Status) {
+            level9Status.textContent = 'Kein Rang - 0/500 Punkte';
+            level9Status.style.background = '#666';
+            level9Status.style.color = '#ccc';
         }
     }
 
@@ -273,22 +462,11 @@ function updateLevelLocks() {
         level1Card.classList.add('available');
     }
 
-    // Check Level 1 completion for Level 2 unlock
-    const level1Progress = localStorage.getItem('aiBytes_level1_progress');
+    // Level 2 is now always available
     const level2Card = document.querySelector('.level-2');
-    if (level1Progress) {
-        const progress = JSON.parse(level1Progress);
-        if (progress.completed) {
-            if (level2Card) {
-                level2Card.classList.remove('locked');
-                level2Card.classList.add('available');
-            }
-        }
-    } else {
-        if (level2Card) {
-            level2Card.classList.add('locked');
-            level2Card.classList.remove('available');
-        }
+    if (level2Card) {
+        level2Card.classList.remove('locked');
+        level2Card.classList.add('available');
     }
 
     // Check Level 2 completion for Level 3 unlock

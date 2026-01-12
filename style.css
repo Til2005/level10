@@ -1040,3 +1040,35 @@ span.highlighted {
     0%, 50% { opacity: 1; }
     51%, 100% { opacity: 0; }
 }
+
+/* Level Thumbnail Styles */
+.level-thumbnail {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.level-card:hover .level-thumbnail {
+    transform: scale(1.05);
+}
+
+.level-card {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.level-card .level-number {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 5px 15px;
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+}
