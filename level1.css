@@ -507,6 +507,17 @@ html {
     pointer-events: none; /* Allow clicking through container */
 }
 
+/* Hide MoMan Host during intro screen */
+#introScreen.active ~ .mo-host-container,
+.game-screen.active#introScreen ~ .mo-host-container {
+    display: none;
+}
+
+/* Alternative: hide when body has intro-active class */
+body.intro-active .mo-host-container {
+    display: none;
+}
+
 .mo-host {
     width: 110px;
     height: 110px;

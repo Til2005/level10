@@ -2,32 +2,7 @@
 //   CONSTANTS & CONFIGURATION
 // ===============================
 const CONFIG = {
-    PHYSICS: {
-        GRAVITY: 0.4,
-        JUMP_POWER: -9,
-        MOVE_SPEED: 3,
-        FALL_THRESHOLD: 300,
-        COLLISION_TOLERANCE: 30
-    },
-    MOMAN: {
-        WIDTH: 60,
-        HEIGHT: 60,
-        SPAWN_OFFSET_Y: 42
-    },
-    ANIMATIONS: {
-        MOMAN_STAND_FRAMES: 24,
-        MOMAN_RUN_FRAMES: 48,
-        MOMAN_JUMP_FRAMES: 42,
-        COIN_FRAMES: 24,
-        FRAME_RATE: 16, // ~60 FPS
-        MOMAN_ANIM_SPEED: 25,
-        COIN_ANIM_SPEED: 83
-    },
     PATHS: {
-        MOMAN_STAND: 'Mo_man_Stand_Pose/',
-        MOMAN_RUN: 'Mo man Lauf 2s 24fps 48 frames/',
-        MOMAN_JUMP: 'Mo_man_Sprung_Pose/',
-        COINS: 'Coin_animation/',
         TXP_STAND: 'TXP/TXP_Stand_Pose/',
         TXP_TALK: 'TXP/TXP_Talk_Pose/',
         TXP_LAUF: 'TXP/TXP_Lauf_Pose/',
@@ -36,7 +11,6 @@ const CONFIG = {
     ACHIEVEMENTS: {
         M_KEY_TARGET: 30,
         ANIMATOR_TARGET: 6,
-        COIN_TARGET: 3,
         GOLD_RANK_TARGET: 1
     }
 };
@@ -45,36 +19,11 @@ const CONFIG = {
 //   GAME STATE
 // ===============================
 const GameState = {
-    moMan: {
-        x: 0,
-        y: 0,
-        velocityY: 0,
-        isGrounded: false,
-        visible: true,
-        facingRight: true,
-        currentAnimation: 'standing',
-        animationFrame: 0,
-        jumpAnimationFrame: 0,
-        jumpAnimationCounter: 0
-    },
-    input: {
-        keysPressed: {}
-    },
-    game: {
-        coins: [],
-        coinsCollected: 0,
-        platforms: [],
-        gameLoop: null,
-        animationLoop: null
-    },
     dom: {
         // Cached DOM elements
-        moCharacter: null,
         container: null,
         mainTitle: null,
         levelsTitle: null,
-        firstLetter: null,
-        titleContainer: null,
         settingsPopup: null,
         achievementsPopup: null
     }
@@ -84,14 +33,11 @@ const GameState = {
 //   DOM CACHE INITIALIZATION
 // ===============================
 function initDOMCache() {
-    GameState.dom.moCharacter = document.getElementById('moCharacter');
     GameState.dom.container = document.querySelector('.container');
     GameState.dom.mainTitle = document.querySelector('.main-title');
     GameState.dom.levelsTitle = document.querySelector('.levels-title');
-    GameState.dom.titleContainer = document.querySelector('.title-container');
     GameState.dom.settingsPopup = document.getElementById('settingsPopup');
     GameState.dom.achievementsPopup = document.getElementById('achievementsPopup');
-    GameState.dom.firstLetter = document.querySelector('.main-title span[data-index="0"]');
 }
 
 // Settings popup functionality
@@ -109,6 +55,116 @@ function closeSettings() {
         settingsPopup.style.display = 'none';
         document.body.style.overflow = 'auto';
     }
+}
+
+// Calendar popup functionality
+function openCalendar() {
+    const calendarPopup = document.getElementById('calendarPopup');
+    if (calendarPopup) {
+        calendarPopup.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeCalendar() {
+    const calendarPopup = document.getElementById('calendarPopup');
+    if (calendarPopup) {
+        calendarPopup.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function downloadCalendar() {
+    // Get next 10 Fridays starting from today
+    const fridays = getNextFridays(10);
+
+    // Generate ICS file content
+    let icsContent = 'BEGIN:VCALENDAR\r\n';
+    icsContent += 'VERSION:2.0\r\n';
+    icsContent += 'PRODID:-//AI-Bytes//Calendar//DE\r\n';
+    icsContent += 'CALSCALE:GREGORIAN\r\n';
+    icsContent += 'METHOD:PUBLISH\r\n';
+    icsContent += 'X-WR-CALNAME:AI-Bytes Training\r\n';
+    icsContent += 'X-WR-TIMEZONE:Europe/Berlin\r\n';
+
+    // Add each Friday as an event
+    fridays.forEach((friday, index) => {
+        const startTime = formatICSDate(friday, 13, 0); // 13:00
+        const endTime = formatICSDate(friday, 14, 0);   // 14:00
+        const uid = `ai-bytes-${friday.getTime()}-${index}@ai-bytes.de`;
+        const now = formatICSDate(new Date(), null, null, true);
+
+        icsContent += 'BEGIN:VEVENT\r\n';
+        icsContent += `UID:${uid}\r\n`;
+        icsContent += `DTSTAMP:${now}\r\n`;
+        icsContent += `DTSTART:${startTime}\r\n`;
+        icsContent += `DTEND:${endTime}\r\n`;
+        icsContent += 'SUMMARY:AI-Bytes Training\r\n';
+        icsContent += 'DESCRIPTION:Zeit für dein AI-Bytes Training! Setze deine Reise fort und lerne neue Prompting-Skills.\r\n';
+        icsContent += 'STATUS:CONFIRMED\r\n';
+        icsContent += 'SEQUENCE:0\r\n';
+        icsContent += 'BEGIN:VALARM\r\n';
+        icsContent += 'TRIGGER:-PT15M\r\n';
+        icsContent += 'ACTION:DISPLAY\r\n';
+        icsContent += 'DESCRIPTION:AI-Bytes Training startet in 15 Minuten!\r\n';
+        icsContent += 'END:VALARM\r\n';
+        icsContent += 'END:VEVENT\r\n';
+    });
+
+    icsContent += 'END:VCALENDAR\r\n';
+
+    // Create blob and download
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'AI-Bytes-Training.ics';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+
+    // Close popup after download
+    setTimeout(() => closeCalendar(), 500);
+}
+
+function getNextFridays(count) {
+    const fridays = [];
+    const today = new Date();
+    let currentDate = new Date(today);
+
+    // Find next Friday
+    const daysUntilFriday = (5 - currentDate.getDay() + 7) % 7;
+    if (daysUntilFriday === 0 && currentDate.getHours() >= 14) {
+        // If it's Friday after 14:00, start from next Friday
+        currentDate.setDate(currentDate.getDate() + 7);
+    } else if (daysUntilFriday > 0) {
+        currentDate.setDate(currentDate.getDate() + daysUntilFriday);
+    }
+
+    // Get the next 'count' Fridays
+    for (let i = 0; i < count; i++) {
+        fridays.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 7);
+    }
+
+    return fridays;
+}
+
+function formatICSDate(date, hours, minutes, isTimestamp = false) {
+    const d = new Date(date);
+
+    if (!isTimestamp) {
+        d.setHours(hours, minutes, 0, 0);
+    }
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hour = String(d.getHours()).padStart(2, '0');
+    const minute = String(d.getMinutes()).padStart(2, '0');
+    const second = String(d.getSeconds()).padStart(2, '0');
+
+    return `${year}${month}${day}T${hour}${minute}${second}`;
 }
 
 // Background switching functionality
@@ -154,11 +210,8 @@ function loadSavedBackground() {
     if (savedBackground) {
         changeBackground(savedBackground);
     } else {
-        // Set default gradient as active (only if bg-options exist)
-        const gradientOption = document.querySelector('[data-bg="gradient"]');
-        if (gradientOption) {
-            gradientOption.classList.add('active');
-        }
+        // Set default to Til 1.png
+        changeBackground('Til 1.png');
     }
 }
 
@@ -205,252 +258,199 @@ function calculateRankFromPoints(points) {
     return 'Kein Rang';
 }
 
+// Calculate total rank from all levels (4500 point system)
+function calculateTotalRank(totalPoints) {
+    if (totalPoints >= 4500) return { rank: 'AI-Bytes Champion', icon: '🏆', class: 'champion' };
+    if (totalPoints >= 3000) return { rank: 'AI-Experte', icon: '⚡', class: 'expert' };
+    if (totalPoints >= 1800) return { rank: 'KI-Enthusiast', icon: '🌟', class: 'enthusiast' };
+    if (totalPoints >= 900) return { rank: 'Prompt-Lehrling', icon: '🎓', class: 'apprentice' };
+    return { rank: 'Kein Rang', icon: '⭐', class: 'no-rank' };
+}
+
+// Update total progress display
+function updateTotalProgress() {
+    // Collect all level points
+    const level1Points = parseInt(localStorage.getItem('playerPoints')) || 0;
+    const level2Points = JSON.parse(localStorage.getItem('aiBytes_level4_progress') || '{}').score || 0;
+    const level3Points = JSON.parse(localStorage.getItem('aiBytes_level1_progress') || '{}').score || 0;
+    const level4Points = JSON.parse(localStorage.getItem('powerAutomateProgress') || '{}').totalPoints || 0;
+    const level5Points = JSON.parse(localStorage.getItem('aiBytes_level6_progress') || '{}').totalPoints || 0;
+    const level6Points = JSON.parse(localStorage.getItem('aiBytes_level6_progress_data') || '{}').totalPoints || 0;
+    const level7Points = JSON.parse(localStorage.getItem('aiBytes_level7_progress') || '{}').totalPoints || 0;
+    const level8Points = JSON.parse(localStorage.getItem('aiBytes_level8_progress') || '{}').totalPoints || 0;
+    const level9Points = JSON.parse(localStorage.getItem('aiBytes_level9_progress') || '{}').totalPoints || 0;
+
+    const totalPoints = level1Points + level2Points + level3Points + level4Points + level5Points +
+                       level6Points + level7Points + level8Points + level9Points;
+
+    // Update progress bar
+    const progressFill = document.getElementById('totalProgressFill');
+    const progressText = document.getElementById('totalProgressText');
+
+    if (progressFill && progressText) {
+        const percentage = Math.min((totalPoints / 4500) * 100, 100);
+        progressFill.style.width = percentage + '%';
+        progressText.textContent = `${totalPoints}/4500 Punkte`;
+    }
+
+    // Update rank badge
+    const rankBadge = document.getElementById('totalRankBadge');
+    const rankIcon = document.querySelector('.total-rank-icon');
+    const rankText = document.getElementById('totalRankText');
+
+    if (rankBadge && rankIcon && rankText) {
+        const rankInfo = calculateTotalRank(totalPoints);
+
+        // Remove old rank classes
+        rankBadge.classList.remove('no-rank', 'apprentice', 'enthusiast', 'expert', 'champion');
+
+        // Add new rank class
+        rankBadge.classList.add(rankInfo.class);
+
+        // Update icon and text
+        rankIcon.textContent = rankInfo.icon;
+        rankText.textContent = rankInfo.rank;
+    }
+}
+
+// Update visual progress bar
+function updateLevelProgress(levelCard, points, maxPoints = 500) {
+    if (!levelCard) return;
+
+    const progressFill = levelCard.querySelector('.level-progress-fill');
+    const progressText = levelCard.querySelector('.level-progress-text');
+
+    if (progressFill && progressText) {
+        const percentage = Math.min((points / maxPoints) * 100, 100);
+        progressFill.style.width = percentage + '%';
+        progressFill.setAttribute('data-progress', points);
+
+        const rank = calculateRankFromPoints(points);
+        progressText.textContent = `${points}/${maxPoints} Punkte - ${rank}`;
+    }
+}
+
 // Load and display level ranks
 function loadLevelRanks() {
     // Level 1: Schummeln erlaubt (level5.html)
     const playerPoints = localStorage.getItem('playerPoints');
     const highestRank = localStorage.getItem('highestRank');
-    const level1Status = document.querySelector('.level-1 .level-status');
+    const level1Card = document.querySelector('.level-card[data-level="level5"]');
 
     if (playerPoints) {
         const points = parseInt(playerPoints) || 0;
-        let rankText = 'Kein Rang';
-        if (highestRank === 'gold') rankText = 'Gold 🥇';
-        else if (highestRank === 'silver') rankText = 'Silber 🥈';
-        else if (highestRank === 'bronze') rankText = 'Bronze 🥉';
-
-        if (level1Status) {
-            level1Status.textContent = `${rankText} - ${points}/500 Punkte`;
-            if (rankText !== 'Kein Rang') {
-                level1Status.style.background = 'var(--saffron)';
-                level1Status.style.color = 'var(--russian-blue)';
-            } else {
-                level1Status.style.background = '#666';
-                level1Status.style.color = '#ccc';
-            }
-        }
+        updateLevelProgress(level1Card, points);
     } else {
-        if (level1Status) {
-            level1Status.textContent = 'Kein Rang - 0/500 Punkte';
-            level1Status.style.background = '#666';
-            level1Status.style.color = '#ccc';
-        }
+        updateLevelProgress(level1Card, 0);
     }
 
     // Level 2: Auch Bilder sind kein Problem (level4.html)
     const level4Progress = localStorage.getItem('aiBytes_level4_progress');
-    const level2Status = document.querySelector('.level-2 .level-status');
+    const level2Card = document.querySelector('.level-card[data-level="level4"]');
 
     if (level4Progress) {
         const progress = JSON.parse(level4Progress);
         const points = progress.score || 0;
-        const rank = calculateRankFromPoints(points);
-        if (level2Status) {
-            level2Status.textContent = `${rank} - ${points}/500 Punkte`;
-            if (rank !== 'Kein Rang') {
-                level2Status.style.background = 'var(--saffron)';
-                level2Status.style.color = 'var(--russian-blue)';
-            } else {
-                level2Status.style.background = '#666';
-                level2Status.style.color = '#ccc';
-            }
-        }
+        updateLevelProgress(level2Card, points);
     } else {
-        if (level2Status) {
-            level2Status.textContent = 'Kein Rang - 0/500 Punkte';
-            level2Status.style.background = '#666';
-            level2Status.style.color = '#ccc';
-        }
+        updateLevelProgress(level2Card, 0);
     }
 
     // Level 3: Nicht suchen, Prompten! (level1.html)
     const level1Progress = localStorage.getItem('aiBytes_level1_progress');
-    const level3Status = document.querySelector('.level-3 .level-status');
+    const level3Card = document.querySelector('.level-card[data-level="level1"]');
 
     if (level1Progress) {
         const progress = JSON.parse(level1Progress);
         const points = progress.score || 0;
-        const rank = calculateRankFromPoints(points);
-        if (level3Status) {
-            level3Status.textContent = `${rank} - ${points}/500 Punkte`;
-            if (rank !== 'Kein Rang') {
-                level3Status.style.background = 'var(--saffron)';
-                level3Status.style.color = 'var(--russian-blue)';
-            } else {
-                level3Status.style.background = '#666';
-                level3Status.style.color = '#ccc';
-            }
-        }
+        updateLevelProgress(level3Card, points);
     } else {
-        // Kein Progress vorhanden - zeige 0 Punkte
-        if (level3Status) {
-            level3Status.textContent = 'Kein Rang - 0/500 Punkte';
-            level3Status.style.background = '#666';
-            level3Status.style.color = '#ccc';
-        }
+        updateLevelProgress(level3Card, 0);
     }
 
     // Level 4: Automatisiere deinen Alltag (level2.html)
     const level2Progress = localStorage.getItem('powerAutomateProgress');
-    const level4Status = document.querySelector('.level-4 .level-status');
+    const level4Card = document.querySelector('.level-card[data-level="level2"]');
 
     if (level2Progress) {
         const progress = JSON.parse(level2Progress);
         const points = progress.totalPoints || 0;
-        const rank = calculateRankFromPoints(points);
-        if (level4Status) {
-            level4Status.textContent = `${rank} - ${points}/500 Punkte`;
-            if (rank !== 'Kein Rang') {
-                level4Status.style.background = 'var(--saffron)';
-                level4Status.style.color = 'var(--russian-blue)';
-            } else {
-                level4Status.style.background = '#666';
-                level4Status.style.color = '#ccc';
-            }
-        }
+        updateLevelProgress(level4Card, points);
     } else {
-        if (level4Status) {
-            level4Status.textContent = 'Kein Rang - 0/500 Punkte';
-            level4Status.style.background = '#666';
-            level4Status.style.color = '#ccc';
-        }
+        updateLevelProgress(level4Card, 0);
     }
 
     // Level 5: Copilot (level6.html)
     const level6Progress = localStorage.getItem('aiBytes_level6_progress');
-    const level5Status = document.querySelector('.level-5 .level-status');
+    const level5Card = document.querySelector('.level-card[data-level="level6"]');
 
     if (level6Progress) {
         const progress = JSON.parse(level6Progress);
         const points = progress.totalPoints || 0;
-        const rank = calculateRankFromPoints(points);
-        if (level5Status) {
-            level5Status.textContent = `${rank} - ${points}/500 Punkte`;
-            if (rank !== 'Kein Rang') {
-                level5Status.style.background = 'var(--saffron)';
-                level5Status.style.color = 'var(--russian-blue)';
-            } else {
-                level5Status.style.background = '#666';
-                level5Status.style.color = '#ccc';
-            }
-        }
+        updateLevelProgress(level5Card, points);
     } else {
-        if (level5Status) {
-            level5Status.textContent = 'Kein Rang - 0/500 Punkte';
-            level5Status.style.background = '#666';
-            level5Status.style.color = '#ccc';
-        }
+        updateLevelProgress(level5Card, 0);
     }
 
     // Level 6: Advanced Prompting
     const level6ProgressData = localStorage.getItem('aiBytes_level6_progress_data');
-    const level6Status = document.querySelector('.level-6 .level-status');
+    const level6Card = document.querySelector('.level-card[data-level="level7"]');
 
     if (level6ProgressData) {
         const progress = JSON.parse(level6ProgressData);
         const points = progress.totalPoints || progress.score || 0;
-        const rank = calculateRankFromPoints(points);
-        if (level6Status) {
-            level6Status.textContent = `${rank} - ${points}/500 Punkte`;
-            if (rank !== 'Kein Rang') {
-                level6Status.style.background = 'var(--saffron)';
-                level6Status.style.color = 'var(--russian-blue)';
-            } else {
-                level6Status.style.background = '#666';
-                level6Status.style.color = '#ccc';
-            }
-        }
+        updateLevelProgress(level6Card, points);
     } else {
-        if (level6Status) {
-            level6Status.textContent = 'Kein Rang - 0/500 Punkte';
-            level6Status.style.background = '#666';
-            level6Status.style.color = '#ccc';
-        }
+        updateLevelProgress(level6Card, 0);
     }
 
     // Level 7: Daten-Spezialist
     const level7Progress = localStorage.getItem('aiBytes_level7_progress');
-    const level7Status = document.querySelector('.level-7 .level-status');
+    const level7Card = document.querySelector('.level-card[data-level="level8"]');
 
     if (level7Progress) {
         const progress = JSON.parse(level7Progress);
         const points = progress.totalPoints || progress.score || 0;
-        const rank = calculateRankFromPoints(points);
-        if (level7Status) {
-            level7Status.textContent = `${rank} - ${points}/500 Punkte`;
-            if (rank !== 'Kein Rang') {
-                level7Status.style.background = 'var(--saffron)';
-                level7Status.style.color = 'var(--russian-blue)';
-            } else {
-                level7Status.style.background = '#666';
-                level7Status.style.color = '#ccc';
-            }
-        }
+        updateLevelProgress(level7Card, points);
     } else {
-        if (level7Status) {
-            level7Status.textContent = 'Kein Rang - 0/500 Punkte';
-            level7Status.style.background = '#666';
-            level7Status.style.color = '#ccc';
-        }
+        updateLevelProgress(level7Card, 0);
     }
 
     // Level 8: Gute Ergebnisse sind kein Zufall
     const level8Progress = localStorage.getItem('aiBytes_level8_progress');
-    const level8Status = document.querySelector('.level-8 .level-status');
+    const level8Card = document.querySelector('.level-card[data-level="level9"]');
 
     if (level8Progress) {
         const progress = JSON.parse(level8Progress);
         const points = progress.totalPoints || progress.score || 0;
-        const rank = calculateRankFromPoints(points);
-        if (level8Status) {
-            level8Status.textContent = `${rank} - ${points}/500 Punkte`;
-            if (rank !== 'Kein Rang') {
-                level8Status.style.background = 'var(--saffron)';
-                level8Status.style.color = 'var(--russian-blue)';
-            } else {
-                level8Status.style.background = '#666';
-                level8Status.style.color = '#ccc';
-            }
-        }
+        updateLevelProgress(level8Card, points);
     } else {
-        if (level8Status) {
-            level8Status.textContent = 'Kein Rang - 0/500 Punkte';
-            level8Status.style.background = '#666';
-            level8Status.style.color = '#ccc';
-        }
+        updateLevelProgress(level8Card, 0);
     }
 
     // Level 9: KI für Dich!
     const level9Progress = localStorage.getItem('aiBytes_level9_progress');
-    const level9Status = document.querySelector('.level-9 .level-status');
+    const level9Card = document.querySelector('.level-card[data-level="level10"]');
 
     if (level9Progress) {
         const progress = JSON.parse(level9Progress);
         const points = progress.totalPoints || progress.score || 0;
-        const rank = calculateRankFromPoints(points);
-        if (level9Status) {
-            level9Status.textContent = `${rank} - ${points}/500 Punkte`;
-            if (rank !== 'Kein Rang') {
-                level9Status.style.background = 'var(--saffron)';
-                level9Status.style.color = 'var(--russian-blue)';
-            } else {
-                level9Status.style.background = '#666';
-                level9Status.style.color = '#ccc';
-            }
-        }
+        updateLevelProgress(level9Card, points);
     } else {
-        if (level9Status) {
-            level9Status.textContent = 'Kein Rang - 0/500 Punkte';
-            level9Status.style.background = '#666';
-            level9Status.style.color = '#ccc';
-        }
+        updateLevelProgress(level9Card, 0);
     }
 
     // Check if secret level should be unlocked
     checkSecretLevel();
 
+    // Update mystery level 10
+    updateMysteryLevel();
+
     // Update level unlock status
     updateLevelLocks();
+
+    // Update total progress display
+    updateTotalProgress();
 }
 
 // Update level card locks based on completion
@@ -469,27 +469,15 @@ function updateLevelLocks() {
         level2Card.classList.add('available');
     }
 
-    // Check Level 2 completion for Level 3 unlock
-    const level2Progress = localStorage.getItem('powerAutomateProgress');
+    // Level 3 is now always available
     const level3Card = document.querySelector('.level-3');
-    if (level2Progress) {
-        const progress = JSON.parse(level2Progress);
-        // Level 2 is completed if at least one challenge is done
-        if (progress.completedChallenges && progress.completedChallenges.length > 0) {
-            if (level3Card) {
-                level3Card.classList.remove('locked');
-                level3Card.classList.add('available');
-            }
-        }
-    } else {
-        if (level3Card) {
-            level3Card.classList.add('locked');
-            level3Card.classList.remove('available');
-        }
+    if (level3Card) {
+        level3Card.classList.remove('locked');
+        level3Card.classList.add('available');
     }
 
-    // Update locked cards style
-    const lockedCards = document.querySelectorAll('.level-card.locked');
+    // Update locked cards style (except mystery card)
+    const lockedCards = document.querySelectorAll('.level-card.locked:not(.mystery)');
     lockedCards.forEach(card => {
         card.style.opacity = '0.5';
         card.style.filter = 'grayscale(80%)';
@@ -560,273 +548,97 @@ function checkSecretLevel() {
     }
 }
 
+// Update Mystery Level 10
+function updateMysteryLevel() {
+    const mysteryLevel = document.querySelector('.level-10.mystery');
+    if (!mysteryLevel) return;
+
+    // Calculate total points
+    const level1Points = parseInt(localStorage.getItem('playerPoints')) || 0;
+    const level2Points = JSON.parse(localStorage.getItem('aiBytes_level4_progress') || '{}').score || 0;
+    const level3Points = JSON.parse(localStorage.getItem('aiBytes_level1_progress') || '{}').score || 0;
+    const level4Points = JSON.parse(localStorage.getItem('powerAutomateProgress') || '{}').totalPoints || 0;
+    const level5Points = JSON.parse(localStorage.getItem('aiBytes_level6_progress') || '{}').totalPoints || 0;
+    const level6Points = JSON.parse(localStorage.getItem('aiBytes_level6_progress_data') || '{}').totalPoints || 0;
+    const level7Points = JSON.parse(localStorage.getItem('aiBytes_level7_progress') || '{}').totalPoints || 0;
+    const level8Points = JSON.parse(localStorage.getItem('aiBytes_level8_progress') || '{}').totalPoints || 0;
+    const level9Points = JSON.parse(localStorage.getItem('aiBytes_level9_progress') || '{}').totalPoints || 0;
+
+    const totalPoints = level1Points + level2Points + level3Points + level4Points + level5Points +
+                       level6Points + level7Points + level8Points + level9Points;
+
+    // Check if 4500 points reached
+    if (totalPoints >= 4500) {
+        mysteryLevel.classList.remove('locked');
+        mysteryLevel.classList.add('unlocked');
+        mysteryLevel.style.cursor = 'pointer';
+
+        const title = mysteryLevel.querySelector('.level-title');
+        if (title) {
+            title.textContent = '🌟 Meister Level 🌟';
+        }
+
+        const description = mysteryLevel.querySelector('.level-description');
+        if (description) {
+            description.textContent = '🎉 Du hast es geschafft! Bereit für die ultimative Herausforderung?';
+        }
+
+        const progressText = mysteryLevel.querySelector('.level-progress-text');
+        if (progressText) {
+            progressText.textContent = '✨ Freigeschaltet!';
+            progressText.style.color = 'var(--saffron)';
+        }
+
+        const progressFill = mysteryLevel.querySelector('.level-progress-fill');
+        if (progressFill) {
+            progressFill.style.width = '100%';
+        }
+
+        // Add click handler for unlocked mystery level
+        mysteryLevel.onclick = function() {
+            alert('🎉 Das Meister Level ist noch in Entwicklung! Du bist ein wahrer AI-Meister!');
+        };
+    } else {
+        // Keep locked state
+        mysteryLevel.classList.add('locked');
+        mysteryLevel.classList.remove('unlocked');
+        mysteryLevel.style.cursor = 'not-allowed';
+
+        const pointsNeeded = 4500 - totalPoints;
+
+        const title = mysteryLevel.querySelector('.level-title');
+        if (title) {
+            title.textContent = '???';
+        }
+
+        const description = mysteryLevel.querySelector('.level-description');
+        if (description) {
+            description.textContent = 'Das ultimative Level wartet auf dich!';
+        }
+
+        const progressText = mysteryLevel.querySelector('.level-progress-text');
+        if (progressText) {
+            progressText.textContent = `🔒 Noch ${pointsNeeded} Punkte benötigt`;
+            progressText.style.color = '#ff6b6b';
+        }
+
+        const progressFill = mysteryLevel.querySelector('.level-progress-fill');
+        if (progressFill) {
+            progressFill.style.width = '0%';
+        }
+
+        mysteryLevel.onclick = function(e) {
+            e.preventDefault();
+            alert(`🔒 Du benötigst noch ${pointsNeeded} Punkte um dieses mysteriöse Level freizuschalten!\n\nAktuell: ${totalPoints}/4500 Punkte`);
+        };
+    }
+}
+
 // ===============================
 //   MO MAN CHARACTER SYSTEM
 // ===============================
 // Mo Man Character Controls - Mario Bros style with Animation and Physics
 // (All state now managed in GameState object)
-
-function initializeMoMan() {
-    const moChar = GameState.dom.moCharacter;
-    if (!moChar) return;
-
-    // Position Mo Man over the L (first letter)
-    const firstLetter = GameState.dom.firstLetter;
-    const containerRect = GameState.dom.titleContainer;
-
-    if (firstLetter && containerRect) {
-        const letterRect = firstLetter.getBoundingClientRect();
-        const contRect = containerRect.getBoundingClientRect();
-        GameState.moMan.x = letterRect.left - contRect.left + (letterRect.width / 2) - (CONFIG.MOMAN.WIDTH / 2);
-
-        // Start Mo Man directly on the first letter
-        const letterTop = letterRect.top - contRect.top;
-        GameState.moMan.y = letterTop - CONFIG.MOMAN.SPAWN_OFFSET_Y;
-        GameState.moMan.isGrounded = true;
-        moChar.style.left = GameState.moMan.x + 'px';
-        moChar.style.top = GameState.moMan.y + 'px';
-
-        // Highlight the L
-        firstLetter.classList.add('highlighted');
-    }
-
-    // Start Mo Man animation
-    startMoManAnimation();
-
-    // Start game loop
-    startGameLoop();
-}
-
-function startMoManAnimation() {
-    GameState.game.animationLoop = setInterval(() => {
-        updateMoManAnimation();
-    }, CONFIG.ANIMATIONS.MOMAN_ANIM_SPEED);
-}
-
-function updateMoManAnimation() {
-    const moChar = GameState.dom.moCharacter;
-    if (!moChar) return;
-
-    const state = GameState.moMan;
-
-    if (state.currentAnimation === 'jumping') {
-        // Update jump animation slower (every 3rd call)
-        state.jumpAnimationCounter++;
-        if (state.jumpAnimationCounter >= 3) {
-            state.jumpAnimationCounter = 0;
-
-            // Handle jumping animation with special frame names
-            let jumpFrameName;
-            if (state.jumpAnimationFrame === 27) {
-                jumpFrameName = 'Mo man Sprung_00027_a.png';
-            } else if (state.jumpAnimationFrame === 28) {
-                jumpFrameName = 'Mo man Sprung_00028_b.png';
-            } else {
-                const frameNumber = String(state.jumpAnimationFrame).padStart(5, '0');
-                jumpFrameName = `Mo man Sprung_${frameNumber}.png`;
-            }
-
-            moChar.src = `${CONFIG.PATHS.MOMAN_JUMP}${jumpFrameName}`;
-        }
-    } else if (state.currentAnimation === 'running') {
-        const frameNumber = String(state.animationFrame).padStart(5, '0');
-        moChar.src = `${CONFIG.PATHS.MOMAN_RUN}Mo man Lauf Pose_${frameNumber}.png`;
-        state.animationFrame = (state.animationFrame + 1) % CONFIG.ANIMATIONS.MOMAN_RUN_FRAMES;
-    } else {
-        const frameNumber = String(state.animationFrame).padStart(5, '0');
-        moChar.src = `${CONFIG.PATHS.MOMAN_STAND}Mo man Stand Pose_${frameNumber}.png`;
-        state.animationFrame = (state.animationFrame + 1) % CONFIG.ANIMATIONS.MOMAN_STAND_FRAMES;
-    }
-
-    // Apply direction (flip horizontally if facing left)
-    moChar.style.transform = state.facingRight ? 'scaleX(1)' : 'scaleX(-1)';
-}
-
-function updateJumpFrame() {
-    // Map jump velocity to animation frame (42 frames total, 0-41)
-    // Frame 27-28 is the peak of the jump
-    const state = GameState.moMan;
-    const maxJumpVelocity = Math.abs(CONFIG.PHYSICS.JUMP_POWER);
-
-    if (state.velocityY <= 0) {
-        // Rising phase: map velocity -9 to 0 → frames 0 to 27
-        const progress = 1 - (Math.abs(state.velocityY) / maxJumpVelocity);
-        state.jumpAnimationFrame = Math.floor(progress * 27);
-        state.jumpAnimationFrame = Math.max(0, Math.min(27, state.jumpAnimationFrame));
-    } else {
-        // Falling phase: map velocity 0 to +9 → frames 27 to 41
-        const progress = Math.min(state.velocityY / maxJumpVelocity, 1);
-        state.jumpAnimationFrame = 27 + Math.floor(progress * 14);
-        state.jumpAnimationFrame = Math.max(27, Math.min(41, state.jumpAnimationFrame));
-    }
-}
-
-function startGameLoop() {
-    GameState.game.gameLoop = setInterval(() => {
-        updateGamePhysics();
-    }, CONFIG.ANIMATIONS.FRAME_RATE);
-}
-
-function updateGamePhysics() {
-    const state = GameState.moMan;
-    const moChar = GameState.dom.moCharacter;
-
-    // Skip physics if Mo Man is not visible
-    if (!state.visible || !moChar) return;
-
-    // Handle horizontal movement
-    let isMoving = false;
-    const keys = GameState.input.keysPressed;
-
-    if (keys['ArrowLeft']) {
-        state.x -= CONFIG.PHYSICS.MOVE_SPEED;
-        state.facingRight = false;
-        isMoving = true;
-    }
-    if (keys['ArrowRight']) {
-        state.x += CONFIG.PHYSICS.MOVE_SPEED;
-        state.facingRight = true;
-        isMoving = true;
-    }
-
-    // Update animation based on movement and physics
-    const newAnimation = determineAnimation(state, isMoving);
-    if (newAnimation !== state.currentAnimation) {
-        state.currentAnimation = newAnimation;
-        if (newAnimation !== 'jumping') {
-            state.animationFrame = 0;
-        }
-        if (newAnimation === 'jumping') {
-            state.jumpAnimationFrame = 0;
-        }
-    }
-
-    // Apply gravity and movement
-    state.velocityY += CONFIG.PHYSICS.GRAVITY;
-    state.y += state.velocityY;
-
-    // Handle collisions
-    handleCollisions(state);
-
-    // Check if fallen too far
-    if (state.y > CONFIG.PHYSICS.FALL_THRESHOLD) {
-        handleMoManFall(moChar);
-        return;
-    }
-
-    // Update DOM
-    moChar.style.left = state.x + 'px';
-    moChar.style.top = state.y + 'px';
-
-    // Update game state
-    updateHighlighting();
-    checkCoinCollisions();
-}
-
-function determineAnimation(state, isMoving) {
-    if (!state.isGrounded && Math.abs(state.velocityY) > 0.5) {
-        updateJumpFrame();
-        return 'jumping';
-    } else if (isMoving) {
-        return 'running';
-    } else {
-        return 'standing';
-    }
-}
-
-function handleCollisions(state) {
-    // Check for platform collision first (higher priority)
-    const platformLevel = checkPlatformCollisions(state.x, state.y);
-
-    if (platformLevel !== null && state.velocityY >= 0) {
-        if (state.y >= platformLevel) {
-            state.y = platformLevel;
-            state.velocityY = 0;
-            state.isGrounded = true;
-        } else {
-            state.isGrounded = false;
-        }
-    } else {
-        // Check for letter collision
-        const groundLevel = checkLetterCollision(state.x, state.y);
-
-        if (groundLevel !== null && state.velocityY >= 0) {
-            if (state.y >= groundLevel) {
-                state.y = groundLevel;
-                state.velocityY = 0;
-                state.isGrounded = true;
-            } else {
-                state.isGrounded = false;
-            }
-        } else if (groundLevel === null) {
-            state.isGrounded = false;
-        }
-    }
-}
-
-function handleMoManFall(moChar) {
-    GameState.moMan.visible = false;
-    moChar.style.display = 'none';
-    showRespawnUI();
-}
-
-// Collision detection with letters
-// Cache letters on initialization to avoid repeated queries
-let cachedLetters = null;
-
-function getCachedLetters() {
-    if (!cachedLetters) {
-        cachedLetters = Array.from(document.querySelectorAll('.main-title span[data-index], .levels-title span[data-index]'));
-    }
-    return cachedLetters;
-}
-
-function checkLetterCollision(x, y) {
-    const letters = getCachedLetters();
-    const moManBottom = y + CONFIG.MOMAN.HEIGHT;
-
-    for (let letter of letters) {
-        const letterRect = letter.getBoundingClientRect();
-
-        // Use different containers based on which title the letter belongs to
-        let containerRect;
-        if (letter.closest('.main-title')) {
-            containerRect = GameState.dom.titleContainer?.getBoundingClientRect();
-        } else {
-            const levelsContainer = document.querySelector('.levels');
-            containerRect = levelsContainer?.getBoundingClientRect();
-        }
-
-        if (!containerRect) continue;
-
-        // Convert to relative coordinates
-        const letterLeft = letterRect.left - containerRect.left;
-        const letterRight = letterLeft + letterRect.width;
-        const letterTop = letterRect.top - containerRect.top;
-
-        // Check if Mo Man is horizontally over this letter
-        const moManLeft = x;
-        const moManRight = x + CONFIG.MOMAN.WIDTH;
-
-        if (moManRight > letterLeft && moManLeft < letterRight) {
-            // Calculate the ground level for this letter
-            let groundLevel;
-            if (letter.closest('.levels-title')) {
-                groundLevel = letterTop + 75;
-            } else {
-                groundLevel = letterTop - CONFIG.MOMAN.SPAWN_OFFSET_Y;
-            }
-
-            // Only return collision if Mo Man is close to this letter
-            const distanceToGround = Math.abs(y - groundLevel);
-            if (distanceToGround < CONFIG.PHYSICS.COLLISION_TOLERANCE) {
-                return groundLevel;
-            }
-        }
-    }
-
-    return null; // No collision
-}
 
 // ===============================
 //   EVENT LISTENERS
@@ -840,20 +652,6 @@ const EventHandlers = {
 function initEventListeners() {
     // Key down handler
     EventHandlers.keydown = function(event) {
-        if (!GameState.dom.mainTitle) return;
-
-        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'ArrowUp') {
-            event.preventDefault();
-            GameState.input.keysPressed[event.key] = true;
-        }
-
-        // Jump with Arrow Up
-        if (event.key === 'ArrowUp' && GameState.moMan.isGrounded) {
-            event.preventDefault();
-            GameState.moMan.velocityY = CONFIG.PHYSICS.JUMP_POWER;
-            GameState.moMan.isGrounded = false;
-        }
-
         // Track M key presses for achievement
         if (event.key.toLowerCase() === 'm') {
             achievementData.mKeyPresses++;
@@ -866,157 +664,17 @@ function initEventListeners() {
         }
     };
 
-    // Key up handler
-    EventHandlers.keyup = function(event) {
-        if (!GameState.dom.mainTitle) return;
-
-        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'ArrowUp') {
-            event.preventDefault();
-            GameState.input.keysPressed[event.key] = false;
-        }
-
-        // Respawn with R key
-        if (event.key === 'R' || event.key === 'r') {
-            if (!GameState.moMan.visible) {
-                respawnMoMan();
-            }
-        }
-    };
-
     document.addEventListener('keydown', EventHandlers.keydown);
-    document.addEventListener('keyup', EventHandlers.keyup);
 }
 
 function cleanupEventListeners() {
     if (EventHandlers.keydown) {
         document.removeEventListener('keydown', EventHandlers.keydown);
     }
-    if (EventHandlers.keyup) {
-        document.removeEventListener('keyup', EventHandlers.keyup);
-    }
 }
 
 // Cleanup on page unload
 window.addEventListener('beforeunload', cleanupEventListeners);
-
-// Respawn UI functions
-function showRespawnUI() {
-    // Create respawn message if it doesn't exist
-    let respawnUI = document.getElementById('respawnUI');
-    if (!respawnUI) {
-        respawnUI = document.createElement('div');
-        respawnUI.id = 'respawnUI';
-        respawnUI.style.cssText = `
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: linear-gradient(135deg, rgba(75, 0, 116, 0.95), rgba(60, 58, 165, 0.95));
-            color: white;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            text-align: center;
-            z-index: 10000;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2),
-                        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-            backdrop-filter: blur(20px);
-            animation: respawnPulse 2s ease-in-out infinite;
-            transition: all 0.3s ease;
-        `;
-        respawnUI.innerHTML = 'Drücke <span style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; font-weight: bold;">R</span> zum Respawnen';
-        document.body.appendChild(respawnUI);
-    }
-    respawnUI.style.display = 'block';
-}
-
-function hideRespawnUI() {
-    const respawnUI = document.getElementById('respawnUI');
-    if (respawnUI) {
-        respawnUI.style.display = 'none';
-    }
-}
-
-function respawnMoMan() {
-    const firstLetter = GameState.dom.firstLetter;
-    const moChar = GameState.dom.moCharacter;
-    const containerRect = GameState.dom.titleContainer;
-
-    if (!firstLetter || !moChar || !containerRect) return;
-
-    // Reset Mo Man to starting position
-    const letterRect = firstLetter.getBoundingClientRect();
-    const contRect = containerRect.getBoundingClientRect();
-
-    GameState.moMan.x = letterRect.left - contRect.left + (letterRect.width / 2) - (CONFIG.MOMAN.WIDTH / 2);
-    const letterTop = letterRect.top - contRect.top;
-    GameState.moMan.y = letterTop - CONFIG.MOMAN.SPAWN_OFFSET_Y;
-    GameState.moMan.velocityY = 0;
-    GameState.moMan.isGrounded = true;
-    GameState.moMan.visible = true;
-
-    // Show Mo Man again
-    moChar.style.display = 'block';
-    moChar.style.left = GameState.moMan.x + 'px';
-    moChar.style.top = GameState.moMan.y + 'px';
-
-    // Hide respawn UI
-    hideRespawnUI();
-
-    // Reset all coins
-    resetCoins();
-
-    // Highlight the L again
-    const letters = getCachedLetters();
-    letters.forEach(span => span.classList.remove('highlighted'));
-    firstLetter.classList.add('highlighted');
-}
-
-function getCurrentLetter() {
-    const letters = getCachedLetters();
-    const state = GameState.moMan;
-    let closestLetter = null;
-    let closestDistance = Infinity;
-
-    letters.forEach(letter => {
-        const letterRect = letter.getBoundingClientRect();
-        let containerRect;
-
-        if (letter.closest('.main-title')) {
-            containerRect = GameState.dom.titleContainer?.getBoundingClientRect();
-        } else {
-            const levelsContainer = document.querySelector('.levels');
-            containerRect = levelsContainer?.getBoundingClientRect();
-        }
-
-        if (!containerRect) return;
-
-        const letterCenter = letterRect.left - containerRect.left + (letterRect.width / 2);
-        const moCenter = state.x + (CONFIG.MOMAN.WIDTH / 2);
-        const distance = Math.abs(letterCenter - moCenter);
-
-        if (distance < closestDistance) {
-            closestDistance = distance;
-            closestLetter = letter;
-        }
-    });
-
-    return closestLetter;
-}
-
-function updateHighlighting() {
-    // Remove all highlights
-    const letters = getCachedLetters();
-    letters.forEach(span => span.classList.remove('highlighted'));
-
-    // Highlight closest letter
-    const closestLetter = getCurrentLetter();
-    if (closestLetter) {
-        closestLetter.classList.add('highlighted');
-    }
-}
 
 // ===============================
 //   INITIALIZATION
@@ -1033,31 +691,7 @@ function initializeGame() {
         loadSavedBackground();
         loadLevelRanks();
         loadAchievements();
-
-        // Initialize game systems with delays to ensure layout is ready
-        setTimeout(() => {
-            try {
-                initializePlatforms();
-            } catch (e) {
-                console.error('Platform initialization failed:', e);
-            }
-        }, 150);
-
-        setTimeout(() => {
-            try {
-                initializeMoMan();
-            } catch (e) {
-                console.error('MoMan initialization failed:', e);
-            }
-        }, 100);
-
-        setTimeout(() => {
-            try {
-                initializeCoins();
-            } catch (e) {
-                console.error('Coin initialization failed:', e);
-            }
-        }, 200);
+        updateMysteryLevel();
 
         // Initialize logo easter egg
         initializeLogoAnimation();
@@ -1068,229 +702,6 @@ function initializeGame() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', initializeGame);
-
-// Platform System
-function initializePlatforms() {
-    // No platforms - removed
-}
-
-function createPlatform(id, x, y, width = 64) {
-    const platform = document.createElement('div');
-    platform.id = id;
-    platform.className = 'platform';
-    platform.style.cssText = `
-        position: absolute;
-        left: ${x}px;
-        top: ${y}px;
-        width: ${width}px;
-        height: ${width}px;
-        z-index: 50;
-        image-rendering: pixelated;
-        image-rendering: -moz-crisp-edges;
-        image-rendering: crisp-edges;
-    `;
-
-    // Use single PNG image, no tiling
-    platform.innerHTML = `<img src="AI Bytes Asset/Münze bbox.png" style="width: 100%; height: 100%; image-rendering: pixelated;">`;
-
-    document.querySelector('.container').appendChild(platform);
-
-    // Store platform data for collision detection
-    platforms.push({
-        element: platform,
-        id: id,
-        x: x,
-        y: y,
-        width: width,
-        height: width
-    });
-}
-
-function checkPlatformCollisions(moManX, moManY) {
-    const moManBottom = moManY + CONFIG.MOMAN.HEIGHT;
-    const moManLeft = moManX;
-    const moManRight = moManX + CONFIG.MOMAN.WIDTH;
-
-    for (let platform of GameState.game.platforms) {
-        const platformLeft = platform.x;
-        const platformRight = platform.x + platform.width;
-        const platformTop = platform.y;
-
-        const horizontalOverlap = moManRight > platformLeft && moManLeft < platformRight;
-        const verticalNear = moManBottom >= platformTop - 10 && moManBottom <= platformTop + 30;
-
-        if (horizontalOverlap && verticalNear) {
-            return platformTop - CONFIG.MOMAN.HEIGHT;
-        }
-    }
-
-    return null;
-}
-
-// ===============================
-//   COINS SYSTEM
-// ===============================
-function initializeCoins() {
-    // Only create coins on the main page (not in levels)
-    if (!GameState.dom.mainTitle) return;
-
-    // Coin positions
-    const coinPositions = [
-        { id: 'coin1', x: -100, y: 120 },   // Above main title center
-        { id: 'coin2', x: 600, y: 180 },    // Between titles
-        { id: 'coin3', x: 800, y: 300 }     // Centered above "Wähle dein Level"
-    ];
-
-    coinPositions.forEach(pos => createCoin(pos.id, pos.x, pos.y));
-}
-
-function createCoin(id, x, y) {
-    const container = GameState.dom.container;
-    if (!container) return;
-
-    const coin = document.createElement('div');
-    coin.id = id;
-    coin.className = 'coin';
-    coin.style.cssText = `
-        position: absolute;
-        left: ${x}px;
-        top: ${y}px;
-        width: 32px;
-        height: 32px;
-        z-index: 100;
-        animation: coinFloat 3s ease-in-out infinite;
-        image-rendering: pixelated;
-        image-rendering: -moz-crisp-edges;
-        image-rendering: crisp-edges;
-    `;
-
-    // Create animated coin image
-    const coinImg = document.createElement('img');
-    coinImg.style.cssText = 'width: 100%; height: 100%; image-rendering: pixelated;';
-    coin.appendChild(coinImg);
-
-    container.appendChild(coin);
-
-    // Store coin data with animation properties
-    const coinData = {
-        element: coin,
-        id: id,
-        x: x,
-        y: y,
-        collected: false,
-        animationFrame: 0,
-        img: coinImg
-    };
-
-    GameState.game.coins.push(coinData);
-    startCoinAnimation(coinData);
-}
-
-function startCoinAnimation(coin) {
-    const animationInterval = setInterval(() => {
-        if (coin.collected) {
-            clearInterval(animationInterval);
-            return;
-        }
-
-        coin.animationFrame = (coin.animationFrame + 1) % CONFIG.ANIMATIONS.COIN_FRAMES;
-        const frameNumber = String(coin.animationFrame + 1).padStart(4, '0');
-        coin.img.src = `${CONFIG.PATHS.COINS}${frameNumber}.png`;
-    }, CONFIG.ANIMATIONS.COIN_ANIM_SPEED);
-}
-
-function resetCoins() {
-    // Remove all existing coins from DOM
-    GameState.game.coins.forEach(coin => {
-        if (coin.element && coin.element.parentNode) {
-            coin.element.remove();
-        }
-    });
-
-    // Clear coins array and counters
-    GameState.game.coins = [];
-    GameState.game.coinsCollected = 0;
-    achievementData.coinsThisRun = 0;
-
-    // Recreate all coins
-    initializeCoins();
-}
-
-function checkCoinCollisions() {
-    const moChar = GameState.dom.moCharacter;
-    if (!GameState.moMan.visible || !moChar) return;
-
-    const moManRect = moChar.getBoundingClientRect();
-
-    GameState.game.coins.forEach(coin => {
-        if (coin.collected) return;
-
-        const coinRect = coin.element.getBoundingClientRect();
-
-        // Check collision (with some tolerance)
-        const collisionTolerance = 5;
-        if (moManRect.right > coinRect.left + collisionTolerance &&
-            moManRect.left < coinRect.right - collisionTolerance &&
-            moManRect.bottom > coinRect.top + collisionTolerance &&
-            moManRect.top < coinRect.bottom - collisionTolerance) {
-            collectCoin(coin);
-        }
-    });
-}
-
-function collectCoin(coin) {
-    coin.collected = true;
-    GameState.game.coinsCollected++;
-    achievementData.coinsThisRun++;
-
-    // Coin collect animation
-    coin.element.style.animation = 'coinCollect 0.5s ease-out forwards';
-
-    // Remove coin after animation
-    setTimeout(() => {
-        coin.element.remove();
-    }, 500);
-
-    // Show collection effect
-    showCoinCollectEffect(coin.x, coin.y);
-
-    // Check for coin master achievement
-    if (achievementData.coinsThisRun >= CONFIG.ACHIEVEMENTS.COIN_TARGET) {
-        setTimeout(() => {
-            if (achievementData.coinsThisRun >= CONFIG.ACHIEVEMENTS.COIN_TARGET) {
-                const coinmasterAchievement = achievements.normal.find(a => a.id === 'coinmaster');
-                if (coinmasterAchievement && !coinmasterAchievement.unlocked) {
-                    coinmasterAchievement.progress = CONFIG.ACHIEVEMENTS.COIN_TARGET;
-                    achievementData.coinsThisRun = 0;
-                    saveAchievements();
-                    checkAchievement('coinmaster');
-                }
-            }
-        }, 1000);
-    }
-}
-
-function showCoinCollectEffect(x, y) {
-    const effect = document.createElement('div');
-    effect.style.cssText = `
-        position: absolute;
-        left: ${x}px;
-        top: ${y}px;
-        color: #FFD700;
-        font-size: 20px;
-        font-weight: bold;
-        z-index: 200;
-        pointer-events: none;
-        animation: collectEffect 1s ease-out forwards;
-    `;
-    effect.textContent = '+1';
-
-    document.querySelector('.container').appendChild(effect);
-
-    setTimeout(() => {
-        effect.remove();
-    }, 1000);
-}
 
 // Professional Logo Animation Easter Egg
 function initializeLogoAnimation() {
@@ -1681,15 +1092,6 @@ const achievements = {
     ],
     normal: [
         {
-            id: 'coinmaster',
-            name: 'Münzsammler',
-            description: `Sammle alle ${CONFIG.ACHIEVEMENTS.COIN_TARGET} Münzen ohne zu sterben`,
-            icon: '🪙',
-            progress: 0,
-            target: CONFIG.ACHIEVEMENTS.COIN_TARGET,
-            unlocked: false
-        },
-        {
             id: 'goldrank',
             name: 'Goldmeister',
             description: 'Erreiche deinen ersten Gold-Rang',
@@ -1715,7 +1117,6 @@ const achievements = {
 let achievementData = {
     mKeyPresses: 0,
     viewedAnimations: new Set(),
-    coinsThisRun: 0,
     hasGoldRank: false,
     level4MaxTime: 0
 };
@@ -1746,7 +1147,6 @@ function loadAchievements() {
         const data = JSON.parse(savedData);
         achievementData.mKeyPresses = data.mKeyPresses || 0;
         achievementData.viewedAnimations = new Set(data.viewedAnimations || []);
-        achievementData.coinsThisRun = data.coinsThisRun || 0;
         achievementData.hasGoldRank = data.hasGoldRank || false;
         achievementData.level4MaxTime = data.level4MaxTime || 0;
     }
@@ -1768,7 +1168,6 @@ function saveAchievements() {
     localStorage.setItem('aiBytes_achievementData', JSON.stringify({
         mKeyPresses: achievementData.mKeyPresses,
         viewedAnimations: Array.from(achievementData.viewedAnimations),
-        coinsThisRun: achievementData.coinsThisRun,
         hasGoldRank: achievementData.hasGoldRank,
         level4MaxTime: achievementData.level4MaxTime
     }));
@@ -1918,7 +1317,6 @@ function resetAllAchievements() {
         // Reset achievement data
         achievementData.mKeyPresses = 0;
         achievementData.viewedAnimations.clear();
-        achievementData.coinsThisRun = 0;
         achievementData.hasGoldRank = false;
         achievementData.level4MaxTime = 0;
 
@@ -1960,7 +1358,7 @@ class TXPCharacter {
         this.isJumping = false;
 
         this.currentAnimation = 'stand'; // stand, talk, lauf, sprung
-        this.position = { x: 50, y: 60 }; // bottom left position
+        this.position = { x: 0, y: 400 }; // centered position (x offset from center)
         this.direction = 1; // 1 = right, -1 = left
         this.movementDistance = 150; // pixels to move (reduced)
 
@@ -2172,9 +1570,9 @@ class TXPCharacter {
         this.direction = Math.random() < 0.5 ? 1 : -1; // Random direction
         const targetX = this.position.x + (this.direction * this.movementDistance);
 
-        // Ensure we don't move off screen (more restrictive on the right)
-        const maxRightPosition = Math.min(window.innerWidth - 300, 400); // Don't go too far right
-        const clampedX = Math.max(20, Math.min(maxRightPosition, targetX));
+        // Ensure we don't move too far from center (centered position, so -250 to +250 from center)
+        const maxOffset = 250;
+        const clampedX = Math.max(-maxOffset, Math.min(maxOffset, targetX));
         this.direction = clampedX > this.position.x ? 1 : -1;
 
         // Update CSS transform for direction
@@ -2213,8 +1611,9 @@ class TXPCharacter {
     }
 
     updatePosition() {
-        this.character.parentElement.style.left = this.position.x + 'px';
-        this.character.parentElement.style.bottom = this.position.y + 'px';
+        // Keep centered with CSS (left: 50%), only adjust horizontal offset with transform
+        // Bottom position stays fixed in CSS, we only move horizontally
+        this.character.parentElement.style.transform = `translateX(calc(-50% + ${this.position.x}px))`;
     }
 
     finishMovement(moveInterval) {
@@ -2242,4 +1641,94 @@ class TXPCharacter {
 let txpCharacter;
 document.addEventListener('DOMContentLoaded', function() {
     txpCharacter = new TXPCharacter();
+});
+
+// ===============================
+//   FULLSCREEN IMAGE VIEWER
+// ===============================
+function openFullscreen(event, imageSrc) {
+    // Prevent the link from navigating
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'fullscreen-overlay';
+    overlay.onclick = closeFullscreen;
+
+    // Create image
+    const img = document.createElement('img');
+    img.src = imageSrc;
+    img.onclick = (e) => e.stopPropagation(); // Prevent closing when clicking image
+
+    // Create close button
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'fullscreen-close';
+    closeBtn.innerHTML = '✕';
+    closeBtn.onclick = closeFullscreen;
+
+    // Append to overlay
+    overlay.appendChild(img);
+    overlay.appendChild(closeBtn);
+
+    // Add to body
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+
+    // Close with ESC key
+    document.addEventListener('keydown', escapeCloseFullscreen);
+}
+
+function closeFullscreen() {
+    const overlay = document.querySelector('.fullscreen-overlay');
+    if (overlay) {
+        overlay.remove();
+        document.body.style.overflow = 'auto';
+        document.removeEventListener('keydown', escapeCloseFullscreen);
+    }
+}
+
+function escapeCloseFullscreen(event) {
+    if (event.key === 'Escape') {
+        closeFullscreen();
+    }
+}
+
+// ===============================
+//   RANK LEGEND POPUP
+// ===============================
+function openRankLegend() {
+    const popup = document.getElementById('rankLegendPopup');
+    if (popup) {
+        popup.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeRankLegend() {
+    const popup = document.getElementById('rankLegendPopup');
+    if (popup) {
+        popup.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Close rank legend with ESC key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const rankPopup = document.getElementById('rankLegendPopup');
+        if (rankPopup && rankPopup.style.display === 'flex') {
+            closeRankLegend();
+        }
+    }
+});
+
+// Close rank legend when clicking outside
+document.addEventListener('click', function(event) {
+    const rankPopup = document.getElementById('rankLegendPopup');
+    const popupContent = rankPopup?.querySelector('.popup-content');
+
+    if (event.target === rankPopup && !popupContent?.contains(event.target)) {
+        closeRankLegend();
+    }
 });

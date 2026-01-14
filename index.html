@@ -11,6 +11,7 @@
         <header class="header">
             <div class="header-buttons">
                 <button class="achievements-btn" onclick="openAchievements()">🏆</button>
+                <button class="calendar-btn" onclick="openCalendar()">📅</button>
                 <button class="settings-btn" onclick="openSettings()">⚙️</button>
             </div>
             <div class="logo-container">
@@ -20,104 +21,189 @@
         </header>
 
         <main class="main">
-            <section class="hero">
-                <div class="hero-content">
-                    <div class="title-container">
-                        <h1 class="main-title">
-                            <span data-index="0">L</span><span data-index="1">e</span><span data-index="2">v</span><span data-index="3">e</span><span data-index="4">l</span>
-                            <span class="space"> </span>
-                            <span data-index="5">U</span><span data-index="6">p</span>
-                            <span class="space"> </span>
-                            <span data-index="7">y</span><span data-index="8">o</span><span data-index="9">u</span><span data-index="10">r</span>
-                            <span class="space"> </span>
-                            <span data-index="11">A</span><span data-index="12">I</span>
-                            <span class="space"> </span>
-                            <span data-index="13">S</span><span data-index="14">k</span><span data-index="15">i</span><span data-index="16">l</span><span data-index="17">l</span><span data-index="18">s</span><span data-index="19">!</span>
-                        </h1>
-                        <img src="assets/images/Mo man 01.png" alt="Mo Man" class="mo-character" id="moCharacter">
+            <section class="levels">
+                <div class="levels-header">
+                    <h2 class="levels-title">
+                        <span data-index="20">W</span><span data-index="21">ä</span><span data-index="22">h</span><span data-index="23">l</span><span data-index="24">e</span>
+                        <span class="space"> </span>
+                        <span data-index="25">d</span><span data-index="26">e</span><span data-index="27">i</span><span data-index="28">n</span>
+                        <span class="space"> </span>
+                        <span data-index="29">L</span><span data-index="30">e</span><span data-index="31">v</span><span data-index="32">e</span><span data-index="33">l</span>
+                    </h2>
+                    <div class="total-rank-badge" id="totalRankBadge" onclick="openRankLegend()" title="Klicke für Rang-Legende">
+                        <span class="total-rank-icon">⭐</span>
+                        <span class="total-rank-text" id="totalRankText">Kein Rang</span>
                     </div>
                 </div>
-            </section>
 
-            <section class="levels">
-                <h2 class="levels-title">
-                    <span data-index="20">W</span><span data-index="21">ä</span><span data-index="22">h</span><span data-index="23">l</span><span data-index="24">e</span>
-                    <span class="space"> </span>
-                    <span data-index="25">d</span><span data-index="26">e</span><span data-index="27">i</span><span data-index="28">n</span>
-                    <span class="space"> </span>
-                    <span data-index="29">L</span><span data-index="30">e</span><span data-index="31">v</span><span data-index="32">e</span><span data-index="33">l</span>
-                </h2>
+                <!-- Total Progress Display -->
+                <div class="total-progress-container">
+                    <div class="total-progress-bar-wrapper">
+                        <div class="total-progress-bar">
+                            <div class="total-progress-fill" id="totalProgressFill" data-progress="0"></div>
+                        </div>
+                        <div class="total-progress-text" id="totalProgressText">0/4500 Punkte</div>
+                    </div>
+                </div>
+
                 <div class="level-grid">
-                    <a href="level5.html" class="level-card level-1 available" style="text-decoration: none; color: inherit;">
-                        <img src="Kursbilder LES/02 (2).png" alt="Schummeln erlaubt" class="level-thumbnail">
+                    <a href="level5.html" class="level-card level-1 available" style="text-decoration: none; color: inherit;" data-level="level5">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/02 (2).png" alt="Schummeln erlaubt" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/02 (2).png')" title="Vollbild">⛶</button>
+                        </div>
                         <div class="level-number">01</div>
                         <h3 class="level-title">Schummeln erlaubt</h3>
                         <p class="level-description">Interaktives Training mit Prompt-Bausteinen</p>
-                        <div class="level-status">Kein Rang</div>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
                     </a>
 
-                    <a href="level4.html" class="level-card level-2 available" style="text-decoration: none; color: inherit;">
-                        <img src="Kursbilder LES/06.png" alt="Auch Bilder sind kein Problem" class="level-thumbnail">
+                    <a href="level4.html" class="level-card level-2 available" style="text-decoration: none; color: inherit;" data-level="level4">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/06.png" alt="Auch Bilder sind kein Problem" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/06.png')" title="Vollbild">⛶</button>
+                        </div>
                         <div class="level-number">02</div>
                         <h3 class="level-title">Auch Bilder sind kein Problem</h3>
                         <p class="level-description">Meistere KI-Bildverarbeitung und Prompts</p>
-                        <div class="level-status">Kein Rang</div>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
                     </a>
 
-                    <a href="level1.html" class="level-card level-3 available" style="text-decoration: none; color: inherit;">
-                        <img src="Kursbilder LES/01.png" alt="Nicht suchen, Prompten!" class="level-thumbnail">
+                    <a href="level1.html" class="level-card level-3 available" style="text-decoration: none; color: inherit;" data-level="level1">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/01.png" alt="Nicht suchen, Prompten!" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/01.png')" title="Vollbild">⛶</button>
+                        </div>
                         <div class="level-number">03</div>
                         <h3 class="level-title">Nicht suchen, Prompten!</h3>
                         <p class="level-description">Lerne die Grundlagen des richtigen Promptens</p>
-                        <div class="level-status">Kein Rang</div>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
                     </a>
 
-                    <a href="level2.html" class="level-card level-4 available" style="text-decoration: none; color: inherit;">
-                        <img src="Kursbilder LES/03.png" alt="Automatisiere deinen Alltag" class="level-thumbnail">
+                    <a href="level2.html" class="level-card level-4 available" style="text-decoration: none; color: inherit;" data-level="level2">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/03.png" alt="Automatisiere deinen Alltag" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/03.png')" title="Vollbild">⛶</button>
+                        </div>
                         <div class="level-number">04</div>
                         <h3 class="level-title">Automatisiere deinen Alltag</h3>
                         <p class="level-description">Power Automate für smarte Workflows</p>
-                        <div class="level-status">Kein Rang</div>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
                     </a>
 
-                    <a href="level6.html" class="level-card level-5 available" style="text-decoration: none; color: inherit;">
-                        <img src="Kursbilder LES/07.png" alt="Copilot" class="level-thumbnail">
+                    <a href="level6.html" class="level-card level-5 available" style="text-decoration: none; color: inherit;" data-level="level6">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/07.png" alt="Copilot" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/07.png')" title="Vollbild">⛶</button>
+                        </div>
                         <div class="level-number">05</div>
                         <h3 class="level-title">Copilot</h3>
                         <p class="level-description">Byte Man Copilot Grundlagen</p>
-                        <div class="level-status">Kein Rang</div>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
                     </a>
 
-                    <a href="#" class="level-card level-6 available" style="text-decoration: none; color: inherit;">
-                        <img src="Kursbilder LES/05.png" alt="Advanced Prompting" class="level-thumbnail">
+                    <a href="#" class="level-card level-6 available" style="text-decoration: none; color: inherit;" data-level="level7">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/05.png" alt="Advanced Prompting" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/05.png')" title="Vollbild">⛶</button>
+                        </div>
                         <div class="level-number">06</div>
                         <h3 class="level-title">Advanced Prompting</h3>
                         <p class="level-description">Fortgeschrittene Prompt-Techniken</p>
-                        <div class="level-status">Kein Rang</div>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
                     </a>
 
-                    <a href="#" class="level-card level-7 available" style="text-decoration: none; color: inherit;">
-                        <img src="Kursbilder LES/04.png" alt="Daten-Spezialist" class="level-thumbnail">
+                    <a href="#" class="level-card level-7 available" style="text-decoration: none; color: inherit;" data-level="level8">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/04.png" alt="Daten-Spezialist" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/04.png')" title="Vollbild">⛶</button>
+                        </div>
                         <div class="level-number">07</div>
                         <h3 class="level-title">Daten-Spezialist</h3>
                         <p class="level-description">Datenanalyse mit KI</p>
-                        <div class="level-status">Kein Rang</div>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
                     </a>
 
-                    <a href="#" class="level-card level-8 available" style="text-decoration: none; color: inherit;">
-                        <img src="Kursbilder LES/02.png" alt="Gute Ergebnisse sind kein Zufall" class="level-thumbnail">
+                    <a href="#" class="level-card level-8 available" style="text-decoration: none; color: inherit;" data-level="level9">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/02.png" alt="Gute Ergebnisse sind kein Zufall" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/02.png')" title="Vollbild">⛶</button>
+                        </div>
                         <div class="level-number">08</div>
                         <h3 class="level-title">Gute Ergebnisse sind kein Zufall</h3>
                         <p class="level-description">Systematische Prompt-Optimierung</p>
-                        <div class="level-status">Kein Rang</div>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
                     </a>
 
-                    <a href="#" class="level-card level-9 available" style="text-decoration: none; color: inherit;">
-                        <img src="Kursbilder LES/08.png" alt="KI für Dich!" class="level-thumbnail">
+                    <a href="#" class="level-card level-9 available" style="text-decoration: none; color: inherit;" data-level="level10">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/08.png" alt="KI für Dich!" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/08.png')" title="Vollbild">⛶</button>
+                        </div>
                         <div class="level-number">09</div>
                         <h3 class="level-title">KI für Dich!</h3>
                         <p class="level-description">Mache jede KI zu deiner!</p>
-                        <div class="level-status">Kein Rang</div>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
+                    </a>
+
+                    <a href="#" class="level-card level-10 mystery locked" style="text-decoration: none; color: inherit;" data-level="level11">
+                        <div class="thumbnail-container">
+                            <div class="mystery-thumbnail">?</div>
+                        </div>
+                        <div class="level-number">10</div>
+                        <h3 class="level-title">???</h3>
+                        <p class="level-description">Das ultimative Level wartet auf dich!</p>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">🔒 Noch 4500 Punkte benötigt</div>
+                        </div>
                     </a>
                 </div>
             </section>
@@ -134,7 +220,7 @@
         </div>
 
         <footer class="footer">
-            <p>&copy; 2025 Digital Factory Campus - AI-Bytes</p>
+            <p>&copy; 2026 AI Bytes</p>
         </footer>
     </div>
 
@@ -223,6 +309,81 @@
                     <h4 class="category-title hard-title">🔴 Hard</h4>
                     <div class="achievements-grid" id="hardAchievements"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rank Legend Popup -->
+    <div id="rankLegendPopup" class="popup-overlay">
+        <div class="popup-content rank-legend-popup">
+            <div class="popup-header">
+                <h3>Rang-Legende</h3>
+                <button class="close-btn" onclick="closeRankLegend()">✕</button>
+            </div>
+            <div class="rank-legend-container">
+                <div class="rank-legend-item no-rank">
+                    <div class="rank-legend-icon">⭐</div>
+                    <div class="rank-legend-info">
+                        <div class="rank-legend-name">Kein Rang</div>
+                        <div class="rank-legend-requirement">0 - 899 Punkte</div>
+                    </div>
+                </div>
+
+                <div class="rank-legend-item apprentice">
+                    <div class="rank-legend-icon">🎓</div>
+                    <div class="rank-legend-info">
+                        <div class="rank-legend-name">Prompt-Lehrling</div>
+                        <div class="rank-legend-requirement">900 - 1799 Punkte</div>
+                    </div>
+                </div>
+
+                <div class="rank-legend-item enthusiast">
+                    <div class="rank-legend-icon">🌟</div>
+                    <div class="rank-legend-info">
+                        <div class="rank-legend-name">KI-Enthusiast</div>
+                        <div class="rank-legend-requirement">1800 - 2999 Punkte</div>
+                    </div>
+                </div>
+
+                <div class="rank-legend-item expert">
+                    <div class="rank-legend-icon">⚡</div>
+                    <div class="rank-legend-info">
+                        <div class="rank-legend-name">AI-Experte</div>
+                        <div class="rank-legend-requirement">3000 - 4499 Punkte</div>
+                    </div>
+                </div>
+
+                <div class="rank-legend-item champion">
+                    <div class="rank-legend-icon">🏆</div>
+                    <div class="rank-legend-info">
+                        <div class="rank-legend-name">AI-Bytes Champion</div>
+                        <div class="rank-legend-requirement">4500 Punkte (Maximum!)</div>
+                    </div>
+                </div>
+
+                <div class="rank-legend-note">
+                    <p>Sammle Punkte in allen 9 Leveln, um höhere Ränge zu erreichen!</p>
+                    <p>Jedes Level hat maximal 500 Punkte.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Popup -->
+    <div id="calendarPopup" class="popup-overlay">
+        <div class="popup-content calendar-popup">
+            <div class="popup-header">
+                <h3>📅 AI-Bytes Kalender</h3>
+                <button class="close-btn" onclick="closeCalendar()">✕</button>
+            </div>
+            <div class="calendar-container">
+                <p class="calendar-description">
+                    Lade das Kalenderelement herunter und füge es mit einem Klick zu deinem Kalender hinzu.
+                    So ist Freitags automatisch Zeit für AI Bytes geblockt. Dein Zukunfts-Ich wird es dir danken.
+                </p>
+                <button class="download-calendar-btn" onclick="downloadCalendar()">
+                    📥 Kalender herunterladen
+                </button>
             </div>
         </div>
     </div>
