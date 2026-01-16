@@ -7,11 +7,6 @@ const CONFIG = {
         TXP_TALK: 'TXP/TXP_Talk_Pose/',
         TXP_LAUF: 'TXP/TXP_Lauf_Pose/',
         TXP_SPRUNG: 'TXP/TXP_Sprung_Pose/'
-    },
-    ACHIEVEMENTS: {
-        M_KEY_TARGET: 30,
-        ANIMATOR_TARGET: 6,
-        GOLD_RANK_TARGET: 1
     }
 };
 
@@ -23,9 +18,7 @@ const GameState = {
         // Cached DOM elements
         container: null,
         mainTitle: null,
-        levelsTitle: null,
-        settingsPopup: null,
-        achievementsPopup: null
+        levelsTitle: null
     }
 };
 
@@ -36,8 +29,6 @@ function initDOMCache() {
     GameState.dom.container = document.querySelector('.container');
     GameState.dom.mainTitle = document.querySelector('.main-title');
     GameState.dom.levelsTitle = document.querySelector('.levels-title');
-    GameState.dom.settingsPopup = document.getElementById('settingsPopup');
-    GameState.dom.achievementsPopup = document.getElementById('achievementsPopup');
 }
 
 // Settings popup functionality
@@ -60,9 +51,27 @@ function closeSettings() {
 // Calendar popup functionality
 function openCalendar() {
     const calendarPopup = document.getElementById('calendarPopup');
+    const calendarBtn = document.querySelector('.calendar-btn');
+
     if (calendarPopup) {
         calendarPopup.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+    }
+
+    // Stop blinking and save that user has clicked
+    if (calendarBtn) {
+        calendarBtn.classList.remove('blink');
+        localStorage.setItem('calendarClicked', 'true');
+    }
+}
+
+// Initialize calendar button blink
+function initCalendarBlink() {
+    const calendarBtn = document.querySelector('.calendar-btn');
+    const hasClicked = localStorage.getItem('calendarClicked');
+
+    if (calendarBtn && !hasClicked) {
+        calendarBtn.classList.add('blink');
     }
 }
 
@@ -204,15 +213,9 @@ function changeBackground(backgroundName) {
     }
 }
 
-// Load saved background on page load
+// Load background on page load - always use Til 1.png
 function loadSavedBackground() {
-    const savedBackground = localStorage.getItem('selectedBackground');
-    if (savedBackground) {
-        changeBackground(savedBackground);
-    } else {
-        // Set default to Til 1.png
-        changeBackground('Til 1.png');
-    }
+    changeBackground('Til 1.png');
 }
 
 // Close popup when clicking outside
@@ -286,9 +289,9 @@ function updateTotalProgress() {
     // Update progress bar
     const progressFill = document.getElementById('totalProgressFill');
     const progressText = document.getElementById('totalProgressText');
+    const percentage = Math.min((totalPoints / 4500) * 100, 100);
 
     if (progressFill && progressText) {
-        const percentage = Math.min((totalPoints / 4500) * 100, 100);
         progressFill.style.width = percentage + '%';
         progressText.textContent = `${totalPoints}/4500 Punkte`;
     }
@@ -297,6 +300,7 @@ function updateTotalProgress() {
     const rankBadge = document.getElementById('totalRankBadge');
     const rankIcon = document.querySelector('.total-rank-icon');
     const rankText = document.getElementById('totalRankText');
+    const rankBadgeWrapper = document.getElementById('rankBadgeWrapper');
 
     if (rankBadge && rankIcon && rankText) {
         const rankInfo = calculateTotalRank(totalPoints);
@@ -310,6 +314,14 @@ function updateTotalProgress() {
         // Update icon and text
         rankIcon.textContent = rankInfo.icon;
         rankText.textContent = rankInfo.rank;
+    }
+
+    // Position rank badge above current progress
+    if (rankBadgeWrapper) {
+        // Ensure minimum position so badge doesn't go off-screen on the left
+        const minPercentage = 8;
+        const positionPercentage = Math.max(percentage, minPercentage);
+        rankBadgeWrapper.style.left = positionPercentage + '%';
     }
 }
 
@@ -650,17 +662,10 @@ const EventHandlers = {
 };
 
 function initEventListeners() {
-    // Key down handler
+    // Key down handler (M key easter egg preserved)
     EventHandlers.keydown = function(event) {
-        // Track M key presses for achievement
         if (event.key.toLowerCase() === 'm') {
-            achievementData.mKeyPresses++;
-            const keymasterAchievement = achievements.easy.find(a => a.id === 'keymaster');
-            if (keymasterAchievement) {
-                keymasterAchievement.progress = achievementData.mKeyPresses;
-                saveAchievements();
-                checkAchievement('keymaster');
-            }
+            // M key pressed - easter egg trigger point
         }
     };
 
@@ -690,8 +695,10 @@ function initializeGame() {
         // Load saved data
         loadSavedBackground();
         loadLevelRanks();
-        loadAchievements();
         updateMysteryLevel();
+
+        // Initialize calendar blink
+        initCalendarBlink();
 
         // Initialize logo easter egg
         initializeLogoAnimation();
@@ -722,16 +729,6 @@ function triggerRandomLogoAnimation() {
     ];
 
     const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
-
-    // Track animation for achievement
-    achievementData.viewedAnimations.add(randomAnimation);
-    const animatorAchievement = achievements.easy.find(a => a.id === 'animator');
-    if (animatorAchievement) {
-        animatorAchievement.viewedAnimations.add(randomAnimation);
-        animatorAchievement.progress = animatorAchievement.viewedAnimations.size;
-        saveAchievements();
-        checkAchievement('animator');
-    }
 
     // Prevent rapid clicking
     const logoContainer = document.querySelector('.logo-container');
@@ -1064,271 +1061,6 @@ document.addEventListener('keydown', function(event) {
         matrixRainAnimation();
     }
 });
-
-// ===============================
-//   ACHIEVEMENT SYSTEM
-// ===============================
-const achievements = {
-    easy: [
-        {
-            id: 'keymaster',
-            name: 'Tastenmeister',
-            description: `Drücke ${CONFIG.ACHIEVEMENTS.M_KEY_TARGET}x die "M" Taste`,
-            icon: '⌨️',
-            progress: 0,
-            target: CONFIG.ACHIEVEMENTS.M_KEY_TARGET,
-            unlocked: false
-        },
-        {
-            id: 'animator',
-            name: 'Animationsexperte',
-            description: 'Sieh alle Logo-Animationen',
-            icon: '🎬',
-            progress: 0,
-            target: CONFIG.ACHIEVEMENTS.ANIMATOR_TARGET,
-            unlocked: false,
-            viewedAnimations: new Set()
-        }
-    ],
-    normal: [
-        {
-            id: 'goldrank',
-            name: 'Goldmeister',
-            description: 'Erreiche deinen ersten Gold-Rang',
-            icon: '🏆',
-            progress: 0,
-            target: CONFIG.ACHIEVEMENTS.GOLD_RANK_TARGET,
-            unlocked: false
-        },
-    ],
-    hard: [
-        {
-            id: 'survivor',
-            name: 'Überlebenskünstler',
-            description: 'Überlebe 300 Sekunden in Level 4',
-            icon: '⏱️',
-            progress: 0,
-            target: 300,
-            unlocked: false
-        }
-    ]
-};
-
-let achievementData = {
-    mKeyPresses: 0,
-    viewedAnimations: new Set(),
-    hasGoldRank: false,
-    level4MaxTime: 0
-};
-
-// Load achievements from localStorage
-function loadAchievements() {
-    const saved = localStorage.getItem('aiBytes_achievements');
-    if (saved) {
-        const data = JSON.parse(saved);
-
-        // Merge saved data with default structure
-        for (let category in achievements) {
-            achievements[category].forEach(achievement => {
-                const savedAchievement = data[category]?.find(a => a.id === achievement.id);
-                if (savedAchievement) {
-                    achievement.progress = savedAchievement.progress || 0;
-                    achievement.unlocked = savedAchievement.unlocked || false;
-                    if (achievement.viewedAnimations && savedAchievement.viewedAnimations) {
-                        achievement.viewedAnimations = new Set(savedAchievement.viewedAnimations);
-                    }
-                }
-            });
-        }
-    }
-
-    const savedData = localStorage.getItem('aiBytes_achievementData');
-    if (savedData) {
-        const data = JSON.parse(savedData);
-        achievementData.mKeyPresses = data.mKeyPresses || 0;
-        achievementData.viewedAnimations = new Set(data.viewedAnimations || []);
-        achievementData.hasGoldRank = data.hasGoldRank || false;
-        achievementData.level4MaxTime = data.level4MaxTime || 0;
-    }
-}
-
-// Save achievements to localStorage
-function saveAchievements() {
-    const saveData = {};
-    for (let category in achievements) {
-        saveData[category] = achievements[category].map(achievement => ({
-            id: achievement.id,
-            progress: achievement.progress,
-            unlocked: achievement.unlocked,
-            viewedAnimations: achievement.viewedAnimations ? Array.from(achievement.viewedAnimations) : undefined
-        }));
-    }
-    localStorage.setItem('aiBytes_achievements', JSON.stringify(saveData));
-
-    localStorage.setItem('aiBytes_achievementData', JSON.stringify({
-        mKeyPresses: achievementData.mKeyPresses,
-        viewedAnimations: Array.from(achievementData.viewedAnimations),
-        hasGoldRank: achievementData.hasGoldRank,
-        level4MaxTime: achievementData.level4MaxTime
-    }));
-}
-
-// Check and unlock achievements
-function checkAchievement(achievementId) {
-    let achievement = null;
-    let category = null;
-
-    for (let cat in achievements) {
-        const found = achievements[cat].find(a => a.id === achievementId);
-        if (found) {
-            achievement = found;
-            category = cat;
-            break;
-        }
-    }
-
-    if (!achievement || achievement.unlocked) return;
-
-    if (achievement.progress >= achievement.target) {
-        achievement.unlocked = true;
-        showAchievementUnlock(achievement, category);
-        saveAchievements();
-    }
-}
-
-// Show achievement unlock animation
-function showAchievementUnlock(achievement, category) {
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: linear-gradient(145deg, var(--indigo), var(--persian-blue));
-        border: 3px solid var(--saffron);
-        border-radius: 20px;
-        padding: 30px;
-        text-align: center;
-        z-index: 10000;
-        color: white;
-        font-family: 'Ithaca', serif;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-        backdrop-filter: blur(20px);
-        animation: achievementPop 6s ease-out forwards;
-        min-width: 350px;
-    `;
-
-    notification.innerHTML = `
-        <div style="font-size: 3rem; margin-bottom: 15px;">${achievement.icon}</div>
-        <div style="font-size: 1.5rem; color: var(--saffron); margin-bottom: 10px;">Achievement Unlocked!</div>
-        <div style="font-size: 1.2rem; margin-bottom: 8px;">${achievement.name}</div>
-        <div style="color: var(--maya-blue); font-size: 0.9rem; text-transform: uppercase;">${category}</div>
-        <div style="color: var(--maya-blue); font-size: 0.9rem; margin-top: 5px;">${achievement.description}</div>
-    `;
-
-    document.body.appendChild(notification);
-
-    // Confetti effect
-    createConfettiEffect();
-
-    setTimeout(() => {
-        notification.remove();
-    }, 6000);
-}
-
-// Create confetti effect for achievement unlock
-function createConfettiEffect() {
-    for (let i = 0; i < 50; i++) {
-        setTimeout(() => {
-            const confetti = document.createElement('div');
-            confetti.style.cssText = `
-                position: fixed;
-                width: 10px;
-                height: 10px;
-                background: ${['#A86AFF', '#67C7FF', '#F5C03B', '#FF4500'][Math.floor(Math.random() * 4)]};
-                top: 30%;
-                left: ${50 + (Math.random() - 0.5) * 20}%;
-                z-index: 9999;
-                animation: confettiFall 2s ease-out forwards;
-                transform: rotate(${Math.random() * 360}deg);
-            `;
-            document.body.appendChild(confetti);
-
-            setTimeout(() => confetti.remove(), 2000);
-        }, i * 20);
-    }
-}
-
-// Achievement popup functions
-function openAchievements() {
-    document.getElementById('achievementsPopup').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    renderAchievements();
-}
-
-function closeAchievements() {
-    document.getElementById('achievementsPopup').style.display = 'none';
-    document.body.style.overflow = 'auto';
-}
-
-function renderAchievements() {
-    for (let category in achievements) {
-        const container = document.getElementById(`${category}Achievements`);
-        if (!container) continue;
-
-        container.innerHTML = '';
-
-        achievements[category].forEach(achievement => {
-            const card = document.createElement('div');
-            card.className = `achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}`;
-
-            let progressText = '';
-            if (!achievement.unlocked) {
-                progressText = `<div class="achievement-progress">${achievement.progress}/${achievement.target}</div>`;
-            } else {
-                progressText = '<div class="achievement-progress">✓ Unlocked</div>';
-            }
-
-            card.innerHTML = `
-                <div class="achievement-icon">${achievement.icon}</div>
-                <div class="achievement-name">${achievement.name}</div>
-                <div class="achievement-description">${achievement.description}</div>
-                ${progressText}
-            `;
-
-            container.appendChild(card);
-        });
-    }
-}
-
-function resetAllAchievements() {
-    if (confirm('Möchtest du wirklich alle Achievements zurücksetzen? Dies kann nicht rückgängig gemacht werden.')) {
-        // Reset all achievements
-        for (let category in achievements) {
-            achievements[category].forEach(achievement => {
-                achievement.progress = 0;
-                achievement.unlocked = false;
-                if (achievement.viewedAnimations) {
-                    achievement.viewedAnimations.clear();
-                }
-            });
-        }
-
-        // Reset achievement data
-        achievementData.mKeyPresses = 0;
-        achievementData.viewedAnimations.clear();
-        achievementData.hasGoldRank = false;
-        achievementData.level4MaxTime = 0;
-
-        // Save reset achievements
-        saveAchievements();
-
-        // Re-render achievements
-        renderAchievements();
-
-        alert('Alle Achievements wurden zurückgesetzt!');
-    }
-}
 
 // ===============================
 //   TXP Character Animation

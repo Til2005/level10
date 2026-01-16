@@ -1194,12 +1194,12 @@ class GameManager {
             this.bestStreak = this.streak;
         }
 
-        // Calculate points (with streak multiplier)
+        // Calculate points (with streak multiplier, max 10 points)
         let points = 5;
-        if (this.streak >= 5) points *= 2;
-        if (this.streak >= 10) points *= 1.5;
+        if (this.streak >= 5) points = 10; // Streak bonus: max 10 points
 
-        this.score += points;
+        // Add points but cap at 100
+        this.score = Math.min(100, this.score + points);
         this.updateHUD();
 
         // Show success feedback
@@ -1508,8 +1508,10 @@ function hideUnlockRequirementPopup() {
 
 function confirmReset() {
     if (window.game) {
-        // Reset progress but keep points
+        // Reset progress but keep total points for rank
         window.game.completedChallenges = [];
+        window.game.challengeScores = {}; // Reset individual challenge scores to lock challenges
+        // Keep totalPoints for rank display
         window.game.saveProgress();
         window.game.updateLevelSelectUI();
         hideResetConfirmation();

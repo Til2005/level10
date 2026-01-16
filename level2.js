@@ -79,7 +79,7 @@ const CHALLENGE_DATA = {
         description: "Verwende Bedingungen um den Flow zu steuern",
         task: "Verarbeite eingehende Formulare automatisch und sorge dafür, dass sie basierend auf einer Prüfung genehmigt oder abgelehnt werden",
         blocks: [
-            { id: "trigger-form", icon: "📝", title: "Formular gesendet", description: "Trigger: Neues Formular", type: "trigger", puzzleType: "horizontal" },
+            { id: "trigger-form", icon: "📝", title: "Formular erhalten", description: "Trigger: Neues Formular", type: "trigger", puzzleType: "horizontal" },
             { id: "action-check-data", icon: "🔍", title: "Daten prüfen", description: "Aktion: Ja/Nein-Entscheidung ermitteln", type: "action", puzzleType: "horizontal" },
             { id: "condition-check", icon: "❓", title: "Bedingung", description: "Bedingung: Wert prüfen", type: "condition", puzzleType: "branch" },
             { id: "action-approve", icon: "✅", title: "Genehmigen", description: "Aktion: Genehmigen (Wenn ja)", type: "action", puzzleType: "vertical" },
@@ -303,7 +303,7 @@ class TXPAssistant {
 
     showSuccessMessage(message) {
         this.isInTutorialMode = false;
-        this.tutorialMessages = [];
+        // Keep tutorialMessages so user can still click TXP to replay tutorial
         this.currentMessageIndex = 0;
         this.showSpeech(message, false); // No continue hint for success messages
     }
@@ -1053,7 +1053,6 @@ class DragDropManager {
             const messages = [
                 "Du magst diesen Block wohl besonders! 😉",
                 "Dieser Block gefällt dir, oder? 🤔",
-                "Vielleicht probierst du mal einen anderen Block? 😄",
                 "Okay, ich habe verstanden - das ist dein Lieblingsblock! ❤️"
             ];
             const randomMessage = messages[Math.floor(Math.random() * messages.length)];
@@ -1560,6 +1559,18 @@ class PowerAutomateGame {
         if (challengeNum === 1) {
             this.showTutorial();
         }
+
+        // For Challenge 2, show TXP hint popup
+        if (challengeNum === 2) {
+            this.showTxpHintPopup();
+        }
+    }
+
+    showTxpHintPopup() {
+        const popup = document.getElementById('txpHintPopup');
+        if (popup) {
+            popup.style.display = 'flex';
+        }
     }
 
     createPuzzleBlockElement(blockData) {
@@ -1795,30 +1806,91 @@ class PowerAutomateGame {
 
         flowVisualization.innerHTML = '';
 
-        const placedSequence = this.dragDropManager.getPlacedSequence();
         const challengeData = CHALLENGE_DATA[this.currentChallenge];
+        const connections = challengeData.correctConnections;
 
-        placedSequence.forEach((blockId, index) => {
+        // Build flow based on connections
+        // Find the starting block (trigger - not a target of any connection)
+        const allTargets = connections.map(c => c.to);
+        const startBlockId = connections.find(c => !allTargets.includes(c.from))?.from;
+
+        if (!startBlockId) return;
+
+        // Helper to create a step element
+        const createStep = (blockId) => {
             const blockData = challengeData.blocks.find(b => b.id === blockId);
-            if (!blockData) return;
+            if (!blockData) return null;
 
-            // Create flow step
             const stepElement = document.createElement('div');
             stepElement.className = 'flow-step';
             stepElement.innerHTML = `
                 <div class="flow-step-icon">${blockData.icon}</div>
                 <div class="flow-step-text">${blockData.title}</div>
             `;
-            flowVisualization.appendChild(stepElement);
+            return stepElement;
+        };
 
-            // Add arrow between steps
-            if (index < placedSequence.length - 1) {
-                const arrow = document.createElement('div');
-                arrow.className = 'flow-arrow';
-                arrow.textContent = '⬇';
-                flowVisualization.appendChild(arrow);
+        // Helper to create arrow
+        const createArrow = (text = '⬇') => {
+            const arrow = document.createElement('div');
+            arrow.className = 'flow-arrow';
+            arrow.textContent = text;
+            return arrow;
+        };
+
+        // Traverse the flow
+        let currentBlockId = startBlockId;
+        while (currentBlockId) {
+            const stepElement = createStep(currentBlockId);
+            if (stepElement) {
+                flowVisualization.appendChild(stepElement);
             }
-        });
+
+            // Find connections from current block
+            const outgoingConnections = connections.filter(c => c.from === currentBlockId);
+
+            if (outgoingConnections.length === 0) {
+                // End of flow
+                break;
+            } else if (outgoingConnections.length === 1 && outgoingConnections[0].direction === 'horizontal') {
+                // Linear connection
+                flowVisualization.appendChild(createArrow());
+                currentBlockId = outgoingConnections[0].to;
+            } else if (outgoingConnections.length >= 2) {
+                // Branch - show both paths side by side
+                const topConnection = outgoingConnections.find(c => c.direction === 'vertical-top');
+                const bottomConnection = outgoingConnections.find(c => c.direction === 'vertical-bottom');
+
+                if (topConnection && bottomConnection) {
+                    // Create branch visualization
+                    const branchContainer = document.createElement('div');
+                    branchContainer.className = 'flow-branch-container';
+
+                    // Yes path
+                    const yesPath = document.createElement('div');
+                    yesPath.className = 'flow-branch-path';
+                    yesPath.innerHTML = '<div class="flow-branch-label">✓ Ja</div>';
+                    const yesStep = createStep(topConnection.to);
+                    if (yesStep) yesPath.appendChild(yesStep);
+
+                    // No path
+                    const noPath = document.createElement('div');
+                    noPath.className = 'flow-branch-path';
+                    noPath.innerHTML = '<div class="flow-branch-label">✗ Nein</div>';
+                    const noStep = createStep(bottomConnection.to);
+                    if (noStep) noPath.appendChild(noStep);
+
+                    branchContainer.appendChild(yesPath);
+                    branchContainer.appendChild(noPath);
+
+                    flowVisualization.appendChild(createArrow('↙  ↘'));
+                    flowVisualization.appendChild(branchContainer);
+                }
+                break; // End after branch
+            } else {
+                break;
+            }
+        }
     }
 
     updateHUD() {
@@ -1977,6 +2049,13 @@ function closeTutorial() {
     const txpOverlay = document.getElementById('txpIntroOverlay');
     if (txpOverlay) {
         txpOverlay.style.display = 'none';
+    }
+}
+
+function closeTxpHint() {
+    const popup = document.getElementById('txpHintPopup');
+    if (popup) {
+        popup.style.display = 'none';
     }
 }
 

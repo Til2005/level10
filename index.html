@@ -10,34 +10,30 @@
     <div class="container">
         <header class="header">
             <div class="header-buttons">
-                <button class="achievements-btn" onclick="openAchievements()">🏆</button>
                 <button class="calendar-btn" onclick="openCalendar()">📅</button>
-                <button class="settings-btn" onclick="openSettings()">⚙️</button>
             </div>
             <div class="logo-container">
                 <img src="logo_horizontal_dark.png" alt="AI Bytes Logo" class="logo logo-dark">
                 <img src="logo_horizontal_white.png" alt="AI Bytes Logo" class="logo logo-white">
             </div>
+            <div class="intro-text">
+                <p>Auf dieser Seite findest du die Level von AI Bytes.</p>
+                <p>Jedes Level ist ein kurzes Training, das zeigt, wie KI funktioniert und deinen Arbeitsalltag erleichtert.</p>
+                <p>Die Level haben keine feste Reihenfolge. Wähle was dich interessiert, sammle Punkte und werde zum KI-Experten.</p>
+            </div>
         </header>
 
         <main class="main">
             <section class="levels">
-                <div class="levels-header">
-                    <h2 class="levels-title">
-                        <span data-index="20">W</span><span data-index="21">ä</span><span data-index="22">h</span><span data-index="23">l</span><span data-index="24">e</span>
-                        <span class="space"> </span>
-                        <span data-index="25">d</span><span data-index="26">e</span><span data-index="27">i</span><span data-index="28">n</span>
-                        <span class="space"> </span>
-                        <span data-index="29">L</span><span data-index="30">e</span><span data-index="31">v</span><span data-index="32">e</span><span data-index="33">l</span>
-                    </h2>
-                    <div class="total-rank-badge" id="totalRankBadge" onclick="openRankLegend()" title="Klicke für Rang-Legende">
-                        <span class="total-rank-icon">⭐</span>
-                        <span class="total-rank-text" id="totalRankText">Kein Rang</span>
-                    </div>
-                </div>
-
-                <!-- Total Progress Display -->
+                <!-- Total Progress Display with Dynamic Rank Badge -->
                 <div class="total-progress-container">
+                    <div class="rank-badge-wrapper" id="rankBadgeWrapper">
+                        <div class="total-rank-badge" id="totalRankBadge" onclick="openRankLegend()" title="Klicke für Rang-Legende">
+                            <span class="total-rank-icon">⭐</span>
+                            <span class="total-rank-text" id="totalRankText">Kein Rang</span>
+                        </div>
+                        <div class="rank-arrow">▼</div>
+                    </div>
                     <div class="total-progress-bar-wrapper">
                         <div class="total-progress-bar">
                             <div class="total-progress-fill" id="totalProgressFill" data-progress="0"></div>
@@ -47,14 +43,14 @@
                 </div>
 
                 <div class="level-grid">
-                    <a href="level5.html" class="level-card level-1 available" style="text-decoration: none; color: inherit;" data-level="level5">
+                    <!-- 01: Nicht suchen, Prompten! -->
+                    <a href="https://360.articulate.com/review/content/910eacb4-96cb-4a9f-92cb-49d02b6303a3/review" target="_blank" class="level-card level-1 available" style="text-decoration: none; color: inherit;" data-level="level1">
                         <div class="thumbnail-container">
-                            <img src="Kursbilder LES/02 (2).png" alt="Schummeln erlaubt" class="level-thumbnail">
-                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/02 (2).png')" title="Vollbild">⛶</button>
+                            <img src="Kursbilder LES/01.png" alt="Nicht suchen, Prompten!" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/01.png')" title="Vollbild">⛶</button>
                         </div>
-                        <div class="level-number">01</div>
-                        <h3 class="level-title">Schummeln erlaubt</h3>
-                        <p class="level-description">Interaktives Training mit Prompt-Bausteinen</p>
+                        <span class="level-info" data-tooltip="Mit starken Prompts und dem richtigen Kontext lernst du in diesem Level, wie du das Beste aus Chatbots herausholst.">ℹ</span>
+                        <h3 class="level-title">Nicht suchen, sondern Prompten!</h3>
                         <div class="level-progress-container">
                             <div class="level-progress-bar">
                                 <div class="level-progress-fill" data-progress="0"></div>
@@ -63,14 +59,14 @@
                         </div>
                     </a>
 
+                    <!-- 02: Auch Bilder sind kein Problem -->
                     <a href="level4.html" class="level-card level-2 available" style="text-decoration: none; color: inherit;" data-level="level4">
                         <div class="thumbnail-container">
                             <img src="Kursbilder LES/06.png" alt="Auch Bilder sind kein Problem" class="level-thumbnail">
                             <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/06.png')" title="Vollbild">⛶</button>
                         </div>
-                        <div class="level-number">02</div>
-                        <h3 class="level-title">Auch Bilder sind kein Problem</h3>
-                        <p class="level-description">Meistere KI-Bildverarbeitung und Prompts</p>
+                        <span class="level-info" data-tooltip="Von Qualitätssicherung bis Kreativität zeigt dieses Level, wie KI mit Bilddaten arbeitet, Wissen aus Bildern gewinnt und generative Bild-KI im Alltag unterstützt.">ℹ</span>
+                        <h3 class="level-title">Wenn Bilder mitarbeiten</h3>
                         <div class="level-progress-container">
                             <div class="level-progress-bar">
                                 <div class="level-progress-fill" data-progress="0"></div>
@@ -79,14 +75,14 @@
                         </div>
                     </a>
 
-                    <a href="level1.html" class="level-card level-3 available" style="text-decoration: none; color: inherit;" data-level="level1">
+                    <!-- 03: Daten-Spezialist -->
+                    <a href="#" class="level-card level-3 available" style="text-decoration: none; color: inherit;" data-level="level8">
                         <div class="thumbnail-container">
-                            <img src="Kursbilder LES/01.png" alt="Nicht suchen, Prompten!" class="level-thumbnail">
-                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/01.png')" title="Vollbild">⛶</button>
+                            <img src="Kursbilder LES/04.png" alt="Daten-Spezialist" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/04.png')" title="Vollbild">⛶</button>
                         </div>
-                        <div class="level-number">03</div>
-                        <h3 class="level-title">Nicht suchen, Prompten!</h3>
-                        <p class="level-description">Lerne die Grundlagen des richtigen Promptens</p>
+                        <span class="level-info" data-tooltip="In diesem Level geht es darum, wie Datendemokratisierung funktioniert und wie ein Prompt-Spickzettel dir hilft, Ergebnisse gezielt abzufragen und richtig zu nutzen.">ℹ</span>
+                        <h3 class="level-title">Abkürzung statt Umweg, schummeln erlaubt!</h3>
                         <div class="level-progress-container">
                             <div class="level-progress-bar">
                                 <div class="level-progress-fill" data-progress="0"></div>
@@ -95,14 +91,14 @@
                         </div>
                     </a>
 
-                    <a href="level2.html" class="level-card level-4 available" style="text-decoration: none; color: inherit;" data-level="level2">
+                    <!-- 04: KI für Dich! -->
+                    <a href="#" class="level-card level-4 available" style="text-decoration: none; color: inherit;" data-level="level10">
                         <div class="thumbnail-container">
-                            <img src="Kursbilder LES/03.png" alt="Automatisiere deinen Alltag" class="level-thumbnail">
-                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/03.png')" title="Vollbild">⛶</button>
+                            <img src="Kursbilder LES/08.png" alt="KI für Dich!" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/08.png')" title="Vollbild">⛶</button>
                         </div>
-                        <div class="level-number">04</div>
-                        <h3 class="level-title">Automatisiere deinen Alltag</h3>
-                        <p class="level-description">Power Automate für smarte Workflows</p>
+                        <span class="level-info" data-tooltip="Dieses Level erklärt, wie AI Momentum KI im Unternehmen verankert und wie du mit einem einfachen Systemprompt deinen persönlichen KI-Assistenten erstellst.">ℹ</span>
+                        <h3 class="level-title">KI für DICH!</h3>
                         <div class="level-progress-container">
                             <div class="level-progress-bar">
                                 <div class="level-progress-fill" data-progress="0"></div>
@@ -111,14 +107,14 @@
                         </div>
                     </a>
 
+                    <!-- 05: Copilot -->
                     <a href="level6.html" class="level-card level-5 available" style="text-decoration: none; color: inherit;" data-level="level6">
                         <div class="thumbnail-container">
                             <img src="Kursbilder LES/07.png" alt="Copilot" class="level-thumbnail">
                             <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/07.png')" title="Vollbild">⛶</button>
                         </div>
-                        <div class="level-number">05</div>
-                        <h3 class="level-title">Copilot</h3>
-                        <p class="level-description">Byte Man Copilot Grundlagen</p>
+                        <span class="level-info" data-tooltip="Als Teil des digitalen Arbeitsplatzes reduziert Copilot Routine, bündelt Informationen und unterstützt dich direkt in deinen täglichen Tools.">ℹ</span>
+                        <h3 class="level-title">Copilot - Das Upgrade für deinen Arbeitsplatz</h3>
                         <div class="level-progress-container">
                             <div class="level-progress-bar">
                                 <div class="level-progress-fill" data-progress="0"></div>
@@ -127,14 +123,14 @@
                         </div>
                     </a>
 
+                    <!-- 06: Advanced Prompting -->
                     <a href="#" class="level-card level-6 available" style="text-decoration: none; color: inherit;" data-level="level7">
                         <div class="thumbnail-container">
                             <img src="Kursbilder LES/05.png" alt="Advanced Prompting" class="level-thumbnail">
                             <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/05.png')" title="Vollbild">⛶</button>
                         </div>
-                        <div class="level-number">06</div>
+                        <span class="level-info" data-tooltip="Fortgeschrittene Prompt-Techniken und die Frage, wann du welche sinnvoll einsetzt, stehen im Mittelpunkt dieses Levels.">ℹ</span>
                         <h3 class="level-title">Advanced Prompting</h3>
-                        <p class="level-description">Fortgeschrittene Prompt-Techniken</p>
                         <div class="level-progress-container">
                             <div class="level-progress-bar">
                                 <div class="level-progress-fill" data-progress="0"></div>
@@ -143,14 +139,14 @@
                         </div>
                     </a>
 
-                    <a href="#" class="level-card level-7 available" style="text-decoration: none; color: inherit;" data-level="level8">
+                    <!-- 07: Schummeln erlaubt -->
+                    <a href="level5.html" class="level-card level-7 available" style="text-decoration: none; color: inherit;" data-level="level5">
                         <div class="thumbnail-container">
-                            <img src="Kursbilder LES/04.png" alt="Daten-Spezialist" class="level-thumbnail">
-                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/04.png')" title="Vollbild">⛶</button>
+                            <img src="Kursbilder LES/02 (2).png" alt="Schummeln erlaubt" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/02 (2).png')" title="Vollbild">⛶</button>
                         </div>
-                        <div class="level-number">07</div>
-                        <h3 class="level-title">Daten-Spezialist</h3>
-                        <p class="level-description">Datenanalyse mit KI</p>
+                        <span class="level-info" data-tooltip="Statt langer Suchwege durch Ordner, Dateien und Ansprechpartner lernst du hier, wie der DFC-Chatbot Mercedes-Wissen zentral verfügbar macht.">ℹ</span>
+                        <h3 class="level-title">Wenn Mercedes wüsste was Mercedes weiss</h3>
                         <div class="level-progress-container">
                             <div class="level-progress-bar">
                                 <div class="level-progress-fill" data-progress="0"></div>
@@ -159,14 +155,30 @@
                         </div>
                     </a>
 
-                    <a href="#" class="level-card level-8 available" style="text-decoration: none; color: inherit;" data-level="level9">
+                    <!-- 08: Automatisiere deinen Alltag -->
+                    <a href="level2.html" class="level-card level-8 available" style="text-decoration: none; color: inherit;" data-level="level2">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/03.png" alt="Automatisiere deinen Alltag" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/03.png')" title="Vollbild">⛶</button>
+                        </div>
+                        <span class="level-info" data-tooltip="Automatisiere wiederkehrende Aufgaben und spare Zeit im Arbeitsalltag – dieses Level zeigt dir, wie Power Automate dabei hilft.">ℹ</span>
+                        <h3 class="level-title">Automatisiere deinen Alltag</h3>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
+                    </a>
+
+                    <!-- 09: Gute Ergebnisse sind kein Zufall -->
+                    <a href="#" class="level-card level-9 available" style="text-decoration: none; color: inherit;" data-level="level9">
                         <div class="thumbnail-container">
                             <img src="Kursbilder LES/02.png" alt="Gute Ergebnisse sind kein Zufall" class="level-thumbnail">
                             <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/02.png')" title="Vollbild">⛶</button>
                         </div>
-                        <div class="level-number">08</div>
+                        <span class="level-info" data-tooltip="Wie KI im Unternehmen gemeinsam entsteht und warum klare Rollen und guter Kontext entscheidend sind, erfährst du in diesem Level.">ℹ</span>
                         <h3 class="level-title">Gute Ergebnisse sind kein Zufall</h3>
-                        <p class="level-description">Systematische Prompt-Optimierung</p>
                         <div class="level-progress-container">
                             <div class="level-progress-bar">
                                 <div class="level-progress-fill" data-progress="0"></div>
@@ -175,29 +187,12 @@
                         </div>
                     </a>
 
-                    <a href="#" class="level-card level-9 available" style="text-decoration: none; color: inherit;" data-level="level10">
-                        <div class="thumbnail-container">
-                            <img src="Kursbilder LES/08.png" alt="KI für Dich!" class="level-thumbnail">
-                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/08.png')" title="Vollbild">⛶</button>
-                        </div>
-                        <div class="level-number">09</div>
-                        <h3 class="level-title">KI für Dich!</h3>
-                        <p class="level-description">Mache jede KI zu deiner!</p>
-                        <div class="level-progress-container">
-                            <div class="level-progress-bar">
-                                <div class="level-progress-fill" data-progress="0"></div>
-                            </div>
-                            <div class="level-progress-text">0/500 Punkte</div>
-                        </div>
-                    </a>
-
+                    <!-- 10: Mystery Level -->
                     <a href="#" class="level-card level-10 mystery locked" style="text-decoration: none; color: inherit;" data-level="level11">
                         <div class="thumbnail-container">
                             <div class="mystery-thumbnail">?</div>
                         </div>
-                        <div class="level-number">10</div>
                         <h3 class="level-title">???</h3>
-                        <p class="level-description">Das ultimative Level wartet auf dich!</p>
                         <div class="level-progress-container">
                             <div class="level-progress-bar">
                                 <div class="level-progress-fill" data-progress="0"></div>
@@ -224,98 +219,9 @@
         </footer>
     </div>
 
-    <!-- Settings Popup -->
-    <div id="settingsPopup" class="popup-overlay">
-        <div class="popup-content">
-            <div class="popup-header">
-                <h3>Hintergrund auswählen</h3>
-                <button class="close-btn" onclick="closeSettings()">✕</button>
-            </div>
-            <div class="background-grid">
-                <div class="bg-option" onclick="changeBackground('gradient')" data-bg="gradient">
-                    <div class="bg-preview gradient-preview"></div>
-                    <span>Standard Gradient</span>
-                </div>
-                <div class="bg-option" onclick="changeBackground('Key Visual.png')" data-bg="Key Visual.png">
-                    <img src="assets/images/Key Visual.png" alt="Key Visual" class="bg-preview">
-                    <span>Key Visual</span>
-                </div>
-                <div class="bg-option" onclick="changeBackground('Key Visual 01.png')" data-bg="Key Visual 01.png">
-                    <img src="assets/images/Key Visual 01.png" alt="Key Visual 01" class="bg-preview">
-                    <span>Key Visual 01</span>
-                </div>
-                <div class="bg-option" onclick="changeBackground('Key Visual 02.png')" data-bg="Key Visual 02.png">
-                    <img src="assets/images/Key Visual 02.png" alt="Key Visual 02" class="bg-preview">
-                    <span>Key Visual 02</span>
-                </div>
-                <div class="bg-option" onclick="changeBackground('Key Visual 03.png')" data-bg="Key Visual 03.png">
-                    <img src="assets/images/Key Visual 03.png" alt="Key Visual 03" class="bg-preview">
-                    <span>Key Visual 03</span>
-                </div>
-                <div class="bg-option" onclick="changeBackground('Key Visual 04.png')" data-bg="Key Visual 04.png">
-                    <img src="assets/images/Key Visual 04.png" alt="Key Visual 04" class="bg-preview">
-                    <span>Key Visual 04</span>
-                </div>
-                <div class="bg-option" onclick="changeBackground('Key Visual 05.png')" data-bg="Key Visual 05.png">
-                    <img src="assets/images/Key Visual 05.png" alt="Key Visual 05" class="bg-preview">
-                    <span>Key Visual 05</span>
-                </div>
-                <div class="bg-option" onclick="changeBackground('Key Visual_02.png')" data-bg="Key Visual_02.png">
-                    <img src="assets/images/Key Visual_02.png" alt="Key Visual Alt" class="bg-preview">
-                    <span>Key Visual Alt</span>
-                </div>
-                <div class="bg-option" onclick="changeBackground('Key Visual_Farbverlauf.png')" data-bg="Key Visual_Farbverlauf.png">
-                    <img src="assets/images/Key Visual_Farbverlauf.png" alt="Farbverlauf" class="bg-preview">
-                    <span>Farbverlauf</span>
-                </div>
-                <div class="bg-option" onclick="changeBackground('Til 1.png')" data-bg="Til 1.png">
-                    <img src="assets/images/Til 1.png" alt="Til 1" class="bg-preview">
-                    <span>Til 1</span>
-                </div>
-                <div class="bg-option" onclick="changeBackground('Til 2.png')" data-bg="Til 2.png">
-                    <img src="assets/images/Til 2.png" alt="Til 2" class="bg-preview">
-                    <span>Til 2</span>
-                </div>
-                <div class="bg-option" onclick="changeBackground('Til 3.png')" data-bg="Til 3.png">
-                    <img src="assets/images/Til 3.png" alt="Til 3" class="bg-preview">
-                    <span>Til 3</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Achievements Popup -->
-    <div id="achievementsPopup" class="popup-overlay">
-        <div class="popup-content achievements-popup">
-            <div class="popup-header">
-                <h3>Achievements</h3>
-                <div class="header-buttons">
-                    <button class="reset-achievements-btn" onclick="resetAllAchievements()">🔄 Reset</button>
-                    <button class="close-btn" onclick="closeAchievements()">✕</button>
-                </div>
-            </div>
-            <div class="achievements-container">
-                <div class="achievement-category">
-                    <h4 class="category-title easy-title">🟢 Easy</h4>
-                    <div class="achievements-grid" id="easyAchievements"></div>
-                </div>
-
-                <div class="achievement-category">
-                    <h4 class="category-title normal-title">🟡 Normal</h4>
-                    <div class="achievements-grid" id="normalAchievements"></div>
-                </div>
-
-                <div class="achievement-category">
-                    <h4 class="category-title hard-title">🔴 Hard</h4>
-                    <div class="achievements-grid" id="hardAchievements"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Rank Legend Popup -->
-    <div id="rankLegendPopup" class="popup-overlay">
-        <div class="popup-content rank-legend-popup">
+    <div id="rankLegendPopup" class="popup-overlay" onclick="closeRankLegend()">
+        <div class="popup-content rank-legend-popup" onclick="event.stopPropagation()">
             <div class="popup-header">
                 <h3>Rang-Legende</h3>
                 <button class="close-btn" onclick="closeRankLegend()">✕</button>
@@ -370,8 +276,8 @@
     </div>
 
     <!-- Calendar Popup -->
-    <div id="calendarPopup" class="popup-overlay">
-        <div class="popup-content calendar-popup">
+    <div id="calendarPopup" class="popup-overlay" onclick="closeCalendar()">
+        <div class="popup-content calendar-popup" onclick="event.stopPropagation()">
             <div class="popup-header">
                 <h3>📅 AI-Bytes Kalender</h3>
                 <button class="close-btn" onclick="closeCalendar()">✕</button>
