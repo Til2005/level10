@@ -869,6 +869,36 @@ body:has(#introScreen.active) .hud-wrapper {
     color: white;
 }
 
+/* Price Tag - appears when challenge is completed */
+.challenge-price-tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(135deg, var(--saffron), #f5a623);
+    color: var(--russian-blue);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(245, 192, 59, 0.5);
+    z-index: 10;
+    animation: priceTagPop 0.5s ease-out;
+}
+
+@keyframes priceTagPop {
+    0% {
+        transform: scale(0) rotate(-10deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1) rotate(5deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
 .challenge-icon {
     font-size: 56px;
     margin: 10px 0;
@@ -1098,11 +1128,35 @@ body:has(#introScreen.active) .hud-wrapper {
 #editorScreen.active {
     display: grid;
     grid-template-columns: 320px 1fr;
-    grid-template-rows: 1fr;
+    grid-template-rows: auto 1fr;
     gap: 20px;
     padding: 20px;
     align-items: stretch;
     justify-content: stretch;
+}
+
+/* Editor Back Button (Top) */
+.editor-back-btn {
+    grid-column: 1 / -1;
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: 2px solid #67C7FF;
+    background: rgba(103, 199, 255, 0.1);
+    color: #67C7FF;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    width: fit-content;
+    justify-self: start;
+}
+
+.editor-back-btn:hover {
+    background: #67C7FF;
+    color: white;
+    transform: translateX(-5px);
+    box-shadow: 0 4px 15px rgba(103, 199, 255, 0.4);
 }
 
 /* TXP Intro Overlay - darkens screen while TXP talks */
@@ -2132,4 +2186,61 @@ body:has(#introScreen.active) .hud-wrapper {
 .complete-content::-webkit-scrollbar-thumb:hover,
 .level-select-container::-webkit-scrollbar-thumb:hover {
     background: var(--primary-color);
+}
+
+/* Scroll Arrow */
+.scroll-arrow {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: default;
+    z-index: 1000;
+    user-select: none;
+}
+
+.scroll-arrow::before {
+    content: '⬇';
+    font-size: 48px;
+    color: var(--saffron);
+    text-shadow:
+        0 0 10px rgba(245, 192, 59, 0.8),
+        0 0 20px rgba(245, 192, 59, 0.5);
+    display: block;
+}
+
+.scroll-arrow.active::before {
+    animation: bounceArrow 2s ease-in-out infinite;
+}
+
+.scroll-arrow:hover::before {
+    filter: brightness(1.3);
+}
+
+.scroll-arrow::after {
+    content: 'Scrolle nach unten um mit dem Kurs fortzufahren';
+    position: fixed;
+    bottom: 75px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--saffron);
+    white-space: nowrap;
+    text-shadow:
+        0 0 10px rgba(245, 192, 59, 0.8),
+        0 0 20px rgba(245, 192, 59, 0.5),
+        2px 2px 4px rgba(0, 0, 0, 0.8);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.scroll-arrow:hover::after {
+    opacity: 1;
+}
+
+@keyframes bounceArrow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
 }

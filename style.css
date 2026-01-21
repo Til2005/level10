@@ -1636,18 +1636,21 @@ span.highlighted {
     top: 15px;
     left: 15px;
     z-index: 10;
-    background: rgba(0, 0, 0, 0.5);
-    color: rgba(255, 255, 255, 0.7);
-    border: none;
-    width: 28px;
-    height: 28px;
+    background: linear-gradient(135deg, rgba(168, 106, 255, 0.9), rgba(138, 83, 255, 0.9));
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    font-size: 14px;
+    font-size: 16px;
+    font-weight: bold;
     cursor: help;
     backdrop-filter: blur(5px);
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 4px 15px rgba(168, 106, 255, 0.4);
+    transition: all 0.3s ease;
 }
 
 /* Custom Tooltip for Level Info */
@@ -1657,14 +1660,14 @@ span.highlighted {
     top: 100%;
     left: 0;
     margin-top: 10px;
-    width: 265px;
-    padding: 15px 18px;
+    width: 220px;
+    padding: 12px 15px;
     background: linear-gradient(135deg, rgba(75, 0, 116, 0.95), rgba(60, 58, 165, 0.95));
     border: 2px solid var(--amethyst);
     border-radius: 12px;
     color: white;
-    font-size: 0.9rem;
-    line-height: 1.5;
+    font-size: 0.85rem;
+    line-height: 1.4;
     text-align: left;
     white-space: normal;
     backdrop-filter: blur(15px);
@@ -1686,10 +1689,17 @@ span.highlighted {
 }
 
 .level-info:hover {
-    background: rgba(168, 106, 255, 0.8);
+    background: linear-gradient(135deg, rgba(168, 106, 255, 1), rgba(138, 83, 255, 1));
     color: white;
-    transform: scale(1.1);
+    transform: scale(1.2);
     z-index: 10001;
+    box-shadow: 0 6px 20px rgba(168, 106, 255, 0.6);
+    border-color: white;
+}
+
+/* Level card should be on top when info is hovered */
+.level-card:has(.level-info:hover) {
+    z-index: 10000;
 }
 
 .level-title {

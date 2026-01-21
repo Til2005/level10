@@ -103,12 +103,11 @@ const LEVEL_DATA = {
     2: {
         name: "Zeitfilter",
         difficulty: "Leicht",
-        prompt: "Zeig mir Produktionsdaten im August 2025 als Balkendiagramm für Werk 040",
+        prompt: "Zeig mir Produktionsdaten im August 2025 für Werk 040",
         requiredPieces: [
             { id: "zeig-mir", text: "Zeig mir", type: "good" },
             { id: "produktionsdaten", text: "Produktionsdaten", type: "good" },
             { id: "august-2025", text: "im August 2025", type: "good" },
-            { id: "balkendiagramm", text: "als Balkendiagramm", type: "good" },
             { id: "werk-040", text: "für Werk 040", type: "good" }
         ],
         // Pieces that are already filled from previous level (shown as text, not placeholders)
@@ -141,8 +140,7 @@ const LEVEL_DATA = {
         ],
         promptPieces: [
             // Only NEW pieces to collect in Level 2
-            { x: 1130, y: 230, id: "august-2025", text: "im August 2025", type: "good" },
-            { x: 2800, y: 230, id: "balkendiagramm", text: "als Balkendiagramm", type: "good" },
+            { x: 2800, y: 230, id: "august-2025", text: "im August 2025", type: "good" },
             // Bad pieces
             { x: 1160, y: 520, id: "irgendwann", text: "irgendwann", type: "bad" },
             { x: 1540, y: 520, id: "letzte-woche", text: "letzte Woche", type: "bad" },
@@ -176,7 +174,6 @@ const LEVEL_DATA = {
             { id: "zeig-mir", text: "Zeig mir" },
             { id: "produktionsdaten", text: "Produktionsdaten" },
             { id: "august-2025", text: "im August 2025" },
-            { id: "balkendiagramm", text: "als Balkendiagramm" },
             { id: "werk-040", text: "für Werk 040" }
         ],
         platforms: [
@@ -208,14 +205,14 @@ const LEVEL_DATA = {
         ],
         promptPieces: [
             // Only NEW pieces to collect in Level 3
+            { x: 550, y: 150, id: "balkendiagramm", text: "als Balkendiagramm", type: "good" },
             { x: 1210, y: 150, id: "filtere-farbe", text: "filtere nach Farbe", type: "good" },
             { x: 2800, y: 150, id: "sortiert-menge", text: "sortiert nach Menge", type: "good" },
             // Bad pieces
             { x: 720, y: 520, id: "filter-größe", text: "filtere nach Größe", type: "bad" },
             { x: 1900, y: 520, id: "gruppiere", text: "gruppiere nach", type: "bad" },
             { x: 2650, y: 550, id: "ohne-filter", text: "ohne Filter", type: "bad" },
-            { x: 2950, y: 490, id: "zeig-alles", text: "zeig alles", type: "bad" },
-            { x: 3420, y: 480, id: "unsortiert", text: "unsortiert", type: "bad" }
+            { x: 2950, y: 490, id: "zeig-alles", text: "zeig alles", type: "bad" }
         ],
         signs: [
             // Sign about specificity in prompts
@@ -298,15 +295,15 @@ const LEVEL_DATA = {
         platforms: [
             // === OBERE EBENE - START ===
             // Section 1: Schwierigere Start-Plattformen (zweite weiter links)
-            { x: 0, y: 550, width: 400, height: 40 },
-            { x: 500, y: 550, width: 500, height: 40 },
+            { x: 0, y: 550, width: 500, height: 40 },
+            { x: 600, y: 550, width: 600, height: 40 },
 
             // Section 2: Schwierige Sprünge nach oben (jede zweite entfernt)
-            { x: 1150, y: 530, width: 120, height: 30 },
-            { x: 1480, y: 450, width: 100, height: 30 },
+            { x: 1300, y: 530, width: 180, height: 30 },
+            { x: 1650, y: 450, width: 160, height: 30 },
 
             // Section 3: Abstieg
-            { x: 1780, y: 450, width: 110, height: 30 },
+            { x: 1970, y: 450, width: 170, height: 30 },
 
             // Section 4: Plattform vor dem Fall (mit Pfeil-Markierung)
             { x: 2300, y: 550, width: 550, height: 30 },
@@ -315,15 +312,15 @@ const LEVEL_DATA = {
 
             // === LAVA SEKTION (KOMPLETT GETRENNT - weit rechts) ===
             // Section 5: Lava-Sektion mit langen Plattformen (Start bei x: 10000)
-            { x: 10000, y: 650, width: 350, height: 40, lava: true },
-            { x: 10700, y: 650, width: 600, height: 40, lava: true },
-            { x: 11650, y: 650, width: 600, height: 40, lava: true },
+            { x: 10000, y: 650, width: 450, height: 40, lava: true },
+            { x: 10700, y: 650, width: 700, height: 40, lava: true },
+            { x: 11650, y: 650, width: 700, height: 40, lava: true },
 
             // Section 6: Weniger aber breitere Aufstiegs-Plattformen
-            { x: 12550, y: 600, width: 400, height: 30, lava: true },
-            { x: 13300, y: 550, width: 400, height: 30, lava: true },
-            { x: 14050, y: 500, width: 400, height: 30, lava: true },
-            { x: 14700, y: 450, width: 1000, height: 30, lava: true },
+            { x: 12550, y: 600, width: 500, height: 30, lava: true },
+            { x: 13300, y: 550, width: 500, height: 30, lava: true },
+            { x: 14050, y: 500, width: 500, height: 30, lava: true },
+            { x: 14700, y: 450, width: 1100, height: 30, lava: true },
 
             // Section 7: Treppe zum Teleporter (kurze Stufen nach oben)
             { x: 15900, y: 390, width: 150, height: 25, lava: true },
@@ -342,11 +339,11 @@ const LEVEL_DATA = {
             // BAD pieces - Challenge auf der langen Final-Plattform (x: 26100 bis 28600)
             // Untere Reihe - erreichbar mit Sprung (y: 460-520)
             { x: 26200, y: 520, id: "bad-1", text: "ohne Details", type: "bad" },
-            { x: 26550, y: 490, id: "bad-2", text: "irgendwie", type: "bad" },
-            { x: 26900, y: 460, id: "bad-4", text: "egal wie", type: "bad" },
-            { x: 27300, y: 530, id: "bad-6", text: "unsortiert", type: "bad" },
-            { x: 27410, y: 530, id: "bad-7", text: "random", type: "bad" },
-            { x: 27700, y: 460, id: "bad-8", text: "keine Filter", type: "bad" },
+            { x: 26550, y: 500, id: "bad-2", text: "irgendwie", type: "bad" },
+            { x: 26900, y: 480, id: "bad-4", text: "egal wie", type: "bad" },
+            { x: 27300, y: 535, id: "bad-6", text: "unsortiert", type: "bad" },
+            { x: 27410, y: 535, id: "bad-7", text: "random", type: "bad" },
+            { x: 27700, y: 475, id: "bad-8", text: "keine Filter", type: "bad" },
             { x: 28100, y: 480, id: "bad-10", text: "keine Sortierung", type: "bad" },
 
             // Obere Reihe - unerreichbar (y: 180) - dicht nebeneinander
@@ -1792,7 +1789,8 @@ class TxpNpc {
             this.tutorialMessages = [
                 "Hey! Schön dich wiederzusehen!",
                 "Jetzt erweitern wir deinen Prompt mit einer genauen Zeitangabe und einer Visualisierungsmöglichkeit.",
-                "So kannst du ein besseres Ergebnis erzielen!"
+                "So kannst du ein besseres Ergebnis erzielen!",
+                "Tipp: Du kannst deinen Sprung auch in der Luft steuern! Drücke links oder rechts, während du in der Luft bist."
             ];
         } else if (level === 3) {
             // Level 3: Filter and sorting
@@ -2126,17 +2124,39 @@ class PlatformerGame {
         this.collectedPieces = [];
         this.requiredPieces = [];
 
+        // Checkpoint system for respawning
+        this.checkpointX = 100;
+        this.checkpointY = 400;
+        this.lavaCheckpointReached = false;
+        this.finalCheckpointReached = false;
+
         // Music
         this.backgroundMusic = document.getElementById('backgroundMusic');
         this.lavaMusic = document.getElementById('lavaMusic');
         this.musicToggleBtn = document.getElementById('musicToggle');
+        this.musicControlContainer = document.querySelector('.music-control-container');
+        this.volumeSlider = document.getElementById('volumeSlider');
+        this.volumeLabel = document.getElementById('volumeLabel');
         this.isMusicPlaying = false;
         this.currentMusic = null; // Track which music is playing
         this.inLavaSection = false;
 
+        // Load volume from localStorage or use default (70%)
+        const savedVolume = localStorage.getItem('level5_volume') || 70;
+        this.currentVolume = parseInt(savedVolume);
+
         // Set volume for both music tracks (0.0 to 1.0)
-        if (this.backgroundMusic) this.backgroundMusic.volume = 0.6;
-        if (this.lavaMusic) this.lavaMusic.volume = 0.4;
+        if (this.backgroundMusic) this.backgroundMusic.volume = this.currentVolume / 100;
+        if (this.lavaMusic) this.lavaMusic.volume = this.currentVolume / 100;
+
+        // Update slider and label
+        if (this.volumeSlider) {
+            this.volumeSlider.value = this.currentVolume;
+            this.updateVolumeSliderBackground();
+        }
+        if (this.volumeLabel) {
+            this.volumeLabel.textContent = this.currentVolume + '%';
+        }
 
         // Web Audio API for jump sound
         this.audioContext = null;
@@ -2313,6 +2333,39 @@ class PlatformerGame {
         this.musicToggleBtn.addEventListener('click', () => {
             this.toggleMusic();
         });
+
+        // Volume slider handler
+        if (this.volumeSlider) {
+            this.volumeSlider.addEventListener('input', (e) => {
+                const volume = parseInt(e.target.value);
+                this.currentVolume = volume;
+
+                // Update both audio elements
+                if (this.backgroundMusic) this.backgroundMusic.volume = volume / 100;
+                if (this.lavaMusic) this.lavaMusic.volume = volume / 100;
+
+                // Update label
+                if (this.volumeLabel) {
+                    this.volumeLabel.textContent = volume + '%';
+                }
+
+                // Update slider background
+                this.updateVolumeSliderBackground();
+
+                // Save to localStorage
+                localStorage.setItem('level5_volume', volume);
+            });
+        }
+    }
+
+    updateVolumeSliderBackground() {
+        if (!this.volumeSlider) return;
+
+        const value = this.volumeSlider.value;
+        const percentage = value;
+
+        // Update gradient based on current value
+        this.volumeSlider.style.background = `linear-gradient(to right, var(--primary-color) 0%, var(--primary-color) ${percentage}%, rgba(255, 255, 255, 0.2) ${percentage}%, rgba(255, 255, 255, 0.2) 100%)`;
     }
 
     toggleMusic() {
@@ -2539,6 +2592,12 @@ class PlatformerGame {
 
         // Clear previous level
         this.clearLevel();
+
+        // Reset checkpoint system
+        this.checkpointX = 100;
+        this.checkpointY = 400;
+        this.lavaCheckpointReached = false;
+        this.finalCheckpointReached = false;
 
         // Set level width (Level 5 needs much more space for lava section)
         if (levelNumber === 5) {
@@ -2842,9 +2901,9 @@ class PlatformerGame {
             }
         }
 
-        // Show music toggle button when entering gameplay
-        if (this.musicToggleBtn) {
-            this.musicToggleBtn.style.display = 'flex';
+        // Show music control container when entering gameplay
+        if (this.musicControlContainer) {
+            this.musicControlContainer.style.display = 'flex';
         }
 
         // Start game loop
@@ -2905,6 +2964,18 @@ class PlatformerGame {
                 const playerInLava = this.player.x >= 10000 && this.player.x < 25000;
                 if (playerInLava !== this.inLavaSection) {
                     this.switchMusic(playerInLava);
+                }
+
+                // Checkpoint system: Set respawn points when reaching new sections
+                if (!this.lavaCheckpointReached && this.player.x >= 10000) {
+                    this.checkpointX = 10050;
+                    this.checkpointY = 450;
+                    this.lavaCheckpointReached = true;
+                }
+                if (!this.finalCheckpointReached && this.player.x >= 25300) {
+                    this.checkpointX = 25350;
+                    this.checkpointY = 500;
+                    this.finalCheckpointReached = true;
                 }
             }
 
@@ -3299,20 +3370,32 @@ class PlatformerGame {
         this.isDead = false;
         this.hideDeathScreen();
 
+        // Save checkpoint values before reloading (loadLevel resets them)
+        const savedCheckpointX = this.checkpointX;
+        const savedCheckpointY = this.checkpointY;
+        const savedLavaCheckpoint = this.lavaCheckpointReached;
+        const savedFinalCheckpoint = this.finalCheckpointReached;
+
         // Reload the entire level to respawn all enemies
         this.loadLevel(this.currentLevel);
 
-        // Reset player position and show again
-        this.player.reset(100, 400);
+        // Restore checkpoint values after reload
+        this.checkpointX = savedCheckpointX;
+        this.checkpointY = savedCheckpointY;
+        this.lavaCheckpointReached = savedLavaCheckpoint;
+        this.finalCheckpointReached = savedFinalCheckpoint;
+
+        // Reset player position to checkpoint and show again
+        this.player.reset(this.checkpointX, this.checkpointY);
         this.player.show();
 
         // Reset movement keys
         this.player.isMovingLeft = false;
         this.player.isMovingRight = false;
 
-        // Reset camera
-        this.camera.x = 0;
-        this.camera.targetX = 0;
+        // Reset camera to checkpoint position
+        this.camera.x = Math.max(0, this.checkpointX - 400);
+        this.camera.targetX = this.camera.x;
         this.camera.apply(this.player);
     }
 
@@ -3445,64 +3528,49 @@ class PlatformerGame {
                 tableText += `${month.month}: `;
                 tableText += `EDU=${month.edrive} EEC=${month.eecomp} AMG-EM=${month.amgmotor} KONV=${month.konv} SUB=${month.subassy}\n`;
             });
-            tableText += '\n[Hinweis: Daten schwer lesbar - kein Filter, keine Visualisierung]';
 
             rawTable.textContent = tableText;
             aiResultContent.appendChild(rawTable);
 
+            // Hint below the container
+            const hint = document.createElement('div');
+            hint.style.marginTop = '15px';
+            hint.style.padding = '10px';
+            hint.style.background = 'rgba(255, 165, 0, 0.1)';
+            hint.style.border = '1px solid rgba(255, 165, 0, 0.3)';
+            hint.style.borderRadius = '5px';
+            hint.style.color = 'var(--accent-color)';
+            hint.style.fontSize = '14px';
+            hint.style.textAlign = 'center';
+            hint.textContent = '💡 Hinweis: Daten schwer lesbar - kein Filter angewendet';
+            aiResultContent.appendChild(hint);
+
         } else if (this.currentLevel === 2) {
-            // Level 2: Simple bar chart (August 2025)
-            const simpleChart = document.createElement('div');
-            simpleChart.className = 'simple-chart';
+            // Level 2: Filtered raw data (August only - no visualization yet)
+            const rawTable = document.createElement('div');
+            rawTable.className = 'raw-data-table';
 
-            // Title
-            const title = document.createElement('div');
-            title.style.textAlign = 'center';
-            title.style.color = 'var(--accent-color)';
-            title.style.marginBottom = '20px';
-            title.style.fontSize = '16px';
-            title.textContent = 'Produktionsdaten - August 2025';
-            simpleChart.appendChild(title);
-
-            // Find max value for scaling
-            const maxValue = Math.max(...productionData.august.map(d => d.value));
-
-            // Create chart rows
-            productionData.august.forEach(data => {
-                const row = document.createElement('div');
-                row.className = 'chart-row';
-
-                const label = document.createElement('div');
-                label.className = 'chart-label';
-                label.textContent = data.category;
-                label.style.minWidth = '200px';
-                label.style.fontSize = '12px';
-                row.appendChild(label);
-
-                const barContainer = document.createElement('div');
-                barContainer.className = 'chart-bar-container';
-
-                const bar = document.createElement('div');
-                bar.className = 'chart-bar';
-                bar.style.width = '0%';
-                barContainer.appendChild(bar);
-
-                row.appendChild(barContainer);
-
-                const value = document.createElement('div');
-                value.className = 'chart-value';
-                value.textContent = data.value;
-                row.appendChild(value);
-
-                simpleChart.appendChild(row);
-
-                // Animate bar width
-                setTimeout(() => {
-                    bar.style.width = `${(data.value / maxValue) * 100}%`;
-                }, 100);
+            let tableText = 'PRODUKTIONSDATEN WERK 040 - AUGUST 2025\n';
+            tableText += '==========================================\n';
+            productionData.august.forEach(item => {
+                tableText += `${item.category}: ${item.value} Stück\n`;
             });
 
-            aiResultContent.appendChild(simpleChart);
+            rawTable.textContent = tableText;
+            aiResultContent.appendChild(rawTable);
+
+            // Hint below the container
+            const hint = document.createElement('div');
+            hint.style.marginTop = '15px';
+            hint.style.padding = '10px';
+            hint.style.background = 'rgba(255, 165, 0, 0.1)';
+            hint.style.border = '1px solid rgba(255, 165, 0, 0.3)';
+            hint.style.borderRadius = '5px';
+            hint.style.color = 'var(--accent-color)';
+            hint.style.fontSize = '14px';
+            hint.style.textAlign = 'center';
+            hint.textContent = '💡 Hinweis: Daten gefiltert nach Zeitraum - aber noch schwer lesbar ohne Visualisierung';
+            aiResultContent.appendChild(hint);
 
         } else if (this.currentLevel === 3) {
             // Level 3: Advanced chart (filtered by color, sorted by quantity)
@@ -3898,14 +3966,14 @@ class PlatformerGame {
             }
         }
 
-        // Show/hide music toggle button based on screen
-        const musicToggle = document.getElementById('musicToggle');
-        if (musicToggle) {
+        // Show/hide music control container based on screen
+        const musicControlContainer = document.querySelector('.music-control-container');
+        if (musicControlContainer) {
             // Hide on intro and loading screens, show on level select and gameplay
             if (screenId === 'introScreen' || screenId === 'loadingScreen') {
-                musicToggle.style.display = 'none';
+                musicControlContainer.style.display = 'none';
             } else {
-                musicToggle.style.display = 'flex';
+                musicControlContainer.style.display = 'flex';
             }
         }
 
@@ -4039,9 +4107,9 @@ function goToLevelSelect(fromCompletedLevel = null) {
         game.clearLevel();
         // Stop music when going to level select
         game.pauseMusic();
-        // Hide music toggle button in level select
-        if (game.musicToggleBtn) {
-            game.musicToggleBtn.style.display = 'none';
+        // Hide music control container in level select
+        if (game.musicControlContainer) {
+            game.musicControlContainer.style.display = 'none';
         }
     }
     showLevelSelect();
@@ -4219,7 +4287,7 @@ function setupLevelCards() {
 
         const lockEl = mapLevel.querySelector('.map-level-lock');
         const statusEl = mapLevel.querySelector('.map-level-status');
-        const pointsEl = mapLevel.querySelector('.map-level-points');
+        const priceTag = mapLevel.querySelector('.map-level-price-tag');
 
         // Check if points have been awarded for this level
         const levelsAwarded = JSON.parse(localStorage.getItem('levelsAwarded') || '[]');
@@ -4229,14 +4297,9 @@ function setupLevelCards() {
             mapLevel.classList.add('completed');
             if (statusEl) statusEl.textContent = '';
             if (lockEl) lockEl.style.display = 'none';
-            if (pointsEl) {
-                // Show 100/100 if points awarded, otherwise 0/100
-                if (hasPointsForLevel) {
-                    pointsEl.textContent = '100 / 100 Punkte';
-                } else {
-                    pointsEl.textContent = '0 / 100 Punkte';
-                }
-                pointsEl.classList.add('completed');
+            // Show price tag only if points awarded
+            if (priceTag) {
+                priceTag.style.display = hasPointsForLevel ? 'block' : 'none';
             }
         } else if (isUnlocked) {
             mapLevel.classList.add('unlocked');
@@ -4245,9 +4308,8 @@ function setupLevelCards() {
                 statusEl.textContent = '▶ Spielen';
                 statusEl.classList.add('unlocked');
             }
-            if (pointsEl) {
-                pointsEl.textContent = '0 / 100 Punkte';
-                pointsEl.classList.remove('completed');
+            if (priceTag) {
+                priceTag.style.display = 'none';
             }
         } else {
             // Locked
@@ -4257,9 +4319,8 @@ function setupLevelCards() {
                 statusEl.textContent = 'Gesperrt';
                 statusEl.classList.remove('unlocked');
             }
-            if (pointsEl) {
-                pointsEl.textContent = '0 / 100 Punkte';
-                pointsEl.classList.remove('completed');
+            if (priceTag) {
+                priceTag.style.display = 'none';
             }
         }
 
@@ -4277,6 +4338,23 @@ function setupLevelCards() {
             }
         });
     });
+
+    // Show scroll arrow after Level 3
+    const scrollArrow = document.getElementById('scrollArrow');
+    if (scrollArrow) {
+        if (completedLevels.includes(3)) {
+            scrollArrow.style.display = 'block';
+            // Add animation class after a tiny delay to ensure clean start
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    scrollArrow.classList.add('active');
+                });
+            });
+        } else {
+            scrollArrow.style.display = 'none';
+            scrollArrow.classList.remove('active');
+        }
+    }
 }
 
 

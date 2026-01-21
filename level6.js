@@ -1,4 +1,4 @@
-// Level 6 - Copilot Command Center - Game Logic
+// Level 6 - Copilot - Game Logic
 
 // ===== GAME CONFIGURATION =====
 const GAME_CONFIG = {
@@ -38,28 +38,30 @@ const CHALLENGE_DATA = {
         tasks: [
             // E-Mail Summary Variationen - KLAR als E-Mail markiert
             { description: "Lange E-Mail mit 15 Absätzen über Projektupdate", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "E-Mail-Thread mit mehreren Beteiligten zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "E-Mail mit mehreren Beteiligten zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
             { description: "Ausführliche E-Mail vom Kunden mit vielen Details", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "E-Mail-Kette mit 20+ Nachrichten zusammenfassen", correctAction: "email-summary", priority: "urgent", timeLimit: 22 },
+            { description: "E-Mail mit 20+ Nachrichten zusammenfassen", correctAction: "email-summary", priority: "urgent", timeLimit: 22 },
             { description: "Lange E-Mail mit mehreren Themen zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "Monatsbericht-E-Mail vom Team zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "Technische E-Mail-Diskussion zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "Kundenbeschwerde-E-Mail mit langer Vorgeschichte", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "Monatsbericht E-Mail vom Team zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "Technische E-Mail Diskussion zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "Kundenbeschwerde E-Mail mit langer Vorgeschichte", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
 
             // Quick Reply Variationen - KLAR als kurze Antwort
             { description: "Ja/Nein Frage schnell beantworten", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
             { description: "Kurze Statusrückmeldung geben", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
-            { description: "Liefertermin-Anfrage kurz beantworten", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
-            { description: "Termin-Rückfrage kurz bestätigen", correctAction: "quick-reply", priority: "urgent", timeLimit: 18 },
+            { description: "Liefertermin Anfrage kurz beantworten", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
+            { description: "Termin Rückfrage kurz bestätigen", correctAction: "quick-reply", priority: "urgent", timeLimit: 18 },
             { description: "Kurze Info an Kollegen schicken", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
             { description: "Kurze Bestätigung senden", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
             { description: "Schnelle Antwort auf kurze Frage", correctAction: "quick-reply", priority: "urgent", timeLimit: 18 },
             { description: "Kurzes OK an Kollegen senden", correctAction: "quick-reply", priority: "normal", timeLimit: 30 }
         ],
         tutorialMessages: [
-            "Willkommen zum Copilot Command Center! 🎮",
-            "Aufgaben erscheinen oben mit einem Timer ⏰",
-            "Klicke auf eine Aufgabe, dann auf die passende Copilot-Aktion!",
+            "Willkommen zum Montag! 🎮",
+            "Du hast 2 Copilot Aktionen:",
+            "📧 E-Mail zusammenfassen für lange E-Mails mit vielen Details",
+            "⚡ Schnell antworten für kurze Ja/Nein Fragen",
+            "Klicke auf eine Aufgabe, dann auf die richtige Aktion!",
             "Viel Erfolg! 🚀"
         ],
         successMessage: "Großartig! Du hast den Montag gemeistert! 😊"
@@ -80,34 +82,34 @@ const CHALLENGE_DATA = {
         ],
         tasks: [
             // E-Mail Summary Variationen - KLAR als E-Mail
-            { description: "Projekt-E-Mail-Thread mit allen Stakeholdern zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "Monatsbericht-E-Mail vom Team zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "Technische E-Mail-Diskussion über mehrere Mails zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "Kundenbeschwerde-E-Mail mit Vorgeschichte zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "Wöchentlichen Report-E-Mail zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "E-Mail-Kette zur Strategiediskussion zusammenfassen", correctAction: "email-summary", priority: "urgent", timeLimit: 18 },
+            { description: "Projekt E-Mail mit allen Kollegen zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "Monatsbericht E-Mail vom Team zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "Technische E-Mail Diskussion zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "Kundenbeschwerde E-Mail mit Vorgeschichte zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "E-Mail mit +200 Zeilen zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "E-Mail zur Strategiediskussion zusammenfassen", correctAction: "email-summary", priority: "urgent", timeLimit: 18 },
 
             // Quick Reply Variationen - KLAR als kurze Antwort
-            { description: "Freigabe-Anfrage schnell beantworten", correctAction: "quick-reply", priority: "urgent", timeLimit: 15 },
+            { description: "Freigabe Anfrage schnell beantworten", correctAction: "quick-reply", priority: "urgent", timeLimit: 15 },
             { description: "Kurze Bestätigung schnell senden", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
-            { description: "Terminanfrage kurz beantworten", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
+            { description: "Anfrage kurz beantworten", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
             { description: "Kurzes OK an Kollegen", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
             { description: "Ja/Nein Entscheidung schnell mitteilen", correctAction: "quick-reply", priority: "urgent", timeLimit: 15 },
             { description: "Kurze Rückmeldung zu Vorschlag geben", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
 
             // Meeting Find Variationen - KLAR als Terminkoordination
-            { description: "Termin für wöchentliches Team-Meeting finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
-            { description: "Freien Termin für Workshop mit 8 Personen finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
+            { description: "Termin für wöchentliches Team Meeting finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
+            { description: "Freien Termin mit 8 Personen finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
             { description: "Doppelbuchung im Kalender auflösen", correctAction: "meeting-find", priority: "urgent", timeLimit: 18 },
-            { description: "Freien Slot im Kalender für Review finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
+            { description: "Freien Slot im Kalender finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
             { description: "Gemeinsamen Termin für 5 Personen finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
             { description: "Neuen Termin finden - alle müssen verfügbar sein", correctAction: "meeting-find", priority: "normal", timeLimit: 30 }
         ],
         tutorialMessages: [
-            "Es wird schneller! ⚡",
-            "Neue Aktion: Meeting finden, für Terminkoordination! 📅",
-            "Achte auf die roten Aufgaben, die sind dringend! 🔴",
-            "Rote Aufgaben haben weniger Zeit! ⏰",
+            "Dienstag wird schneller! ⚡",
+            "Neue Aktion: 📅 Meeting finden für Termine im Kalender koordinieren",
+            "Nutze sie, wenn du einen freien Termin für Meetings finden musst!",
+            "⚠️ Rote Aufgaben sind dringend und haben weniger Zeit!",
             "Baue einen Streak auf für Bonus Punkte! 🔥"
         ],
         successMessage: "Fantastisch! Du bist produktiv! 😐"
@@ -129,37 +131,37 @@ const CHALLENGE_DATA = {
         ],
         tasks: [
             // E-Mail Summary - KLAR als E-Mail markiert
-            { description: "E-Mail-Diskussion zur Strategie zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "E-Mail-Kette mit verschiedenen Meinungen zusammenfassen", correctAction: "email-summary", priority: "urgent", timeLimit: 15 },
-            { description: "E-Mail-Thread mit Feedback von 5 Kollegen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "Wöchentliche Report-E-Mail zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "Wichtige E-Mail an alle Stakeholder zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "E-Mail zur Strategie zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "E-Mail mit verschiedenen Meinungen zusammenfassen", correctAction: "email-summary", priority: "urgent", timeLimit: 15 },
+            { description: "E-Mail mit Feedback von 5 Kollegen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "E-Mail mit +700 Zeilen zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "Wichtige E-Mail an alle Kollegen zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
 
             // Quick Reply - KLAR als kurze Antwort
             { description: "Ja/Nein Entscheidung kurz beantworten", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
             { description: "Kurze Rückmeldung zu Vorschlag geben", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
-            { description: "Budget-Freigabe kurz bestätigen", correctAction: "quick-reply", priority: "urgent", timeLimit: 12 },
+            { description: "Freigabe kurz bestätigen", correctAction: "quick-reply", priority: "urgent", timeLimit: 12 },
             { description: "Designentwurf kurz kommentieren", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
             { description: "Go/No-Go schnell entscheiden", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
 
             // Meeting Find - KLAR als Terminkoordination
-            { description: "5 Kalender-Überschneidungen diese Woche auflösen", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
+            { description: "5 Kalender Überschneidungen diese Woche auflösen", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
             { description: "Termin für spontanes Meeting finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
-            { description: "Termin für Quarterly Planning mit allen Abteilungen", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
+            { description: "Termin für Quartalsplanung mit allen Abteilungen", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
             { description: "Neuen Termin für wiederkehrendes Meeting finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
-            { description: "Termin für Notfall-Meeting mit Team-Leads finden", correctAction: "meeting-find", priority: "urgent", timeLimit: 15 },
+            { description: "Termin für Notfall Meeting mit Team Leitern finden", correctAction: "meeting-find", priority: "urgent", timeLimit: 15 },
 
-            // Chat analysieren - KLAR als Teams/Slack Chat
-            { description: "Teams-Chat: Was wurde entschieden?", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
-            { description: "3 parallele Slack-Chats zusammenfassen", correctAction: "chat-points", priority: "urgent", timeLimit: 18 },
-            { description: "Wichtige Infos aus Projekt-Chat (Teams) herausfiltern", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
-            { description: "To-Dos aus Meeting-Chat (Slack) extrahieren", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
-            { description: "Teams-Chat mit 50+ Nachrichten analysieren", correctAction: "chat-points", priority: "normal", timeLimit: 30 }
+            // Chat analysieren - KLAR als Teams Chat
+            { description: "Langen Teams Chat filtern", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
+            { description: "3 parallele Teams Chats zusammenfassen", correctAction: "chat-points", priority: "urgent", timeLimit: 18 },
+            { description: "Wichtige Infos aus Projekt Chat herausfiltern", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
+            { description: "To-Dos aus Teams Chat finden", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
+            { description: "Teams Chat mit 50+ Nachrichten analysieren", correctAction: "chat-points", priority: "normal", timeLimit: 30 }
         ],
         tutorialMessages: [
             "Mittwoch wird intensiv! 😅",
-            "Neue Aktion: Chat analysieren! 💬",
-            "Für lange Team Diskussionen!",
+            "Neue Aktion: 💬 Chat analysieren bei Teams Diskussionen",
+            "Nutze sie, wenn du wichtige Infos aus langen Chats filtern musst!",
             "Mehrere Aufgaben gleichzeitig, bleib ruhig!",
             "Viel Erfolg! 🚀"
         ],
@@ -183,44 +185,44 @@ const CHALLENGE_DATA = {
         ],
         tasks: [
             // E-Mail Summary - Normal 30s, Urgent 14s
-            { description: "Wichtige E-Mail an alle Stakeholder zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "Eskalations-E-Mail mit vielen CCs zusammenfassen", correctAction: "email-summary", priority: "urgent", timeLimit: 14 },
-            { description: "E-Mail-Thread zur Jahresplanung zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "Vendor-E-Mail-Kommunikation mit Historie zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "Feedback-E-Mail-Runde mit 10+ Stakeholdern", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "Wichtige E-Mail an alle Kollegen zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "Dringende E-Mail mit vielen Empfängern zusammenfassen", correctAction: "email-summary", priority: "urgent", timeLimit: 14 },
+            { description: "E-Mail zur Jahresplanung zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "Lieferanten E-Mail mit Historie zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "Feedback E-Mail von 10+ Kollegen zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
 
             // Quick Reply - Normal 30s, Urgent 12s
-            { description: "Status-Frage vom CEO sofort beantworten", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
+            { description: "Status Frage vom Kollegen sofort beantworten", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
             { description: "Go/No-Go Entscheidung schnell mitteilen", correctAction: "quick-reply", priority: "urgent", timeLimit: 12 },
-            { description: "Deployment-Freigabe kurz erteilen", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
-            { description: "Bug-Einschätzung kurz geben", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
-            { description: "Management-Rückfrage sofort beantworten", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
+            { description: "Software Freigabe kurz erteilen", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
+            { description: "Fehler Einschätzung kurz geben", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
+            { description: "Rückfrage sofort beantworten", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
 
             // Meeting Find - Normal 30s, Urgent 14s
             { description: "Doppelbuchung im Kalender JETZT auflösen", correctAction: "meeting-find", priority: "urgent", timeLimit: 14 },
-            { description: "Termin für Notfall-Meeting mit C-Level finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
-            { description: "Termin für Krisentreffen mit allen Team-Leads", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
-            { description: "Mehrere Termin-Kollisionen im Kalender sortieren", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
-            { description: "Termin für spontanes Review mit Abteilungen finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
+            { description: "Termin für Notfall Meeting mit Geschäftsleitung finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
+            { description: "Termin für Krisentreffen mit allen Team Leitern finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
+            { description: "Mehrere Termin Kollisionen im Kalender sortieren", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
+            { description: "Termin für Besprechung mit Abteilungen finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
 
             // Chat analysieren - Normal 30s, Urgent 15s
-            { description: "Teams-Krisen-Chat: Was muss sofort passieren?", correctAction: "chat-points", priority: "urgent", timeLimit: 15 },
-            { description: "Slack-Diskussion: Entscheidungen dokumentieren", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
-            { description: "Teams-Chat: Multi-Team-Koordination zusammenfassen", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
-            { description: "Wichtige Infos aus Slack-Chaos-Chat retten", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
-            { description: "Teams-Brainstorming-Chat strukturieren", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
+            { description: "Nach alten Teams Chat suchen", correctAction: "chat-points", priority: "urgent", timeLimit: 15 },
+            { description: "Teams Diskussion zusammenfassen", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
+            { description: "Teams Nachrichten nach Wörtern filtern", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
+            { description: "Wichtige Infos aus chaotischem Teams Chat retten", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
+            { description: "Teams Brainstorming Chat zusammenfassen", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
 
             // Doc Draft - Normal 30s, Urgent 17s
-            { description: "Vertrags-Dokument erstellen (muss heute raus)", correctAction: "doc-draft", priority: "urgent", timeLimit: 17 },
-            { description: "Post-Mortem Report-Dokument schreiben", correctAction: "doc-draft", priority: "normal", timeLimit: 30 },
-            { description: "Compliance-Dokument erstellen (bis EOD)", correctAction: "doc-draft", priority: "normal", timeLimit: 30 },
-            { description: "RFP-Response-Dokument erstellen", correctAction: "doc-draft", priority: "normal", timeLimit: 30 },
-            { description: "Quartalsbericht-Dokument erstellen", correctAction: "doc-draft", priority: "normal", timeLimit: 30 }
+            { description: "Vertrags Dokument erstellen (muss heute raus)", correctAction: "doc-draft", priority: "urgent", timeLimit: 17 },
+            { description: "Projekt Bericht Dokument schreiben", correctAction: "doc-draft", priority: "normal", timeLimit: 30 },
+            { description: "Regelwerk Dokument erstellen (bis heute Abend)", correctAction: "doc-draft", priority: "normal", timeLimit: 30 },
+            { description: "Angebots Dokument erstellen", correctAction: "doc-draft", priority: "normal", timeLimit: 30 },
+            { description: "Quartalsbericht Dokument erstellen", correctAction: "doc-draft", priority: "normal", timeLimit: 30 }
         ],
         tutorialMessages: [
-            "Donnerstag wird intensiv! 😰",
-            "Neue Aktion: Dokument erstellen! ✍️",
-            "Für längere Texte und Berichte!",
+            "Es donnert gewaltig am Donnerstag! ⚡😰",
+            "Neue Aktion: ✍️ Dokument erstellen für längere Texte und Berichte",
+            "Nutze sie für Verträge, Reports und andere Dokumente!",
             "Nutze die 5 Aktionen weise!",
             "Fokus auf die wichtigen Dinge!"
         ],
@@ -246,49 +248,49 @@ const CHALLENGE_DATA = {
         ],
         tasks: [
             // E-Mail Summary - Normal 30s, Urgent 12s
-            { description: "E-Mail vom Board: Sofortiges Update zu allen Projekten", correctAction: "email-summary", priority: "urgent", timeLimit: 12 },
-            { description: "E-Mail-Thread: Mehrere kritische Kundeneskalationen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "E-Mail-Kette: Strategiewechsel und alle Implikationen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "E-Mail vom Teamleiter: Sofortiges Update zu allen Projekten", correctAction: "email-summary", priority: "urgent", timeLimit: 12 },
+            { description: "E-Mail mit +1300 Zeilen zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "E-Mail zusammenfassen zum Social-Intranet-Update", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
             { description: "30+ E-Mails zur Vertragsverhandlung zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
-            { description: "E-Mail zur Merger-Ankündigung mit allen Reaktionen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
+            { description: "E-Mail zur Unternehmens Fusion zusammenfassen", correctAction: "email-summary", priority: "normal", timeLimit: 30 },
 
             // Quick Reply - Normal 30s, Urgent 10s
-            { description: "CEO-Frage JETZT kurz beantworten", correctAction: "quick-reply", priority: "urgent", timeLimit: 10 },
-            { description: "Launch-Entscheidung schnell mitteilen (5 Min)", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
+            { description: "Frage JETZT kurz beantworten", correctAction: "quick-reply", priority: "urgent", timeLimit: 10 },
+            { description: "Produkt Start Entscheidung schnell mitteilen", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
             { description: "Kunde droht mit Kündigung - kurz reagieren", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
-            { description: "Produktionsstopp: Freigabe ja/nein?", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
-            { description: "Security-Stellungnahme kurz abgeben", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
+            { description: "Produktionsstopp: Kurze Freigabe ja/nein?", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
+            { description: "Allgemeine Stellungnahme kurz abgeben", correctAction: "quick-reply", priority: "normal", timeLimit: 30 },
 
             // Meeting Find - Normal 30s, Urgent 12s
-            { description: "Termin für Leadership Team SOFORT finden", correctAction: "meeting-find", priority: "urgent", timeLimit: 12 },
-            { description: "10 Kalender-Überschneidungen heute auflösen", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
-            { description: "Spontan-Termin für Investor finden - wann möglich?", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
+            { description: "Termin für Führungsteam SOFORT finden", correctAction: "meeting-find", priority: "urgent", timeLimit: 12 },
+            { description: "10 Kalender Überschneidungen heute auflösen", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
+            { description: "Spontan Termin für Geldgeber finden?", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
             { description: "Alle Termine nächste Woche neu koordinieren", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
             { description: "Termin für Krisenmeeting mit Partnern finden", correctAction: "meeting-find", priority: "normal", timeLimit: 30 },
 
             // Chat analysieren - Normal 30s, Urgent 14s
-            { description: "5 parallele Teams-Krisen-Chats analysieren", correctAction: "chat-points", priority: "urgent", timeLimit: 14 },
-            { description: "Teams-Chat: Notfall-Koordination dokumentieren", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
-            { description: "Slack-Chat: Was wurde beschlossen? Keiner weiß es", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
+            { description: "5 parallele Teams Krisen Chats analysieren", correctAction: "chat-points", priority: "urgent", timeLimit: 14 },
+            { description: "Teams Chat von einer bestimmten Person suchen", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
+            { description: "Kraftausdrücke von meiner Frau in altem Teams Chat suchen", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
 
             // Doc Draft - Normal 30s, Urgent 16s
-            { description: "Vertrags-Dokument für Millionen-Deal erstellen", correctAction: "doc-draft", priority: "urgent", timeLimit: 16 },
-            { description: "Krisenkommunikations-Dokument schreiben", correctAction: "doc-draft", priority: "normal", timeLimit: 30 },
-            { description: "Business Case-Dokument erstellen", correctAction: "doc-draft", priority: "normal", timeLimit: 30 },
-            { description: "Presse-Statement-Dokument erstellen", correctAction: "doc-draft", priority: "normal", timeLimit: 30 },
-            { description: "Notfall-Prozedur-Dokument schreiben", correctAction: "doc-draft", priority: "normal", timeLimit: 30 },
+            { description: "Vertrags Dokument für großen Deal erstellen", correctAction: "doc-draft", priority: "urgent", timeLimit: 16 },
+            { description: "Einfach irgendein Dokument schreiben", correctAction: "doc-draft", priority: "normal", timeLimit: 30 },
+            { description: "Geschäftsplan Dokument erstellen", correctAction: "doc-draft", priority: "normal", timeLimit: 30 },
+            { description: "Presse Dokument erstellen", correctAction: "doc-draft", priority: "normal", timeLimit: 30 },
+            { description: "WIE FINDE ICH EIN MEETING?-Dokument erstellen", correctAction: "doc-draft", priority: "normal", timeLimit: 30 },
 
             // Presentation - Normal 30s, Urgent 14s
-            { description: "Board-Präsentation fertigstellen (30 Min!)", correctAction: "presentation", priority: "urgent", timeLimit: 14 },
-            { description: "Investor-Pitch-Slides komplett umbauen", correctAction: "presentation", priority: "normal", timeLimit: 30 },
-            { description: "Krisen-Präsentation für All-Hands erstellen", correctAction: "presentation", priority: "normal", timeLimit: 30 },
-            { description: "Q4-Results-Slides für Analysten aufbereiten", correctAction: "presentation", priority: "normal", timeLimit: 30 },
-            { description: "Strategie-Präsentation für Board überarbeiten", correctAction: "presentation", priority: "normal", timeLimit: 30 }
+            { description: "Vorstands Präsentation fertigstellen (30 Min!)", correctAction: "presentation", priority: "urgent", timeLimit: 14 },
+            { description: "Geldgeber Präsentation Folien komplett umbauen", correctAction: "presentation", priority: "normal", timeLimit: 30 },
+            { description: "Krisen Präsentation für Team Meeting erstellen", correctAction: "presentation", priority: "normal", timeLimit: 30 },
+            { description: "Quartals-Ergebnis Folien aufbereiten", correctAction: "presentation", priority: "normal", timeLimit: 30 },
+            { description: "Strategie Präsentation für Teamleiter überarbeiten", correctAction: "presentation", priority: "normal", timeLimit: 30 }
         ],
         tutorialMessages: [
             "Freitag, der Boss Battle! 🔥",
-            "Neue Aktion: Präsentation erstellen! 📊",
-            "Für wichtige Slides!",
+            "Neue Aktion: 📊 Präsentation erstellen für wichtige Folien",
+            "Nutze sie für Vorstands Präsentationen und Geldgeber Meetings!",
             "Heute ist alles dran: Alle 6 Aktionen auf einmal!",
             "Gib alles! Du schaffst das! 💪"
         ],
@@ -545,6 +547,7 @@ class TaskManager {
         this.challengeData = challengeData;
         this.tasks = [];
         this.nextTaskId = 0;
+        this.selectedTask = null;
         this.clearQueue();
 
         // Start spawning tasks
@@ -586,13 +589,13 @@ class TaskManager {
         this.createTaskElement(task);
         this.startTaskTimer(task);
 
-        // Auto-select first task if none is selected (with small delay to ensure DOM is ready)
+        // Auto-select first task if none is selected (use requestAnimationFrame to ensure DOM is ready)
         if (!this.selectedTask) {
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 if (!this.selectedTask && this.tasks.includes(task)) {
                     this.selectTask(task);
                 }
-            }, 10);
+            });
         }
     }
 
@@ -972,6 +975,23 @@ class GameManager {
                 if (statusElement) {
                     statusElement.textContent = '✅ Abgeschlossen';
                 }
+            }
+        }
+
+        // Show scroll arrow after Challenge 3
+        const scrollArrow = document.getElementById('scrollArrow');
+        if (scrollArrow) {
+            if (this.isChallengeCompleted(3)) {
+                scrollArrow.style.display = 'block';
+                // Add animation class after a tiny delay to ensure clean start
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        scrollArrow.classList.add('active');
+                    });
+                });
+            } else {
+                scrollArrow.style.display = 'none';
+                scrollArrow.classList.remove('active');
             }
         }
     }

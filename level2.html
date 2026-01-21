@@ -63,7 +63,7 @@
             <!-- Loading Screen -->
             <div class="game-screen" id="loadingScreen">
                 <div class="loading-content">
-                    <h2 class="loading-title">Lade Assets...</h2>
+                    <h2 class="loading-title">Lade Game...</h2>
                     <div class="loading-bar-container">
                         <div class="loading-bar" id="loadingBar"></div>
                     </div>
@@ -81,46 +81,46 @@
                     <div class="challenges-grid">
                         <!-- Challenge 1 -->
                         <div class="challenge-card unlocked" data-level="1">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
                             <div class="challenge-number">1</div>
                             <div class="challenge-icon">📧</div>
                             <div class="challenge-name">E-Mail Benachrichtigung</div>
-                            <div class="challenge-points">0/100 Punkte</div>
                             <div class="challenge-status">▶ Starten</div>
                         </div>
 
                         <!-- Challenge 2 -->
                         <div class="challenge-card locked" data-level="2">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
                             <div class="challenge-number">2</div>
                             <div class="challenge-icon">📊</div>
                             <div class="challenge-name">Daten filtern</div>
-                            <div class="challenge-points">0/100 Punkte</div>
                             <div class="challenge-status">🔒 Gesperrt</div>
                         </div>
 
                         <!-- Challenge 3 -->
                         <div class="challenge-card locked" data-level="3">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
                             <div class="challenge-number">3</div>
                             <div class="challenge-icon">❓</div>
                             <div class="challenge-name">Bedingungen & Verzweigungen</div>
-                            <div class="challenge-points">0/100 Punkte</div>
                             <div class="challenge-status">🔒 Gesperrt</div>
                         </div>
 
                         <!-- Challenge 4 -->
                         <div class="challenge-card locked" data-level="4">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
                             <div class="challenge-number">4</div>
                             <div class="challenge-icon">🔁</div>
                             <div class="challenge-name">Schleifen & Wiederholungen</div>
-                            <div class="challenge-points">0/100 Punkte</div>
                             <div class="challenge-status">🔒 Gesperrt</div>
                         </div>
 
                         <!-- Challenge 5 -->
                         <div class="challenge-card locked final-challenge" data-level="5">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
                             <div class="challenge-number">5</div>
-                            <div class="challenge-icon">👑</div>
-                            <div class="challenge-name">Komplexer Approval-Flow</div>
-                            <div class="challenge-points">0/100 Punkte</div>
+                            <div class="challenge-icon">📦</div>
+                            <div class="challenge-name">Versandschein-Automatisierung</div>
                             <div class="challenge-status">🔒 Gesperrt</div>
                         </div>
                     </div>
@@ -144,28 +144,10 @@
                         </div>
                     </div>
 
-                    <!-- Reset Progress Button -->
-                    <button class="reset-progress-btn" onclick="showResetConfirmation()">
-                        Fortschritt zurücksetzen
-                    </button>
                 </div>
-            </div>
 
-            <!-- Reset Confirmation Popup -->
-            <div class="reset-popup-overlay" id="resetPopup" style="display: none;">
-                <div class="reset-popup">
-                    <h3>⚠️ Fortschritt zurücksetzen?</h3>
-                    <p>Dies setzt deinen kompletten Fortschritt zurück:</p>
-                    <ul>
-                        <li>Alle Challenges werden wieder gesperrt</li>
-                        <li>Du startest wieder bei Challenge 1</li>
-                        <li>✅ Dein Rang und deine Punkte bleiben erhalten</li>
-                    </ul>
-                    <div class="reset-popup-actions">
-                        <button class="reset-confirm-btn" onclick="confirmReset()">Ja, zurücksetzen</button>
-                        <button class="reset-cancel-btn" onclick="hideResetConfirmation()">Abbrechen</button>
-                    </div>
-                </div>
+                <!-- Scroll Down Arrow -->
+                <div class="scroll-arrow" id="scrollArrow" style="display: none;"></div>
             </div>
 
             <!-- Flow Editor Screen -->
@@ -187,6 +169,11 @@
                     </div>
                 </div>
 
+                <!-- Back Button (Top) -->
+                <button class="editor-back-btn" onclick="returnToLevelSelect()" title="Zurück zur Levelauswahl">
+                    ← Zurück zur Levelauswahl
+                </button>
+
                 <!-- Flow Palette (Left Side) -->
                 <div class="flow-palette" id="flowPalette">
                     <div class="palette-header">
@@ -204,9 +191,6 @@
                     <div class="whiteboard-header">
                         <div class="whiteboard-title">Flow-Editor</div>
                         <div class="whiteboard-actions">
-                            <button class="action-btn back-btn" onclick="returnToLevelSelect()" title="Zurück zur Levelauswahl">
-                                ← Zurück
-                            </button>
                             <button class="action-btn clear-btn" id="clearBtn" title="Whiteboard leeren">
                                 🗑️ Leeren
                             </button>

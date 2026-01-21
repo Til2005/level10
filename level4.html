@@ -72,7 +72,7 @@
                     <div class="press-key">Drücke eine beliebige Taste</div>
 
                     <!-- Copyright -->
-                    <div class="copyright">© 2025 AI Bytes</div>
+                    <div class="copyright">© 2026 AI Bytes</div>
                 </div>
             </div>
 
@@ -129,6 +129,15 @@
 
                 <!-- Power-Up Status Container -->
                 <div class="power-up-status" id="powerUpStatus"></div>
+
+                <!-- Tutorial Info Box -->
+                <div class="tutorial-info-box" id="tutorialInfoBox" style="display: none;">
+                    <div class="tutorial-info-content">
+                        <h3 id="tutorialInfoTitle"></h3>
+                        <p id="tutorialInfoText"></p>
+                        <button class="tutorial-continue-btn" id="tutorialContinueBtn">Weiter</button>
+                    </div>
+                </div>
 
                 <!-- Pause Overlay -->
                 <div class="pause-overlay" id="pauseOverlay" style="display: none;">
@@ -196,6 +205,13 @@
 
                             <div class="results-actions">
                                 <button class="play-again-button" onclick="restartGame()"><span>Nochmal spielen</span></button>
+                            </div>
+
+                            <div class="tutorial-skip-option">
+                                <label class="tutorial-skip-label">
+                                    <input type="checkbox" id="skipTutorialCheckbox" onchange="toggleSkipTutorial(this.checked)">
+                                    <span>Tutorial am Anfang des Levels überspringen</span>
+                                </label>
                             </div>
                         </div>
                     </div>

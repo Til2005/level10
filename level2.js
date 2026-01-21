@@ -40,8 +40,8 @@ const CHALLENGE_DATA = {
             { from: "trigger-email", to: "action-notify", direction: "horizontal" }
         ],
         tutorialMessages: [
-            "Willkommen! Ich bin TXP, dein Assistent. 👋",
-            "In diesem Level lernst du, wie man Flows in Power Automate erstellt.",
+            "Willkommen! Ich bin TXP, dein Training eXPlainer. 👋",
+            "In diesem Level lernst du, wie man Flows erstellt.",
             "Ziehe die Flow-Bausteine von links ins Whiteboard und baue den richtigen Flow!",
             "Viel Erfolg! 🚀"
         ],
@@ -107,7 +107,7 @@ const CHALLENGE_DATA = {
         task: "Täglich um 9 Uhr sollen alle offenen Tickets aus der SharePoint-Liste abgerufen, verarbeitet und per E-Mail versendet werden",
         blocks: [
             { id: "wrong-create-item", icon: "➕", title: "Eintrag erstellen", description: "Aktion: Neuen Eintrag anlegen", type: "action", puzzleType: "horizontal" },
-            { id: "action-process", icon: "⚙️", title: "Daten verarbeiten", description: "Aktion: Ticket-Info formatieren", type: "action", puzzleType: "horizontal" },
+            { id: "action-process", icon: "⚙️", title: "Daten verarbeiten", description: "Aktion: Ticket-Info verarbeiten", type: "action", puzzleType: "horizontal" },
             { id: "wrong-delete-list", icon: "🗑️", title: "Liste löschen", description: "Aktion: SharePoint-Liste entfernen", type: "action", puzzleType: "horizontal" },
             { id: "action-email", icon: "📧", title: "E-Mail senden", description: "Aktion: E-Mail an Zuständigen", type: "action", puzzleType: "horizontal" },
             { id: "trigger-scheduled", icon: "🔁", title: "Zeitgesteuert", description: "Wiederholt täglich um 9:00 Uhr", type: "trigger", puzzleType: "horizontal" },
@@ -131,36 +131,39 @@ const CHALLENGE_DATA = {
     },
 
     5: {
-        name: "Komplexer Approval-Flow",
+        name: "Versandschein-Automatisierung",
         difficulty: "Sehr Schwer",
-        description: "Erstelle einen komplexen Genehmigungsworkflow",
-        task: "Baue einen kompletten Approval-Flow mit mehreren Stufen",
+        description: "Automatisiere die Erstellung von Versandscheinen basierend auf Kundenpriorität",
+        task: "Baue einen Flow, der bei neuen Bestellungen automatisch den passenden Versandschein erstellt",
         blocks: [
-            { id: "wrong-send-email", icon: "📧", title: "E-Mail senden", description: "Aktion: E-Mail versenden", type: "action", puzzleType: "horizontal" },
-            { id: "action-notify-yes", icon: "✅", title: "Bestätigung senden", description: "Aktion: Bestätigung an Antragsteller", type: "action", puzzleType: "vertical" },
-            { id: "trigger-request", icon: "📬", title: "Antrag erstellt", description: "Trigger: Neuer Antrag", type: "trigger", puzzleType: "horizontal" },
-            { id: "wrong-archive", icon: "📁", title: "Archivieren", description: "Aktion: Antrag archivieren", type: "action", puzzleType: "vertical" },
-            { id: "action-get-manager", icon: "👤", title: "Manager abrufen", description: "Aktion: Vorgesetzten ermitteln", type: "action", puzzleType: "horizontal" },
-            { id: "wrong-save-db", icon: "💾", title: "In DB speichern", description: "Aktion: In Datenbank speichern", type: "action", puzzleType: "horizontal" },
-            { id: "condition-approved", icon: "❓", title: "Genehmigt?", description: "Bedingung: Genehmigt?", type: "condition", puzzleType: "branch" },
-            { id: "action-approval", icon: "📝", title: "Genehmigung", description: "Aktion: Genehmigung anfordern", type: "action", puzzleType: "horizontal" },
-            { id: "action-notify-no", icon: "❌", title: "Ablehnung senden", description: "Aktion: Ablehnung an Antragsteller", type: "action", puzzleType: "vertical" },
-            { id: "wrong-forward", icon: "➡️", title: "Weiterleiten", description: "Aktion: An anderen Empfänger weiterleiten", type: "action", puzzleType: "horizontal" },
-            { id: "wrong-scheduled", icon: "⏰", title: "Zeitgesteuert", description: "Trigger: Täglich wiederholen", type: "trigger", puzzleType: "horizontal" }
+            { id: "wrong-send-email", icon: "📧", title: "E-Mail an Kunde", description: "Aktion: E-Mail versenden", type: "action", puzzleType: "horizontal" },
+            { id: "action-check-customer", icon: "👤", title: "Kundenprofil prüfen", description: "Aktion: Kundenstatus ermitteln", type: "action", puzzleType: "horizontal" },
+            { id: "wrong-scheduled", icon: "⏰", title: "Zeitgesteuert", description: "Trigger: Täglich wiederholen", type: "trigger", puzzleType: "horizontal" },
+            { id: "action-express-label", icon: "⚡", title: "Express-Versand", description: "Aktion: Express-Label erstellen", type: "action", puzzleType: "vertical" },
+            { id: "wrong-stock", icon: "📊", title: "Lager auffüllen", description: "Aktion: Lagerbestand erhöhen", type: "action", puzzleType: "horizontal" },
+            { id: "trigger-order", icon: "🛒", title: "Neue Bestellung", description: "Trigger: Bestellung eingetroffen", type: "trigger", puzzleType: "horizontal" },
+            { id: "action-standard-label", icon: "📦", title: "Standard-Versand", description: "Aktion: Standard-Label erstellen", type: "action", puzzleType: "vertical" },
+            { id: "wrong-archive", icon: "📁", title: "Produkt archivieren", description: "Aktion: Artikel archivieren", type: "action", puzzleType: "vertical" },
+            { id: "condition-premium", icon: "❓", title: "Premium-Kunde?", description: "Bedingung: Kundenstatus prüfen", type: "condition", puzzleType: "branch" },
+            { id: "action-get-order", icon: "📋", title: "Bestelldaten abrufen", description: "Aktion: Bestellinformationen laden", type: "action", puzzleType: "horizontal" },
+            { id: "wrong-cancel", icon: "❌", title: "Bestellung stornieren", description: "Aktion: Bestellung abbrechen", type: "action", puzzleType: "vertical" },
+            { id: "wrong-address", icon: "🏠", title: "Adresse ändern", description: "Aktion: Lieferadresse anpassen", type: "action", puzzleType: "vertical" }
         ],
         correctConnections: [
-            { from: "trigger-request", to: "action-get-manager", direction: "horizontal" },
-            { from: "action-get-manager", to: "action-approval", direction: "horizontal" },
-            { from: "action-approval", to: "condition-approved", direction: "horizontal" },
-            { from: "condition-approved", to: "action-notify-yes", direction: "vertical-top" },
-            { from: "condition-approved", to: "action-notify-no", direction: "vertical-bottom" }
+            { from: "trigger-order", to: "action-get-order", direction: "horizontal" },
+            { from: "action-get-order", to: "action-check-customer", direction: "horizontal" },
+            { from: "action-check-customer", to: "condition-premium", direction: "horizontal" },
+            { from: "condition-premium", to: "action-express-label", direction: "vertical-top" },
+            { from: "condition-premium", to: "action-standard-label", direction: "vertical-bottom" }
         ],
         tutorialMessages: [
-            "Willkommen zur finalen Challenge! 👑",
-            "Ein Approval-Flow ist ein Genehmigungsprozess: Jemand stellt einen Antrag (z.B. Urlaub, Ausgaben), der von einem Vorgesetzten genehmigt oder abgelehnt werden muss.",
-            "Baue diesen kompletten Workflow! Je nachdem ob genehmigt oder abgelehnt wurde, bekommt der Antragsteller eine unterschiedliche Nachricht. Viel Erfolg! 🚀"
+            "Willkommen zur finalen Challenge! 🚀",
+            "Hier automatisierst du einen Versandprozess: Wenn eine Bestellung eingeht, muss das richtige Versandlabel erstellt werden.",
+            "Premium-Kunden bekommen Express-Versand, normale Kunden Standard-Versand.",
+            "Der Flow verzweigt sich also in zwei Pfade basierend auf dem Kundenstatus der ermittelt wird!",
+            "Achtung: Viele Bausteine gehören NICHT in den Flow. Wähle nur die richtigen! 💡"
         ],
-        successMessage: "Unglaublich! Du bist ein Power Automate Profi! 👑"
+        successMessage: "Fantastisch! Du bist ein Power Automate Profi! 👑"
     }
 };
 
@@ -1435,10 +1438,10 @@ class PowerAutomateGame {
 
             console.log(`Challenge ${i}: unlocked=${isUnlocked}, completed=${isCompleted}`);
 
-            // Update points display
-            const pointsElement = cardElement.querySelector('.challenge-points');
-            if (pointsElement) {
-                pointsElement.textContent = isCompleted ? '100/100 Punkte' : '0/100 Punkte';
+            // Show price tag only when completed
+            const priceTag = cardElement.querySelector('.challenge-price-tag');
+            if (priceTag) {
+                priceTag.style.display = isCompleted ? 'block' : 'none';
             }
 
             // Update unlock status
@@ -1478,6 +1481,23 @@ class PowerAutomateGame {
                     statusElement.textContent = '✓ Abgeschlossen';
                     statusElement.style.color = 'var(--success-color)';
                 }
+            }
+        }
+
+        // Show scroll arrow after Challenge 3
+        const scrollArrow = document.getElementById('scrollArrow');
+        if (scrollArrow) {
+            if (this.isChallengeCompleted(3)) {
+                scrollArrow.style.display = 'block';
+                // Add animation class after a tiny delay to ensure clean start
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        scrollArrow.classList.add('active');
+                    });
+                });
+            } else {
+                scrollArrow.style.display = 'none';
+                scrollArrow.classList.remove('active');
             }
         }
     }

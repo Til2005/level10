@@ -539,18 +539,18 @@ const challenges = [
     {
         id: 1,
         title: "Challenge 1: Mercedes-Benz LinkedIn-Post",
-        description: "Das Mercedes-Benz Werk Sindelfingen hat heute das 50.000ste vollelektrische EQS-Fahrzeug in diesem Jahr produziert - ein wichtiger Meilenstein für die Elektromobilität. Das Marketing-Team braucht einen LinkedIn-Post, der professionell und stolz klingt, aber nicht übertrieben wirkt. Die Zielgruppe sind Automobilindustrie-Professionals, potenzielle Mitarbeiter und Partner.",
+        description: "Das Mercedes-Benz Werk Sindelfingen hat dieses Jahr sein 50.000stes vollelektrisches EQS-Fahrzeug gebaut. Das ist ein wichtiger Erfolg für die Elektromobilität. Das Team möchte einen LinkedIn-Post erstellen, der professionell und stolz klingt, aber nicht übertrieben ist. Er soll Fachleute aus der Automobilbranche, die eigenen Mitarbeiter und Partner ansprechen. Für welchen Prompt entscheidest du dich?",
         scenario: "⚡ Wichtiger Meilenstein - Post muss heute noch online!",
         prompts: [
             {
-                text: "Schreibe einen LinkedIn-Post über Elektroautos",
+                text: "Schreibe einen LinkedIn-Post über den 50000stes EQS",
                 quality: "poor",
                 score: 0,
                 response: "Elektroautos sind die Zukunft der Mobilität. Sie sind umweltfreundlich und effizient. Immer mehr Hersteller setzen auf elektrische Antriebe.\n\n#Elektromobilität #Zukunft\n\n*[Viel zu allgemein - keine spezifischen Informationen zum Meilenstein]*",
                 explanation: "Viel zu vage! Der Prompt enthält keine der wichtigen Informationen: Weder das Werk, noch die 50.000 Fahrzeuge, noch die Zielgruppe. Die AI kann nicht wissen, WORUM es konkret geht!"
             },
             {
-                text: "Erstelle einen LinkedIn-Post für Mercedes-Benz Werk Sindelfingen. Heute wurde das 50.000ste vollelektrische EQS-Fahrzeug in diesem Jahr produziert. Ton: Professionell, stolz aber nicht übertrieben. Zielgruppe: Automobilindustrie-Professionals, potenzielle Mitarbeiter, Partner. Betone: Meilenstein Elektromobilität, Teamleistung, Zukunft der Mobilität.",
+                text: "Erstelle einen LinkedIn-Post für das Mercedes-Benz Werk Sindelfingen. Heute wurde das 50.000ste vollelektrische EQS-Fahrzeug in diesem Jahr produziert. Ton: Professionell, stolz, aber nicht übertrieben. Zielgruppe: Fachleute aus der Automobilindustrie, eigene Mercedes-Benz Mitarbeiter und Partner. Erstelle mir einen Entwurf.",
                 quality: "excellent",
                 score: 100,
                 response: "🎉 Meilenstein in Sindelfingen: 50.000 EQS in 2025!\n\nHeute haben wir am Standort Sindelfingen das 50.000ste vollelektrische EQS-Fahrzeug in diesem Jahr vom Band rollen lassen. Dieser Erfolg ist das Ergebnis der außergewöhnlichen Teamleistung unserer Mitarbeiterinnen und Mitarbeiter.\n\nMit jedem EQS gestalten wir aktiv die Zukunft der Mobilität – elektrisch, nachhaltig und innovativ. Danke an alle, die diesen Meilenstein möglich gemacht haben!\n\n#MercedesBenz #Elektromobilität #EQS #Sindelfingen #ZukunftDerMobilität #Teamwork\n\n*[Perfekt: Alle wichtigen Infos enthalten, professioneller Ton, richtige Zielgruppe]*",
@@ -569,7 +569,7 @@ const challenges = [
     {
         id: 2,
         title: "Challenge 2: WhatsApp-Nachricht Chaos",
-        description: "Du willst deiner Oma (78) erklären, wie sie Fotos in WhatsApp verschicken kann. Sie ist nervös und hat wenig Technik-Erfahrung.",
+        description: "Du möchtest deiner Oma (78 Jahre alt, ein wenig ängstlich vor Technik und kennt sich damit nicht gut aus) erklären, wie sie Fotos über WhatsApp verschicken kann.",
         scenario: "📱 Oma wartet am Telefon - Erklärung muss sofort verständlich sein!",
         prompts: [
             {
@@ -599,18 +599,18 @@ const challenges = [
     {
         id: 3,
         title: "Challenge 3: Bewerbungs-Stress",
-        description: "Dein Freund Max (26) bewirbt sich als Grafikdesigner. Er hat 3 Jahre Berufserfahrung, kann Photoshop/Illustrator und hat das Rebranding einer lokalen Bäckerei gemacht. Sein Anschreiben ist langweilig. Wie hilfst du ihm?",
+        description: "Dein Freund Max (26) möchte sich als Grafikdesigner bewerben. Er hat schon 3 Jahre Berufserfahrung, kann gut mit Photoshop und Illustrator umgehen und hat sogar das Rebranding einer Bäckerei gemacht. Sein Bewerbungsschreiben ist ziemlich langweilig. Wie würdest du ihm helfen?",
         scenario: "🕐 Bewerbungsfrist läuft morgen ab - muss heute fertig werden!",
         prompts: [
             {
-                text: "Verbessere mein Anschreiben",
+                text: "Verbessere das Anschreiben",
                 quality: "poor",
                 score: 0,
                 response: "Hier sind einige Verbesserungsvorschläge für Ihr Anschreiben:\n\n- Verwenden Sie aktivere Sprache\n- Fügen Sie mehr Details hinzu\n- Strukturieren Sie den Text besser\n- Korrigieren Sie Rechtschreibfehler\n\n*[Viel zu allgemein - was soll konkret verbessert werden?]*",
-                explanation: "Zu vage! 'Verbessere mein Anschreiben' ist wie 'Mach es besser' - die AI weiß nicht, WAS verbessert werden soll. Kontext ist King!"
+                explanation: "Zu vage! 'Verbessere das Anschreiben' ist wie 'Mach es besser' - die AI weiß nicht, WAS verbessert werden soll. Kontext ist King!"
             },
             {
-                text: "Du bist ein zertifizierter HR-Experte mit 25 Jahren Erfahrung mit Expertise in modernen Bewerbungsstrategien. Analysiere das Anschreiben meines Freundes für eine Grafikdesigner-Position und optimiere es nach neuesten HR-Trends, sodass es nicht so langweilig wirkt. Er hat 3 Jahre Erfahrung, kann Photoshop/Illustrator und hat das Rebranding einer lokalen Bäckerei gemacht.",
+                text: "Du bist ein Grafikdesigner mit Expertise in modernen Bewerbungsstrategien. Analysiere das Anschreiben meines Freundes für eine Grafikdesigner-Position und optimiere es nach neuesten HR-Trends, sodass es nicht so langweilig wirkt. Er hat 3 Jahre BerufsErfahrung, kann Photoshop/Illustrator und hat das Rebranding einer lokalen Bäckerei gemacht.",
                 quality: "excellent",
                 score: 100,
                 response: "**Überarbeitetes Anschreiben - Grafikdesigner:**\n\nSehr geehrte Damen und Herren,\n\nDesign ist für mich mehr als schöne Bilder – es löst Probleme. Als ich letztes Jahr das Rebranding für die lokale Bäckerei Schmidt entwickelte, stieg deren Umsatz um 30%. Das war der Moment, wo ich wusste: Gutes Design verändert wirklich etwas.\n\nMeine 3-jährige Berufserfahrung mit Photoshop und Illustrator ermöglicht es mir, vielseitige Lösungen zu entwickeln. Von Plakat-Kampagnen bis zu digitalen Web-Experiences – ich denke immer daran, wie Menschen mit Design interagieren.\n\nIhre Stellenausschreibung hat mich sofort angesprochen, weil Sie nach jemandem suchen, der 'über den Tellerrand blickt'. Genau das mache ich: Ich verbinde kreative Vision mit strategischem Denken.\n\nIch würde gerne zeigen, wie meine Erfahrung und Leidenschaft Ihr Team bereichern kann.\n\nMit freundlichen Grüßen\nMax\n\n*[Perfekt: Konkret, authentisch, zeigt Erfahrung und Erfolge]*",
@@ -629,7 +629,7 @@ const challenges = [
     {
         id: 4,
         title: "Challenge 4: Sicherheitsrichtlinien-Schulung",
-        description: "In der Mercedes-Benz Produktion wurden neue Sicherheitsrichtlinien für die Arbeit an Hochvolt-Batterien eingeführt. Diese müssen allen 450 Mitarbeitern der Elektromontage erklärt werden - viele davon haben unterschiedliche technische Vorkenntnisse. Die Schulungsabteilung braucht eine verständliche Zusammenfassung für eine 15-minütige Sicherheitsunterweisung.",
+        description: "Bei Mercedes-Benz müssen rund 450 Produktionsmitarbeiter die neuen Sicherheitsregeln im Umgang mit Hochvolt-Batterien geschult werden. In der Elektromontage liegen unterschiedliche technische Vorkenntnisse vor. Die Schulungsabteilung benötigt eine verständliche und einfache Zusammenfassung für ein 15-minütiges Training.",
         scenario: "⚠️ Neue Sicherheitsrichtlinien - Schulung startet morgen!",
         prompts: [
             {
@@ -659,7 +659,7 @@ const challenges = [
     {
         id: 5,
         title: "Challenge 5: Mitarbeiter-Newsletter - Neue Kantine",
-        description: "Das Mercedes-Benz Werk Rastatt hat seine Kantine komplett renoviert und um einen neuen veganen Bereich erweitert. Die interne Kommunikation braucht einen Newsletter-Artikel für die 6.500 Mitarbeiter. Der Ton soll informativ, freundlich und inklusiv sein - es sollen sich alle Mitarbeiter angesprochen fühlen.",
+        description: "Das Mercedes-Benz Werk in Rastatt hat seine Kantine komplett erneuert und um einen neuen Bereich nur für veganes Essen erweitert. Die interne Kommunikationsabteilung braucht einen Artikel für den Newsletter, der an alle 6.500 Mitarbeiter gerichtet ist. Der Artikel soll informieren, freundlich klingen und alle Mitarbeiter ansprechen, damit sich jeder willkommen fühlt.",
         scenario: "🍽️ Kantine öffnet morgen - Newsletter muss heute raus!",
         prompts: [
             {
@@ -689,7 +689,7 @@ const challenges = [
     {
         id: 6,
         title: "Challenge 6: Lautsprecher-Durchsage Staplerverkehr",
-        description: "In der Produktionshalle 3 des Mercedes-Benz Werks Sindelfingen finden heute außerplanmäßig Materialtransporte mit Gabelstaplern statt. Du bist Schichtleiter und musst eine kurze Durchsage über die Lautsprecher-Anlage machen, um die 180 Mitarbeiter in der Halle zu warnen. Eine Durchsage sollte maximal 15 Sekunden dauern - knapp, klar, und direkt verständlich.",
+        description: "Du bist Schichtleiter in der Produktionshalle 3 im Mercedes-Benz Werk Sindelfingen. Heute gibt es unerwartet viele Materialtransporte mit Gabelstaplern. Du musst schnell eine kurze Durchsage über die Lautsprecher machen, um die 180 Mitarbeiter in der Halle zu warnen. Deine Durchsage muss maximal 15 Sekunden lang sein sowie kurz, klar und sofort verständlich.",
         scenario: "📢 Stapler fahren gleich los - Durchsage muss JETZT gemacht werden!",
         prompts: [
             {
@@ -719,7 +719,7 @@ const challenges = [
     {
         id: 7,
         title: "Challenge 7: E-Mail Betreff-Zeile Meeting-Verlegung",
-        description: "Du bist Assistent der Geschäftsführung im Mercedes-Benz Werk Berlin. Ein wichtiges Projekt-Meeting mit 12 Teilnehmern muss kurzfristig von morgen 10 Uhr auf morgen 15 Uhr verlegt werden. Der Raum ändert sich auch (von Konferenzraum 201 zu 304). Du sollst die Betreff-Zeile für die Änderungs-E-Mail schreiben. Die Betreff-Zeile muss alle wichtigen Infos enthalten - die Teilnehmer sollen im Posteingang SOFORT sehen was Sache ist, ohne die E-Mail öffnen zu müssen.",
+        description: "Du bist Assistent im Mercedes-Benz Werk Berlin und musst das morgige Projekt-Meeting in Uhrzeit und Räumlichkeit verschieben (um 10 Uhr/Raum 201 - auf 15 Uhr/Raum 304). Schreibe eine Betreffzeile für die Änderungs-E-Mail, die alle wichtigen Infos sofort sichtbar macht.",
         scenario: "📧 Meeting-Änderung muss sofort kommuniziert werden!",
         prompts: [
             {
@@ -749,7 +749,7 @@ const challenges = [
     {
         id: 8,
         title: "Challenge 8: KI-Textzusammenfassung - Meeting-Protokoll",
-        description: "Im Mercedes-Benz Werk Berlin fand gestern ein 3-stündiges Strategie-Meeting zur E-Mobilität statt. Es gibt ein 8-seitiges Protokoll mit vielen Details. Die Geschäftsführung hat keine Zeit, 8 Seiten zu lesen - sie braucht eine Zusammenfassung der wichtigsten Punkte. Du sollst im Mercedes-Benz Direct Chat passend prompten, um das Protokoll auf maximal 5 Bullet Points zusammenzufassen.",
+        description: "Du bist Assistent im Mercedes-Benz Werk Berlin. Es gibt ein 8-seitiges Protokoll von einem Strategie-Meeting zur E-Mobilität. Die Geschäftsführung braucht eine schnelle Zusammenfassung: maximal 5 Stichpunkte mit den wichtigsten Infos.",
         scenario: "📄 Geschäftsführung braucht Zusammenfassung bis heute Nachmittag!",
         prompts: [
             {
@@ -779,7 +779,7 @@ const challenges = [
     {
         id: 9,
         title: "Challenge 9: KI-Schulungskonzept - Neue Produktionstechnologie",
-        description: "Im Mercedes-Benz Werk Berlin wird ein neues KI-gestütztes Assistenzsystem für die Montage von E-Antrieben eingeführt. Das System führt Mitarbeiter Schritt-für-Schritt durch die Montage und erkennt Fehler automatisch. 250 Produktionsmitarbeiter müssen geschult werden - das Alter reicht von 22 bis 62 Jahren.",
+        description: "Im Mercedes-Benz Werk Berlin gibt es ein neues Computerprogramm, das den 250 Mitarbeitern im Alter von 22-62 Jahren beim Zusammenbau von Elektro-Motoren hilft, indem es Schritt für Schritt anleitet und Fehler sofort erkennt. Diese Mitarbeiter müssen nun geschult werden.",
         scenario: "📋 Präsentation vor Geschäftsführung ist übermorgen!",
         prompts: [
             {
@@ -809,7 +809,7 @@ const challenges = [
     {
         id: 10,
         title: "Challenge 10: Türschild-Text für neuen Meetingraum",
-        description: "Im Mercedes-Benz Werk Berlin wurde ein neuer Meetingraum eingerichtet: das 'Innovation Lab'. Dieser Raum ist speziell ausgestattet für kreative Workshops, Brainstorming-Sessions und agile Team-Meetings. Er hat Whiteboards, flexible Möbel und moderne Technik. Jetzt braucht der Raum ein Türschild mit einer kurzen Beschreibung, damit Mitarbeiter wissen, wofür der Raum gedacht ist.",
+        description: "Im Mercedes-Benz Werk Berlin gibt es einen neuen Raum: das \"Innovation Lab\". Es ist für kreative Workshops, Brainstorming und agile Meetings gedacht, mit Whiteboards, flexiblen Möbeln und moderner Technik ausgestattet. Schreibe eine kurze Beschreibung für ein Türschild, damit jeder weiß, wofür der Raum ist.",
         scenario: "🚪 Türschild muss heute noch gedruckt werden!",
         prompts: [
             {

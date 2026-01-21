@@ -376,9 +376,9 @@ h1, h2, h3, h4, h5, h6,
 .title-main {
     position: relative;
     display: block;
-    font-size: 140px;
+    font-size: 80px;
     font-weight: 900;
-    letter-spacing: 30px;
+    letter-spacing: 8px;
     color: #E8E8E8;
     text-shadow:
         0 0 8px rgba(255, 255, 255, 0.5),
@@ -484,9 +484,9 @@ h1, h2, h3, h4, h5, h6,
     top: 0;
     left: 0;
     width: 100%;
-    font-size: 140px;
+    font-size: 80px;
     font-weight: 900;
-    letter-spacing: 30px;
+    letter-spacing: 8px;
     color: var(--maya-blue);
     opacity: 0.5;
     z-index: -1;
@@ -1664,3 +1664,61 @@ h1, h2, h3, h4, h5, h6,
 .level-select-container::-webkit-scrollbar-thumb:hover {
     background: var(--primary-color);
 }
+
+/* Scroll Arrow */
+.scroll-arrow {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: default;
+    z-index: 1000;
+    user-select: none;
+}
+
+.scroll-arrow::before {
+    content: '⬇';
+    font-size: 48px;
+    color: var(--saffron);
+    text-shadow:
+        0 0 10px rgba(245, 192, 59, 0.8),
+        0 0 20px rgba(245, 192, 59, 0.5);
+    display: block;
+}
+
+.scroll-arrow.active::before {
+    animation: bounceArrow 2s ease-in-out infinite;
+}
+
+.scroll-arrow:hover::before {
+    filter: brightness(1.3);
+}
+
+.scroll-arrow::after {
+    content: 'Scrolle nach unten um mit dem Kurs fortzufahren';
+    position: fixed;
+    bottom: 75px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--saffron);
+    white-space: nowrap;
+    text-shadow:
+        0 0 10px rgba(245, 192, 59, 0.8),
+        0 0 20px rgba(245, 192, 59, 0.5),
+        2px 2px 4px rgba(0, 0, 0, 0.8);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.scroll-arrow:hover::after {
+    opacity: 1;
+}
+
+@keyframes bounceArrow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+

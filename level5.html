@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Schummeln erlaubt</title>
+    <title>Abkürzung statt Umweg, schummeln erlaubt!</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="level5.css">
 </head>
@@ -11,9 +11,15 @@
     <div class="container">
 
         <!-- Music Toggle Button (Top Right) -->
-        <button class="music-toggle-btn" id="musicToggle" aria-label="Musik an/aus">
-            🔇
-        </button>
+        <div class="music-control-container">
+            <button class="music-toggle-btn" id="musicToggle" aria-label="Musik an/aus">
+                🔇
+            </button>
+            <div class="volume-slider-container">
+                <input type="range" min="0" max="100" value="70" class="volume-slider" id="volumeSlider">
+                <div class="volume-label" id="volumeLabel">70%</div>
+            </div>
+        </div>
 
         <!-- Background Music -->
         <audio id="backgroundMusic" loop>
@@ -76,8 +82,8 @@
 
                     <!-- Main Title -->
                     <h1 class="game-title">
-                        <span class="title-line-1">Schummeln</span>
-                        <span class="title-line-2">erlaubt</span>
+                        <span class="title-line-1">Abkürzung statt Umweg,</span>
+                        <span class="title-line-2">schummeln erlaubt!</span>
                     </h1>
 
                     <!-- Press Any Key -->
@@ -91,7 +97,7 @@
             <!-- Loading Screen -->
             <div class="game-screen" id="loadingScreen">
                 <div class="loading-content">
-                    <h2 class="loading-title">Lade Assets...</h2>
+                    <h2 class="loading-title">Lade Game...</h2>
                     <div class="loading-bar-container">
                         <div class="loading-bar" id="loadingBar"></div>
                     </div>
@@ -102,12 +108,12 @@
             <!-- Level Selection Screen - World Map -->
             <div class="game-screen" id="levelSelectScreen">
                 <div class="world-map-container">
-                    <h2 class="world-map-title">Schummeln erlaubt</h2>
-                    <div class="world-map-subtitle">Wähle dein Level</div>
+                    <h2 class="world-map-title">Abkürzung statt Umweg, schummeln erlaubt!</h2>
 
                     <div class="world-map-levels">
                         <!-- Level 1 - Bottom Left -->
                         <div class="map-level" data-level="1" style="left: 150px; top: 300px;">
+                            <div class="map-level-price-tag" style="display: none;">100P</div>
                             <div class="map-level-icon">
                                 <div class="map-level-number">1</div>
                                 <div class="map-level-glow"></div>
@@ -115,12 +121,12 @@
                             <div class="map-level-info">
                                 <div class="map-level-name">Erste Anfrage</div>
                                 <div class="map-level-status unlocked">▶ Start</div>
-                                <div class="map-level-points">0 / 100 Punkte</div>
                             </div>
                         </div>
 
                         <!-- Level 2 - Mid Left -->
                         <div class="map-level locked" data-level="2" style="left: 336px; top: 210px;">
+                            <div class="map-level-price-tag" style="display: none;">100P</div>
                             <div class="map-level-icon">
                                 <div class="map-level-number">2</div>
                                 <div class="map-level-lock">🔒</div>
@@ -129,12 +135,12 @@
                             <div class="map-level-info">
                                 <div class="map-level-name">Zeitfilter</div>
                                 <div class="map-level-status">Gesperrt</div>
-                                <div class="map-level-points">0 / 100 Punkte</div>
                             </div>
                         </div>
 
                         <!-- Level 3 - Center -->
                         <div class="map-level locked" data-level="3" style="left: 540px; top: 150px;">
+                            <div class="map-level-price-tag" style="display: none;">100P</div>
                             <div class="map-level-icon">
                                 <div class="map-level-number">3</div>
                                 <div class="map-level-lock">🔒</div>
@@ -143,12 +149,12 @@
                             <div class="map-level-info">
                                 <div class="map-level-name">Visualisierung</div>
                                 <div class="map-level-status">Gesperrt</div>
-                                <div class="map-level-points">0 / 100 Punkte</div>
                             </div>
                         </div>
 
                         <!-- Level 4 - Mid Right -->
                         <div class="map-level locked" data-level="4" style="left: 744px; top: 90px;">
+                            <div class="map-level-price-tag" style="display: none;">100P</div>
                             <div class="map-level-icon">
                                 <div class="map-level-number">4</div>
                                 <div class="map-level-lock">🔒</div>
@@ -157,12 +163,12 @@
                             <div class="map-level-info">
                                 <div class="map-level-name">Filter & Sortierung</div>
                                 <div class="map-level-status">Gesperrt</div>
-                                <div class="map-level-points">0 / 100 Punkte</div>
                             </div>
                         </div>
 
                         <!-- Level 5 - Top Right (Final Boss) -->
                         <div class="map-level locked final-level" data-level="5" style="left: 936px; top: 30px;">
+                            <div class="map-level-price-tag" style="display: none;">100P</div>
                             <div class="map-level-icon">
                                 <div class="map-level-number">5</div>
                                 <div class="map-level-lock">🔒</div>
@@ -172,7 +178,6 @@
                             <div class="map-level-info">
                                 <div class="map-level-name">Finale Prüfung</div>
                                 <div class="map-level-status">Gesperrt</div>
-                                <div class="map-level-points">0 / 100 Punkte</div>
                             </div>
                         </div>
                     </div>
@@ -199,10 +204,8 @@
                         </div>
                     </div>
 
-                    <!-- Reset Progress Button (outside card, to the right) -->
-                    <button class="reset-progress-btn" onclick="showResetConfirmation()">
-                        Fortschritt zurücksetzen
-                    </button>
+                    <!-- Scroll Down Arrow -->
+                    <div class="scroll-arrow" id="scrollArrow" style="display: none;"></div>
                 </div>
             </div>
 

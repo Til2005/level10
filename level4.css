@@ -1921,3 +1921,110 @@ body:has(#introScreen.active) .hud-wrapper {
         font-size: 14px;
     }
 }
+
+/* ===== TUTORIAL INFO BOX ===== */
+.tutorial-info-box {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    background: linear-gradient(145deg, rgba(75, 0, 116, 0.98), rgba(60, 58, 165, 0.98));
+    border: 3px solid var(--saffron);
+    border-radius: 20px;
+    padding: 30px 40px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow:
+        0 0 40px rgba(245, 192, 59, 0.6),
+        0 20px 60px rgba(0, 0, 0, 0.8);
+    animation: tutorialBoxAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    backdrop-filter: blur(10px);
+}
+
+@keyframes tutorialBoxAppear {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-30px) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+}
+
+.tutorial-info-content {
+    text-align: center;
+    color: white;
+}
+
+.tutorial-info-content h3 {
+    font-family: 'Ithaca', sans-serif;
+    font-size: 1.6rem;
+    color: var(--saffron);
+    margin: 0 0 15px 0;
+    text-shadow: 0 0 10px rgba(245, 192, 59, 0.5);
+}
+
+.tutorial-info-content p {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0 0 20px 0;
+    color: var(--maya-blue);
+}
+
+.tutorial-continue-btn {
+    background: linear-gradient(135deg, var(--saffron), #FFD700);
+    border: 2px solid white;
+    border-radius: 12px;
+    padding: 12px 35px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--russian-blue);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(245, 192, 59, 0.4);
+}
+
+.tutorial-continue-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(245, 192, 59, 0.6);
+    background: linear-gradient(135deg, #FFD700, var(--saffron));
+}
+
+.tutorial-continue-btn:active {
+    transform: translateY(-1px);
+}
+
+/* ===== TUTORIAL SKIP OPTION ===== */
+.tutorial-skip-option {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(168, 106, 255, 0.3);
+}
+
+.tutorial-skip-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    color: var(--maya-blue);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.tutorial-skip-label:hover {
+    color: var(--saffron);
+}
+
+.tutorial-skip-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--saffron);
+}
+
+.tutorial-skip-label span {
+    user-select: none;
+}

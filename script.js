@@ -98,8 +98,8 @@ function downloadCalendar() {
 
     // Add each Friday as an event
     fridays.forEach((friday, index) => {
-        const startTime = formatICSDate(friday, 13, 0); // 13:00
-        const endTime = formatICSDate(friday, 14, 0);   // 14:00
+        const startTime = formatICSDate(friday, 8, 15); // 08:15
+        const endTime = formatICSDate(friday, 9, 15);   // 09:15
         const uid = `ai-bytes-${friday.getTime()}-${index}@ai-bytes.de`;
         const now = formatICSDate(new Date(), null, null, true);
 
@@ -109,7 +109,7 @@ function downloadCalendar() {
         icsContent += `DTSTART:${startTime}\r\n`;
         icsContent += `DTEND:${endTime}\r\n`;
         icsContent += 'SUMMARY:AI-Bytes Training\r\n';
-        icsContent += 'DESCRIPTION:Zeit für dein AI-Bytes Training! Setze deine Reise fort und lerne neue Prompting-Skills.\r\n';
+        icsContent += 'DESCRIPTION:Hey!\\n\\nDie Lerneinheiten dauern nur wenige Minuten.\\nDafür halten wir dir dieses Zeitfenster frei\\, natürlich kannst du die AI Bytes Level auch jederzeit flexibel starten.\\nUnter folgendem Link findest du deine Lernreise:\\n\\nhttps://les.mo360cp.i.mercedes-benz.com/cms/aibytes?sesskey=r59vhX43Qm\\n\\nViel Spaß beim Leveln! 🚀\\nDein AI-Bytes Team\\n\\nℹ️ Hinweis: Wenn du die Erinnerung nicht mehr brauchst\\,\\nkannst du den Serientermin einfach aus deinem Kalender löschen.\r\n';
         icsContent += 'STATUS:CONFIRMED\r\n';
         icsContent += 'SEQUENCE:0\r\n';
         icsContent += 'BEGIN:VALARM\r\n';
@@ -274,7 +274,7 @@ function calculateTotalRank(totalPoints) {
 function updateTotalProgress() {
     // Collect all level points
     const level1Points = parseInt(localStorage.getItem('playerPoints')) || 0;
-    const level2Points = JSON.parse(localStorage.getItem('aiBytes_level4_progress') || '{}').score || 0;
+    const level2Points = Math.min(JSON.parse(localStorage.getItem('aiBytes_level4_progress') || '{}').score || 0, 500);
     const level3Points = JSON.parse(localStorage.getItem('aiBytes_level1_progress') || '{}').score || 0;
     const level4Points = JSON.parse(localStorage.getItem('powerAutomateProgress') || '{}').totalPoints || 0;
     const level5Points = JSON.parse(localStorage.getItem('aiBytes_level6_progress') || '{}').totalPoints || 0;
@@ -319,7 +319,7 @@ function updateTotalProgress() {
     // Position rank badge above current progress
     if (rankBadgeWrapper) {
         // Ensure minimum position so badge doesn't go off-screen on the left
-        const minPercentage = 8;
+        const minPercentage = 2;
         const positionPercentage = Math.max(percentage, minPercentage);
         rankBadgeWrapper.style.left = positionPercentage + '%';
     }
@@ -362,7 +362,7 @@ function loadLevelRanks() {
 
     if (level4Progress) {
         const progress = JSON.parse(level4Progress);
-        const points = progress.score || 0;
+        const points = Math.min(progress.score || 0, 500);
         updateLevelProgress(level2Card, points);
     } else {
         updateLevelProgress(level2Card, 0);
@@ -516,7 +516,7 @@ function updateLevelLocks() {
 
 // Check if all levels have Gold rank to unlock secret level
 function checkSecretLevel() {
-    const secretLevel = document.querySelector('.level-9');
+    const secretLevel = document.querySelector('.level-10.mystery');
     if (!secretLevel) return;
 
     // For now, only check Level 1 since it's the only one implemented
@@ -567,7 +567,7 @@ function updateMysteryLevel() {
 
     // Calculate total points
     const level1Points = parseInt(localStorage.getItem('playerPoints')) || 0;
-    const level2Points = JSON.parse(localStorage.getItem('aiBytes_level4_progress') || '{}').score || 0;
+    const level2Points = Math.min(JSON.parse(localStorage.getItem('aiBytes_level4_progress') || '{}').score || 0, 500);
     const level3Points = JSON.parse(localStorage.getItem('aiBytes_level1_progress') || '{}').score || 0;
     const level4Points = JSON.parse(localStorage.getItem('powerAutomateProgress') || '{}').totalPoints || 0;
     const level5Points = JSON.parse(localStorage.getItem('aiBytes_level6_progress') || '{}').totalPoints || 0;
@@ -1464,3 +1464,97 @@ document.addEventListener('click', function(event) {
         closeRankLegend();
     }
 });
+
+// ===============================
+//   SECRET TXP CHEAT CODE
+// ===============================
+(function() {
+    const secretSequence = ['t', 'x', 'p'];
+    let currentSequence = [];
+    let resetTimeout;
+    let unlocked = false;
+
+    function unlockMysteryLevel() {
+        if (unlocked) return; // Verhindere mehrfaches Aufrufen
+        unlocked = true;
+
+        const mysteryLevel = document.querySelector('.level-10.mystery');
+        if (!mysteryLevel) return;
+
+        // Remove locked state
+        mysteryLevel.classList.remove('locked');
+        mysteryLevel.classList.add('unlocked');
+        mysteryLevel.style.cursor = 'pointer';
+        mysteryLevel.style.opacity = '1';
+        mysteryLevel.style.filter = 'none';
+
+        // Update title
+        const title = mysteryLevel.querySelector('.level-title');
+        if (title) {
+            title.textContent = '🌟 TXP Geheim-Level 🌟';
+        }
+
+        // Update progress text
+        const progressText = mysteryLevel.querySelector('.level-progress-text');
+        if (progressText) {
+            progressText.textContent = '✨ Freigeschaltet mit TXP Code!';
+            progressText.style.color = 'var(--saffron)';
+        }
+
+        // Update progress fill
+        const progressFill = mysteryLevel.querySelector('.level-progress-fill');
+        if (progressFill) {
+            progressFill.style.width = '100%';
+        }
+
+        // Add click handler
+        mysteryLevel.onclick = function() {
+            alert('🎉 Du hast den geheimen TXP Code gefunden! Das Meister Level ist noch in Entwicklung!');
+        };
+
+        // Show TXP celebration
+        if (window.txpCharacter) {
+            window.txpCharacter.speak('🎉 TXP CODE AKTIVIERT! Du hast mich gefunden! Das geheime Level ist jetzt freigeschaltet!');
+        }
+
+        // Visual feedback
+        mysteryLevel.style.animation = 'pulse 0.5s ease-in-out 3';
+    }
+
+    // Listen for key presses (sequence only)
+    document.addEventListener('keydown', function(event) {
+        // Ignore if user is typing in an input field
+        if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+            return;
+        }
+
+        const key = event.key.toLowerCase();
+
+        // Only track if it's one of our secret keys
+        if (secretSequence.includes(key)) {
+            currentSequence.push(key);
+
+            // Keep only last 3 keys
+            if (currentSequence.length > 3) {
+                currentSequence.shift();
+            }
+
+            // Clear timeout and set new one
+            clearTimeout(resetTimeout);
+            resetTimeout = setTimeout(() => {
+                currentSequence = [];
+            }, 2000); // Reset after 2 seconds
+
+            // Check if sequence matches T-X-P
+            if (currentSequence.length === 3 &&
+                currentSequence[0] === 't' &&
+                currentSequence[1] === 'x' &&
+                currentSequence[2] === 'p') {
+
+                unlockMysteryLevel();
+                currentSequence = [];
+                clearTimeout(resetTimeout);
+            }
+        }
+    });
+})();

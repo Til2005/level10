@@ -95,12 +95,6 @@ const IMAGE_PROMPTS = {
             image: "assets/level4/01_roboter_good.png"
         },
         {
-            description: "Produktfotografie-Studio, weißer Infinity-Hintergrund, Softboxen, Hasselblad Kamera, minimalistisch",
-            caption: "✓ Guter Prompt",
-            icon: "📸",
-            image: "assets/level4/02_fotostudio_good.png"
-        },
-        {
             description: "Qualitätskontrolle: Prüfstand mit LED-Ringlicht, Kabelbaum, Monitor zeigt KI-Analyse, technisch",
             caption: "✓ Guter Prompt",
             icon: "🔍",
@@ -155,12 +149,6 @@ const IMAGE_PROMPTS = {
             caption: "✗ Schlechter Prompt",
             icon: "🤖",
             image: "assets/level4/01_roboter_bad.png"
-        },
-        {
-            description: "Studio mit Kamera",
-            caption: "✗ Schlechter Prompt",
-            icon: "📸",
-            image: "assets/level4/02_fotostudio_bad.png"
         },
         {
             description: "Qualitätskontrolle",
@@ -775,6 +763,9 @@ class BildPuzzleGame {
         // Game state
         this.isRunning = false;
         this.isPaused = false;
+        this.isTutorial = false;
+        this.tutorialStep = 0;
+        this.tutorialCard = null;
         this.gameTime = 0; // Time in seconds, counts up
 
         // Player & Cards
@@ -924,10 +915,15 @@ class BildPuzzleGame {
         this.mistakes = 0;
         this.gameTime = 0;
         this.achievementShownThisRun = false;
+        this.tutorialStep = 0;
 
         // Clear any existing cards
         this.cards.forEach(card => card.destroy());
         this.cards = [];
+        if (this.tutorialCard) {
+            this.tutorialCard.destroy();
+            this.tutorialCard = null;
+        }
 
         // Show game screen
         this.showScreen('gameScreen');
@@ -941,11 +937,137 @@ class BildPuzzleGame {
         // Update UI
         this.updateUI();
 
-        // Start game loop
+        // Check if tutorial should be skipped
+        const skipTutorial = localStorage.getItem('aiBytes_level4_skipTutorial') === 'true';
+
+        if (skipTutorial) {
+            // Skip tutorial, start game directly
+            this.isTutorial = false;
+            this.isRunning = true;
+            this.lastTime = performance.now();
+            this.gameLoop();
+            this.showSpeech("Los geht's! Sammle die guten Prompts!");
+        } else {
+            // Start tutorial first
+            this.isTutorial = true;
+            this.startTutorial();
+        }
+    }
+
+    startTutorial() {
+        this.isTutorial = true;
+        this.tutorialStep = 0;
+
+        // Start game loop for tutorial
         this.isRunning = true;
         this.lastTime = performance.now();
         this.gameLoop();
 
+        // Spawn bad card first without explanation
+        this.spawnTutorialCard('bad');
+    }
+
+    spawnTutorialCard(quality) {
+        // Get the specific card data based on quality
+        const imageData = quality === 'bad'
+            ? IMAGE_PROMPTS.bad.find(card => card.image.includes('01_roboter_bad'))
+            : IMAGE_PROMPTS.good.find(card => card.image.includes('01_roboter_good'));
+
+        if (!imageData) {
+            console.error('Tutorial card not found:', quality);
+            return;
+        }
+
+        // Create the tutorial card at the top center
+        const card = new FallingCard(this.gameArea, imageData, quality, 1.0);
+        card.x = this.gameArea.clientWidth / 2 - GAME_CONFIG.cardWidth / 2;
+        card.y = -GAME_CONFIG.cardHeight;
+        this.tutorialCard = card;
+
+        // Track if explanation was shown
+        let explanationShown = false;
+
+        // Start a simple animation loop just for the tutorial card
+        const animateTutorialCard = () => {
+            if (!this.isTutorial || !this.tutorialCard) return;
+
+            // Move card down slowly
+            this.tutorialCard.y += 2;
+            this.tutorialCard.updatePosition();
+
+            // Show explanation when card is about 15% down the screen
+            if (!explanationShown && this.tutorialCard.y >= this.gameArea.clientHeight * 0.15) {
+                explanationShown = true;
+
+                if (quality === 'bad') {
+                    // Show explanation for bad prompt while card is falling
+                    this.showTutorialInfo(
+                        "❌ Schlechter Prompt",
+                        "Ein einfacher, unspezifischer Prompt wie 'Roboter schweißt' gibt dir zwar ein Bild aus, aber das Ergebnis passt selten zu deinen Vorstellungen.",
+                        () => {
+                            // After clicking continue, stop current card and spawn good card
+                            if (this.tutorialCard) {
+                                this.tutorialCard.destroy();
+                                this.tutorialCard = null;
+                            }
+                            this.spawnTutorialCard('good');
+                        }
+                    );
+                } else {
+                    // Show explanation for good prompt while card is falling
+                    this.showTutorialInfo(
+                        "✅ Guter Prompt",
+                        "Ein spezifischer und detaillierter Prompt wie 'Industrieroboter schweißt Metallteile, Funkenflug, dramatische Beleuchtung, Weitwinkel' liefert ein viel besseres und passenderes Ergebnis!",
+                        () => {
+                            // After clicking continue, stop current card and finish tutorial
+                            if (this.tutorialCard) {
+                                this.tutorialCard.destroy();
+                                this.tutorialCard = null;
+                            }
+                            this.finishTutorial();
+                        }
+                    );
+                }
+            }
+
+            // Check if card reached the ground (continue falling even if explanation is shown)
+            if (this.tutorialCard.y >= this.gameArea.clientHeight - GAME_CONFIG.cardHeight - 50) {
+                // Card landed at bottom, stop animation (wait for user to click continue)
+                return;
+            } else {
+                requestAnimationFrame(animateTutorialCard);
+            }
+        };
+
+        requestAnimationFrame(animateTutorialCard);
+    }
+
+    showTutorialInfo(title, text, callback) {
+        const infoBox = document.getElementById('tutorialInfoBox');
+        const infoTitle = document.getElementById('tutorialInfoTitle');
+        const infoText = document.getElementById('tutorialInfoText');
+        const continueBtn = document.getElementById('tutorialContinueBtn');
+
+        infoTitle.textContent = title;
+        infoText.textContent = text;
+        infoBox.style.display = 'block';
+
+        // Remove old event listeners
+        const newContinueBtn = continueBtn.cloneNode(true);
+        continueBtn.parentNode.replaceChild(newContinueBtn, continueBtn);
+
+        // Add new event listener
+        newContinueBtn.addEventListener('click', () => {
+            infoBox.style.display = 'none';
+            if (callback) callback();
+        });
+    }
+
+    finishTutorial() {
+        this.isTutorial = false;
+        this.tutorialStep = 0;
+
+        // Game loop is already running, just enable normal card spawning
         // Initial speech
         this.showSpeech("Los geht's! Sammle die guten Prompts!");
     }
@@ -963,8 +1085,11 @@ class BildPuzzleGame {
             const gameDeltaTime = deltaTime * slowMotionMultiplier;
 
             // Update game time (always normal speed, NOT affected by slow-motion)
-            this.gameTime += deltaTime / 60; // Convert to seconds (60fps)
-            this.updateTimeDisplay();
+            // Don't count time during tutorial
+            if (!this.isTutorial) {
+                this.gameTime += deltaTime / 60; // Convert to seconds (60fps)
+                this.updateTimeDisplay();
+            }
 
             // Progressive difficulty - increases speed by 4% every second
             // Caps at 20x speed (after 475 seconds / 7:55 minutes)
@@ -1008,11 +1133,14 @@ class BildPuzzleGame {
             // Spawn cards continuously - spawn rate increases with difficulty
             // Higher difficulty = shorter interval between spawns
             // Affected by slow-motion
-            this.cardSpawnTimer += gameDeltaTime;
-            const adjustedSpawnInterval = GAME_CONFIG.cardSpawnInterval / this.difficultyMultiplier;
-            if (this.cardSpawnTimer >= adjustedSpawnInterval / 16.67) {
-                this.spawnCardOrPowerUp();
-                this.cardSpawnTimer = 0;
+            // Don't spawn cards during tutorial
+            if (!this.isTutorial) {
+                this.cardSpawnTimer += gameDeltaTime;
+                const adjustedSpawnInterval = GAME_CONFIG.cardSpawnInterval / this.difficultyMultiplier;
+                if (this.cardSpawnTimer >= adjustedSpawnInterval / 16.67) {
+                    this.spawnCardOrPowerUp();
+                    this.cardSpawnTimer = 0;
+                }
             }
 
             // Update power-up timers (NOT affected by slow-motion - real time)
@@ -1447,6 +1575,9 @@ class BildPuzzleGame {
         document.getElementById('statCollected').textContent = this.collected;
         document.getElementById('statAvoided').textContent = this.avoided;
         document.getElementById('statAccuracy').textContent = `${accuracy}%`;
+
+        // Load skip tutorial checkbox state
+        loadSkipTutorialState();
 
         this.showScreen('resultsScreen');
     }
@@ -2066,6 +2197,19 @@ function restartGame() {
 
 function goToMenu() {
     window.location.href = 'index.html';
+}
+
+// ===== TUTORIAL SKIP MANAGEMENT =====
+function toggleSkipTutorial(checked) {
+    localStorage.setItem('aiBytes_level4_skipTutorial', checked.toString());
+}
+
+function loadSkipTutorialState() {
+    const skipTutorial = localStorage.getItem('aiBytes_level4_skipTutorial') === 'true';
+    const checkbox = document.getElementById('skipTutorialCheckbox');
+    if (checkbox) {
+        checkbox.checked = skipTutorial;
+    }
 }
 
 // ===== PROGRESS MANAGEMENT =====
