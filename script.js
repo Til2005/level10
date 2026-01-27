@@ -56,6 +56,7 @@ function openCalendar() {
     if (calendarPopup) {
         calendarPopup.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
     }
 
     // Stop blinking and save that user has clicked
@@ -80,6 +81,26 @@ function closeCalendar() {
     if (calendarPopup) {
         calendarPopup.style.display = 'none';
         document.body.style.overflow = 'auto';
+        document.documentElement.style.overflow = 'auto';
+    }
+}
+
+// Credits popup functionality
+function openCredits() {
+    const creditsPopup = document.getElementById('creditsPopup');
+    if (creditsPopup) {
+        creditsPopup.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+    }
+}
+
+function closeCredits() {
+    const creditsPopup = document.getElementById('creditsPopup');
+    if (creditsPopup) {
+        creditsPopup.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        document.documentElement.style.overflow = 'auto';
     }
 }
 
@@ -1048,6 +1069,8 @@ function particleWaveAnimation() {
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
         closeSettings();
+        closeCredits();
+        closeCalendar();
     }
 
     // Matrix Rain Easter Egg - Press 'M'
