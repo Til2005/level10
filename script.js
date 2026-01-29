@@ -48,6 +48,25 @@ function closeSettings() {
     }
 }
 
+// Feedback popup functionality
+function openFeedback() {
+    const feedbackPopup = document.getElementById('feedbackPopup');
+    if (feedbackPopup) {
+        feedbackPopup.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+    }
+}
+
+function closeFeedback() {
+    const feedbackPopup = document.getElementById('feedbackPopup');
+    if (feedbackPopup) {
+        feedbackPopup.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        document.documentElement.style.overflow = 'auto';
+    }
+}
+
 // Calendar popup functionality
 function openCalendar() {
     const calendarPopup = document.getElementById('calendarPopup');
@@ -282,9 +301,9 @@ function calculateRankFromPoints(points) {
     return 'Kein Rang';
 }
 
-// Calculate total rank from all levels (4500 point system)
+// Calculate total rank from all levels (4200 point system)
 function calculateTotalRank(totalPoints) {
-    if (totalPoints >= 4500) return { rank: 'AI-Bytes Champion', icon: '🏆', class: 'champion' };
+    if (totalPoints >= 4200) return { rank: 'AI-Bytes Champion', icon: '🏆', class: 'champion' };
     if (totalPoints >= 3000) return { rank: 'AI-Experte', icon: '⚡', class: 'expert' };
     if (totalPoints >= 1800) return { rank: 'KI-Enthusiast', icon: '🌟', class: 'enthusiast' };
     if (totalPoints >= 900) return { rank: 'Prompt-Lehrling', icon: '🎓', class: 'apprentice' };
@@ -310,11 +329,11 @@ function updateTotalProgress() {
     // Update progress bar
     const progressFill = document.getElementById('totalProgressFill');
     const progressText = document.getElementById('totalProgressText');
-    const percentage = Math.min((totalPoints / 4500) * 100, 100);
+    const percentage = Math.min((totalPoints / 4200) * 100, 100);
 
     if (progressFill && progressText) {
         progressFill.style.width = percentage + '%';
-        progressText.textContent = `${totalPoints}/4500 Punkte`;
+        progressText.textContent = `${totalPoints}/4200 Punkte`;
     }
 
     // Update rank badge
@@ -600,8 +619,8 @@ function updateMysteryLevel() {
     const totalPoints = level1Points + level2Points + level3Points + level4Points + level5Points +
                        level6Points + level7Points + level8Points + level9Points;
 
-    // Check if 4500 points reached
-    if (totalPoints >= 4500) {
+    // Check if 4200 points reached
+    if (totalPoints >= 4200) {
         mysteryLevel.classList.remove('locked');
         mysteryLevel.classList.add('unlocked');
         mysteryLevel.style.cursor = 'pointer';
@@ -637,7 +656,7 @@ function updateMysteryLevel() {
         mysteryLevel.classList.remove('unlocked');
         mysteryLevel.style.cursor = 'not-allowed';
 
-        const pointsNeeded = 4500 - totalPoints;
+        const pointsNeeded = 4200 - totalPoints;
 
         const title = mysteryLevel.querySelector('.level-title');
         if (title) {
@@ -662,7 +681,7 @@ function updateMysteryLevel() {
 
         mysteryLevel.onclick = function(e) {
             e.preventDefault();
-            alert(`🔒 Du benötigst noch ${pointsNeeded} Punkte um dieses mysteriöse Level freizuschalten!\n\nAktuell: ${totalPoints}/4500 Punkte`);
+            alert(`🔒 Du benötigst noch ${pointsNeeded} Punkte um dieses mysteriöse Level freizuschalten!\n\nAktuell: ${totalPoints}/4200 Punkte`);
         };
     }
 }
@@ -1071,6 +1090,7 @@ document.addEventListener('keydown', function(event) {
         closeSettings();
         closeCredits();
         closeCalendar();
+        closeFeedback();
     }
 
     // Matrix Rain Easter Egg - Press 'M'

@@ -9,6 +9,9 @@
 <body>
     <div class="container">
         <header class="header">
+            <div class="header-buttons-left">
+                <button class="feedback-btn" onclick="openFeedback()" title="Feedback geben">💬</button>
+            </div>
             <div class="header-buttons">
                 <button class="credits-btn" onclick="openCredits()" title="Projektteam">
                     <img src="Assets für Credits/DFC-Logo_rgb_blue dunkler Hintergrund (1).png" alt="Credits" class="credits-logo">
@@ -40,7 +43,7 @@
                         <div class="total-progress-bar">
                             <div class="total-progress-fill" id="totalProgressFill" data-progress="0"></div>
                         </div>
-                        <div class="total-progress-text" id="totalProgressText">0/4500 Punkte</div>
+                        <div class="total-progress-text" id="totalProgressText">0/4200 Punkte</div>
                     </div>
                 </div>
 
@@ -199,7 +202,7 @@
                             <div class="level-progress-bar">
                                 <div class="level-progress-fill" data-progress="0"></div>
                             </div>
-                            <div class="level-progress-text">🔒 Noch 4500 Punkte benötigt</div>
+                            <div class="level-progress-text">🔒 Noch 4200 Punkte benötigt</div>
                         </div>
                     </a>
                 </div>
@@ -265,7 +268,7 @@
                     <div class="rank-legend-icon">🏆</div>
                     <div class="rank-legend-info">
                         <div class="rank-legend-name">AI-Bytes Champion</div>
-                        <div class="rank-legend-requirement">4500 Punkte (Maximum!)</div>
+                        <div class="rank-legend-requirement">4200 Punkte</div>
                     </div>
                 </div>
 
@@ -309,6 +312,24 @@
                 <button class="download-calendar-btn" onclick="downloadCalendar()">
                     📥 Kalender herunterladen
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Popup -->
+    <div id="feedbackPopup" class="popup-overlay" onclick="closeFeedback()">
+        <div class="popup-content feedback-popup" onclick="event.stopPropagation()">
+            <div class="popup-header">
+                <h3>Feedback geben</h3>
+                <button class="close-btn" onclick="closeFeedback()">✕</button>
+            </div>
+            <div class="feedback-container">
+                <p class="feedback-description">
+                    Deine Meinung ist uns wichtig! Hilf uns, AI Bytes noch besser zu machen.
+                </p>
+                <a href="https://forms.office.com/e/TLy5KzKMN7" target="_blank" class="feedback-link-btn">
+                    💬 Zum Feedback-Formular
+                </a>
             </div>
         </div>
     </div>

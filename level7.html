@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unternehmensdaten schlau machen</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="level7.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- Rank Badge (Top Right) -->
+        <div class="rank-badge" id="rankBadge" style="display: none;">
+            <span class="rank-icon" id="rankIcon"></span>
+            <span class="rank-label" id="rankLabel"></span>
+        </div>
+
+        <!-- Card Skin Button (Between Back Button and Rank Badge) -->
+        <button class="skin-selector-btn" id="skinSelectorBtn" onclick="openSkinSelector()" title="Karten-Design ändern">
+            <div class="skin-btn-icon">🎨</div>
+        </button>
+
+        <!-- Main Game Area -->
+        <main class="game-area" id="gameArea">
+
+            <!-- Intro Screen -->
+            <div class="game-screen active" id="introScreen">
+                <div class="intro-content">
+                    <!-- Animated Neural Network Background -->
+                    <canvas class="neural-canvas" id="neuralCanvas"></canvas>
+
+                    <!-- Scanlines Effect -->
+                    <div class="scanlines"></div>
+
+                    <!-- Main Title -->
+                    <h1 class="game-title">
+                        <span class="title-line-1">
+                            <span class="letter" data-letter="0">U</span><span class="letter" data-letter="1">n</span><span class="letter" data-letter="2">t</span><span class="letter" data-letter="3">e</span><span class="letter" data-letter="4">r</span><span class="letter" data-letter="5">n</span><span class="letter" data-letter="6">e</span><span class="letter" data-letter="7">h</span><span class="letter" data-letter="8">m</span><span class="letter" data-letter="9">e</span><span class="letter" data-letter="10">n</span><span class="letter" data-letter="11">s</span><span class="letter" data-letter="12">d</span><span class="letter" data-letter="13">a</span><span class="letter" data-letter="14">t</span><span class="letter" data-letter="15">e</span><span class="letter" data-letter="16">n</span>
+                        </span>
+                        <span class="title-line-2">
+                            <span class="letter" data-letter="17">s</span><span class="letter" data-letter="18">c</span><span class="letter" data-letter="19">h</span><span class="letter" data-letter="20">l</span><span class="letter" data-letter="21">a</span><span class="letter" data-letter="22">u</span><span class="letter" data-letter="23">&nbsp;</span><span class="letter" data-letter="24">m</span><span class="letter" data-letter="25">a</span><span class="letter" data-letter="26">c</span><span class="letter" data-letter="27">h</span><span class="letter" data-letter="28">e</span><span class="letter" data-letter="29">n</span>
+                        </span>
+                    </h1>
+
+                    <!-- Subtitle -->
+                    <div class="game-subtitle">Wissen teilen, ein Kinderspiel!</div>
+
+                    <!-- Press Any Key or Click -->
+                    <div class="press-key" id="pressKey">Drücke eine beliebige Taste</div>
+
+                    <!-- Copyright -->
+                    <div class="copyright">© 2026 AI Bytes</div>
+                </div>
+            </div>
+
+            <!-- Loading Screen -->
+            <div class="game-screen" id="loadingScreen">
+                <div class="loading-content">
+                    <h2 class="loading-title">Lade Game...</h2>
+                    <div class="loading-bar-container">
+                        <div class="loading-bar" id="loadingBar"></div>
+                    </div>
+                    <div class="loading-text" id="loadingText">0%</div>
+                </div>
+            </div>
+
+            <!-- Level Selection Screen -->
+            <div class="game-screen" id="levelSelectScreen">
+                <div class="level-select-container">
+                    <h2 class="level-select-title">Die KI-Challenge</h2>
+                    <div class="level-select-subtitle">Wähle deine Challenge</div>
+
+                    <!-- Challenge Grid -->
+                    <div class="challenges-grid">
+                        <!-- Challenge 1 -->
+                        <div class="challenge-card unlocked" data-level="1">
+                            <div class="challenge-price-tag" style="display: none;">300P</div>
+                            <div class="challenge-number">1</div>
+                            <div class="challenge-icon">🧠</div>
+                            <div class="challenge-name">Basis-Wissen</div>
+                            <div class="challenge-difficulty">4 Paare</div>
+                            <div class="challenge-status">▶ Starten</div>
+                        </div>
+
+                        <!-- Challenge 2 -->
+                        <div class="challenge-card locked" data-level="2">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
+                            <div class="challenge-number">2</div>
+                            <div class="challenge-icon">⚡</div>
+                            <div class="challenge-name">DFC-Experte</div>
+                            <div class="challenge-difficulty">6 Paare</div>
+                            <div class="challenge-status">🔒 Gesperrt</div>
+                        </div>
+
+                        <!-- Challenge 3 -->
+                        <div class="challenge-card locked" data-level="3">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
+                            <div class="challenge-number">3</div>
+                            <div class="challenge-icon">🏆</div>
+                            <div class="challenge-name">Wissens-Champion</div>
+                            <div class="challenge-difficulty">8 Paare</div>
+                            <div class="challenge-status">🔒 Gesperrt</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Info -->
+                    <div class="progress-info">
+                        <div class="progress-stats">
+                            <div class="progress-item">
+                                <span class="progress-label">Gesamtpunkte:</span>
+                                <span class="progress-value" id="totalPointsDisplay">0 / 500</span>
+                            </div>
+                            <div class="progress-item">
+                                <span class="progress-label">Aktueller Rang:</span>
+                                <span class="progress-value" id="currentRankDisplay">Anfänger</span>
+                            </div>
+                        </div>
+                        <div class="rank-info">
+                            <div class="rank-item">🥉 Bronze: 300 Punkte</div>
+                            <div class="rank-item">🥈 Silber: 400 Punkte</div>
+                            <div class="rank-item">🥇 Gold: 500 Punkte</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Memory Game Screen -->
+            <div class="game-screen" id="memoryGameScreen">
+
+                <!-- Back Button (Top) -->
+                <button class="editor-back-btn" onclick="returnToLevelSelect()" title="Zurück zur Levelauswahl">
+                    ← Zurück zur Levelauswahl
+                </button>
+
+                <!-- Memory Cards Grid -->
+                <div class="memory-grid" id="memoryGrid">
+                    <!-- Cards will be dynamically generated -->
+                </div>
+
+                <!-- Info Modal (shows when pair is matched) -->
+                <div class="info-modal" id="infoModal" style="display: none;">
+                    <div class="info-modal-content">
+                        <div class="info-modal-icon" id="infoModalIcon">📂</div>
+                        <div class="info-modal-title" id="infoModalTitle">Datenbank</div>
+                        <div class="info-modal-text" id="infoModalText">Info text here...</div>
+                        <button class="info-modal-close" onclick="closeInfoModal()">Weiter</button>
+                    </div>
+                </div>
+
+                <!-- Pause Menu -->
+                <div class="pause-menu-overlay" id="pauseMenu" style="display: none;">
+                    <div class="pause-menu-content">
+                        <h2 class="pause-menu-title">⏸️ Pause</h2>
+                        <div class="pause-menu-buttons">
+                            <button class="pause-menu-button" onclick="resumeGame()">
+                                <span>▶ Weiterspielen</span>
+                            </button>
+                            <button class="pause-menu-button" onclick="returnToLevelSelect()">
+                                <span>Zur Challenge-Auswahl</span>
+                            </button>
+                        </div>
+                        <div class="pause-menu-hint">Drücke <span class="key-highlight">ESC</span> zum Fortfahren</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skin Selector Modal -->
+            <div class="skin-selector-overlay" id="skinSelectorOverlay" style="display: none;" onclick="closeSkinSelector()">
+                <div class="skin-selector-modal" onclick="event.stopPropagation()">
+                    <div class="skin-modal-header">
+                        <h2 class="skin-modal-title">🎨 Karten-Design</h2>
+                        <button class="skin-modal-close" onclick="closeSkinSelector()">✕</button>
+                    </div>
+
+                    <div class="skin-modal-content">
+                        <!-- Skin Options List -->
+                        <div class="skin-options-list" id="skinOptionsList">
+
+                            <!-- Skin 1: Standard (Neon Cyan) -->
+                            <div class="skin-option selected" data-skin="standard">
+                                <div class="skin-checkbox-wrapper">
+                                    <input type="checkbox" class="skin-checkbox" id="skin-standard" name="card-skin" checked>
+                                    <label for="skin-standard" class="skin-checkbox-label"></label>
+                                </div>
+                                <div class="skin-info">
+                                    <div class="skin-name">Neon Cyan</div>
+                                    <div class="skin-description">Standard Design</div>
+                                </div>
+                            </div>
+
+                            <!-- Skin 2: Gold Luxury -->
+                            <div class="skin-option" data-skin="gold">
+                                <div class="skin-checkbox-wrapper">
+                                    <input type="checkbox" class="skin-checkbox" id="skin-gold" name="card-skin">
+                                    <label for="skin-gold" class="skin-checkbox-label"></label>
+                                </div>
+                                <div class="skin-info">
+                                    <div class="skin-name">Gold Luxury</div>
+                                    <div class="skin-description">Premium Gold</div>
+                                </div>
+                            </div>
+
+                            <!-- Skin 3: Matrix Green -->
+                            <div class="skin-option" data-skin="matrix">
+                                <div class="skin-checkbox-wrapper">
+                                    <input type="checkbox" class="skin-checkbox" id="skin-matrix" name="card-skin">
+                                    <label for="skin-matrix" class="skin-checkbox-label"></label>
+                                </div>
+                                <div class="skin-info">
+                                    <div class="skin-name">Matrix Code</div>
+                                    <div class="skin-description">Grüner Hacker-Style</div>
+                                </div>
+                            </div>
+
+                            <!-- Skin 4: Purple Dream -->
+                            <div class="skin-option" data-skin="purple">
+                                <div class="skin-checkbox-wrapper">
+                                    <input type="checkbox" class="skin-checkbox" id="skin-purple" name="card-skin">
+                                    <label for="skin-purple" class="skin-checkbox-label"></label>
+                                </div>
+                                <div class="skin-info">
+                                    <div class="skin-name">Purple Dream</div>
+                                    <div class="skin-description">Lila Gradient</div>
+                                </div>
+                            </div>
+
+                            <!-- Skin 5: Mercedes Silver -->
+                            <div class="skin-option" data-skin="mercedes">
+                                <div class="skin-checkbox-wrapper">
+                                    <input type="checkbox" class="skin-checkbox" id="skin-mercedes" name="card-skin">
+                                    <label for="skin-mercedes" class="skin-checkbox-label"></label>
+                                </div>
+                                <div class="skin-info">
+                                    <div class="skin-name">Mercedes Silver</div>
+                                    <div class="skin-description">Silber & Schwarz</div>
+                                </div>
+                            </div>
+
+                            <!-- Skin 6: Fire Red -->
+                            <div class="skin-option" data-skin="fire">
+                                <div class="skin-checkbox-wrapper">
+                                    <input type="checkbox" class="skin-checkbox" id="skin-fire" name="card-skin">
+                                    <label for="skin-fire" class="skin-checkbox-label"></label>
+                                </div>
+                                <div class="skin-info">
+                                    <div class="skin-name">Fire Red</div>
+                                    <div class="skin-description">Flammen-Design</div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Live Preview -->
+                        <div class="skin-preview-container">
+                            <div class="skin-preview-label">Vorschau</div>
+                            <div class="skin-preview-cards">
+                                <div class="preview-card back" id="previewCardBack">
+                                    <div class="preview-question">?</div>
+                                </div>
+                                <div class="preview-card front" id="previewCardFront">
+                                    <div class="preview-icon">📂</div>
+                                    <div class="preview-title">Datenbank</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge Complete Screen -->
+            <div class="game-screen" id="challengeCompleteScreen">
+                <div class="complete-content">
+                    <h2 class="complete-title">🎉 Challenge Geschafft!</h2>
+
+                    <div class="complete-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Punkte:</div>
+                            <div class="stat-value" id="earnedPoints">300</div>
+                        </div>
+                    </div>
+
+                    <div class="complete-actions">
+                        <button class="next-level-button" onclick="nextChallenge()"><span>Nächste Challenge</span></button>
+                        <button class="menu-button" onclick="goToLevelSelectWithAnimation()"><span>Challenge-Auswahl</span></button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="script.js"></script>
+    <script src="level7.js"></script>
+</body>
+</html>
