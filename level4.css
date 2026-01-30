@@ -1380,7 +1380,7 @@ body:has(#introScreen.active) .hud-wrapper {
 .card-image-container {
     position: relative;
     width: 100%;
-    height: 180px;
+    height: 159px; /* Reduziert von 180px - schneidet unten 21px ab */
     background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
@@ -1415,6 +1415,7 @@ body:has(#introScreen.active) .hud-wrapper {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center top; /* Bild oben ausrichten - NUR unten abschneiden */
     display: block;
 }
 
