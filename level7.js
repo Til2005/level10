@@ -350,7 +350,7 @@ function startGame() {
 
 // ===== LEVEL SELECTION =====
 function loadProgress() {
-    const savedProgress = localStorage.getItem('level7Progress');
+    const savedProgress = localStorage.getItem('aiBytes_level7_progress');
     if (savedProgress) {
         const progress = JSON.parse(savedProgress);
         gameState.challengeProgress = progress.challengeProgress || gameState.challengeProgress;
@@ -656,7 +656,7 @@ function saveProgress() {
         challengeProgress: gameState.challengeProgress,
         currentRank: gameState.currentRank
     };
-    localStorage.setItem('level7Progress', JSON.stringify(progress));
+    localStorage.setItem('aiBytes_level7_progress', JSON.stringify(progress));
 }
 
 function saveToMainProgress() {

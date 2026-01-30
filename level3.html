@@ -2,469 +2,255 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1200, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Bytes Level 3 - Advanced Prompting</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gute Ergebnisse sind kein Zufall</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="level3.css">
 </head>
 <body>
-    <div class="level3-container">
-        <!-- Game Header -->
-        <header class="workshop-header">
-            <div class="level-info">
-                <h1 class="level-title">Level 3: Advanced Prompting</h1>
-                <p class="level-subtitle">Werde zum Prompt-Engineering Experten!</p>
-            </div>
-            <div class="workshop-stats">
-                <div class="stat-item">
-                    <span class="stat-label">Phase:</span>
-                    <span id="currentPhase" class="stat-value">1/3</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Score:</span>
-                    <span id="totalScore" class="stat-value">0</span>
-                </div>
-            </div>
-        </header>
+    <div class="container">
 
-        <!-- Mo Man Workshop Guide -->
-        <div class="mo-workshop-container">
-            <div id="moWorkshopHost" class="mo-workshop-host">
-                <img src="Mo_man_Stand_Pose/Mo man Stand Pose_00000.png" alt="Mo Man Workshop Guide" class="mo-workshop-img">
-            </div>
-            <div class="mo-workshop-bubble" id="moWorkshopSpeech">
-                <p>Willkommen in der Prompt-Werkstatt! Hier lernst du die Geheimnisse des professionellen Promptens!</p>
-                <button id="understoodButton" class="understood-btn" style="display: none;">Verstanden</button>
-            </div>
-        </div>
-
-        <!-- Introduction Screen -->
-        <div id="introScreen" class="game-screen active">
-            <div class="intro-content">
-                <div class="workshop-intro">
-                    <h2>Die Prompt-Werkstatt</h2>
-                    <p class="intro-description">Erlerne 3 mächtige Prompting-Techniken und werde zum AI-Flüsterer!</p>
-
-
-                    <div class="workshop-phases">
-                        <h3>Dein Lernpfad:</h3>
-                        <div class="phase-list">
-                            <div class="phase-item">
-                                <span class="phase-number">1</span>
-                                <span class="phase-name">Technik-Training</span>
-                                <span class="phase-desc">3 Mini-Spiele</span>
-                            </div>
-                            <div class="phase-item">
-                                <span class="phase-number">2</span>
-                                <span class="phase-name">Kritisches Denken</span>
-                                <span class="phase-desc">3 Challenges</span>
-                            </div>
-                            <div class="phase-item">
-                                <span class="phase-number">3</span>
-                                <span class="phase-name">Meister-Challenge</span>
-                                <span class="phase-desc">Quiz-Format</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button id="startWorkshop" class="workshop-start-btn">Werkstatt betreten</button>
-                    <button id="backToHome" class="workshop-back-btn">Zurück zur Levelauswahl</button>
+        <!-- Game HUD -->
+        <div class="hud-wrapper">
+            <!-- Scenario Display (nur im Gameplay sichtbar) -->
+            <div class="scenario-display" id="scenarioDisplay" style="display: none;">
+                <div class="scenario-label">Szenario:</div>
+                <div class="scenario-text" id="scenarioText">
+                    <!-- Wird dynamisch gefüllt -->
                 </div>
             </div>
         </div>
 
-
-        <!-- Phase 1: Technique Training -->
-        <div id="techniqueTrainingScreen" class="game-screen">
-            <div class="training-container">
-                <div class="training-header" id="trainingMainHeader">
-                    <h2>Phase 1: Technik-Training</h2>
-                    <p>Meistere die 3 Advanced Prompting Techniken!</p>
-                </div>
-
-                <!-- Technique Selection -->
-                <div id="techniqueSelection" class="technique-selection active">
-                    <div class="technique-grid">
-                        <div class="technique-card clickable" data-technique="fewshot">
-                            <div class="technique-icon">📚</div>
-                            <h3>Few Shot Prompting</h3>
-                            <p>Zeige der KI mit Beispielen, was du erwartest</p>
-                            <div class="technique-status" id="fewshotStatus">Nicht abgeschlossen</div>
-                        </div>
-
-                        <div class="technique-card clickable" data-technique="chainofthought">
-                            <div class="technique-icon">🔗</div>
-                            <h3>Chain-of-Thought</h3>
-                            <p>Teile komplexe Aufgaben in Zwischenschritte auf</p>
-                            <div class="technique-status" id="chainofthoughtStatus">Nicht abgeschlossen</div>
-                        </div>
-
-                        <div class="technique-card clickable" data-technique="treeofthoughts">
-                            <div class="technique-icon">🌳</div>
-                            <h3>Tree of Thoughts</h3>
-                            <p>Generiere verschiedene Ideenstränge</p>
-                            <div class="technique-status" id="treeofthoughtsStatus">Nicht abgeschlossen</div>
-                        </div>
-
-                    </div>
-
-                    <button id="continueToPhase2" class="continue-btn" disabled>Weiter zu Phase 2</button>
-                </div>
-
-                <!-- Few Shot Mini-Game -->
-                <div id="fewshotGame" class="mini-game">
-                    <div class="mini-game-header">
-                        <h3>Few Shot: Beispiel-Sammler</h3>
-                        <p>Wähle die besten Beispiele für das gewünschte Ergebnis!</p>
-                    </div>
-
-                    <div class="example-collector">
-                        <div class="task-description">
-                            <h4>Aufgabe:</h4>
-                            <p id="fewshotTask">Erstelle einen Prompt für kreative Produktbeschreibungen</p>
-                        </div>
-
-                        <div class="example-pool">
-                            <h4>Verfügbare Beispiele:</h4>
-                            <div class="example-items" id="examplePool">
-                                <!-- Examples will be populated by JavaScript -->
-                            </div>
-                        </div>
-
-                        <div class="selected-examples">
-                            <h4>Deine Auswahl (wähle die 3 besten):</h4>
-                            <div class="selected-items" id="selectedExamples">
-                                <div class="drop-zone">Ziehe Beispiele hierher</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mini-game-actions">
-                        <button id="submitFewshot" class="action-btn primary">Auswahl bestätigen</button>
-                        <button id="backToTechniques1" class="action-btn secondary">Zurück</button>
-                    </div>
-                </div>
-
-                <!-- Chain of Thought Mini-Game -->
-                <div id="chainofthoughtGame" class="mini-game">
-                    <div class="mini-game-header">
-                        <h3>Chain-of-Thought: Guided Problem Solving</h3>
-                        <p>Lerne schrittweise Problemzerlegung mit interaktivem Tutorial!</p>
-                    </div>
-
-                    <div class="chain-tutorial">
-                        <div class="tutorial-content">
-                            <div class="tutorial-left">
-                                <div class="problem-statement">
-                                    <h4>Aufgabe:</h4>
-                                    <div class="problem-box">
-                                        <p id="chainProblem">Entwickle eine Content-Strategie für ein neues AI-Startup</p>
-                                    </div>
-                                </div>
-
-                                <div class="chain-guidance">
-                                    <h4>Schritt-für-Schritt Anleitung:</h4>
-                                    <div class="guidance-steps" id="guidanceSteps">
-                                        <div class="guidance-step active" data-step="0">
-                                            <span class="step-icon">🎯</span>
-                                            <div class="step-content">
-                                                <h5>1. Zielgruppe definieren</h5>
-                                                <p>Wer sind die Kunden? Welche Bedürfnisse haben sie?</p>
-                                            </div>
-                                        </div>
-                                        <div class="guidance-step" data-step="1">
-                                            <span class="step-icon">📊</span>
-                                            <div class="step-content">
-                                                <h5>2. Marktanalyse</h5>
-                                                <p>Was macht die Konkurrenz? Wo sind die Lücken?</p>
-                                            </div>
-                                        </div>
-                                        <div class="guidance-step" data-step="2">
-                                            <span class="step-icon">💡</span>
-                                            <div class="step-content">
-                                                <h5>3. Content-Themen</h5>
-                                                <p>Welche Themen interessieren die Zielgruppe?</p>
-                                            </div>
-                                        </div>
-                                        <div class="guidance-step" data-step="3">
-                                            <span class="step-icon">📅</span>
-                                            <div class="step-content">
-                                                <h5>4. Umsetzungsplan</h5>
-                                                <p>Wie und wann wird der Content erstellt und veröffentlicht?</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="tutorial-right">
-                                <div class="step-builder-interactive">
-                                    <h4>Deine Lösungsschritte:</h4>
-                                    <div class="step-slots-container">
-                                        <div class="step-slot" data-slot="0">
-                                            <div class="slot-header">Schritt 1</div>
-                                            <div class="slot-content" id="slot0">Ziehe einen Schritt hierher</div>
-                                        </div>
-                                        <div class="step-slot" data-slot="1">
-                                            <div class="slot-header">Schritt 2</div>
-                                            <div class="slot-content" id="slot1">Ziehe einen Schritt hierher</div>
-                                        </div>
-                                        <div class="step-slot" data-slot="2">
-                                            <div class="slot-header">Schritt 3</div>
-                                            <div class="slot-content" id="slot2">Ziehe einen Schritt hierher</div>
-                                        </div>
-                                        <div class="step-slot" data-slot="3">
-                                            <div class="slot-header">Schritt 4</div>
-                                            <div class="slot-content" id="slot3">Ziehe einen Schritt hierher</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="available-steps">
-                                    <h4>Verfügbare Schritte:</h4>
-                                    <div class="steps-pool" id="stepsPool">
-                                        <!-- Steps will be populated by JavaScript -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="chain-actions">
-                            <button id="submitChainOfThought" class="action-btn primary" disabled>Reihenfolge bestätigen</button>
-                            <button id="backToTechniques2" class="action-btn secondary">Zurück</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tree of Thoughts Mini-Game -->
-                <div id="treeofthoughtsGame" class="mini-game">
-                    <div class="mini-game-header">
-                        <h3>Tree of Thoughts: Ideenbaum-Explorer</h3>
-                        <p>Erkunde verschiedene Denkpfade und sortiere schlechte Äste aus!</p>
-                    </div>
-
-                    <div class="thought-tree">
-                        <div class="tree-root">
-                            <div class="thought-node root" id="rootNode">
-                                <p>Wie können wir die Mitarbeitermotivation steigern?</p>
-                            </div>
-                        </div>
-
-                        <div class="tree-branches" id="treeBranches">
-                            <!-- Tree structure will be built by JavaScript -->
-                        </div>
-                    </div>
-
-                    <div class="tree-controls">
-                        <button id="pruneNode" class="tree-btn danger">Schlechten Ast entfernen</button>
-                    </div>
-
-                    <div class="mini-game-actions">
-                        <button id="backToTechniques3" class="action-btn secondary">Zurück</button>
-                    </div>
-                </div>
-
-            </div>
+        <!-- Rank Badge (Top Right) -->
+        <div class="rank-badge" id="rankBadge" style="display: none;">
+            <span class="rank-icon" id="rankIcon"></span>
+            <span class="rank-label" id="rankLabel"></span>
         </div>
 
-        <!-- Phase 2: Critical Thinking -->
-        <div id="criticalThinkingScreen" class="game-screen">
-            <div class="critical-container">
-                <div class="critical-header" id="criticalMainHeader">
-                    <h2>Phase 2: Kritisches Denken</h2>
-                    <p>Lerne AI-Ergebnisse kritisch zu bewerten und Fallen zu erkennen!</p>
+        <!-- Main Game Area -->
+        <main class="game-area" id="gameArea">
+
+            <!-- Intro Screen -->
+            <div class="game-screen active" id="introScreen">
+                <div class="intro-content">
+                    <!-- Animated Background Canvas -->
+                    <canvas class="flow-canvas" id="flowCanvas"></canvas>
+
+                    <!-- Scanlines Effect -->
+                    <div class="scanlines"></div>
+
+                    <!-- Main Title -->
+                    <h1 class="game-title">
+                        <span class="title-line-1">
+                            <span class="letter" data-letter="0">G</span><span class="letter" data-letter="1">u</span><span class="letter" data-letter="2">t</span><span class="letter" data-letter="3">e</span> <span class="letter" data-letter="4">E</span><span class="letter" data-letter="5">r</span><span class="letter" data-letter="6">g</span><span class="letter" data-letter="7">e</span><span class="letter" data-letter="8">b</span><span class="letter" data-letter="9">n</span><span class="letter" data-letter="10">i</span><span class="letter" data-letter="11">s</span><span class="letter" data-letter="12">s</span><span class="letter" data-letter="13">e</span>
+                        </span>
+                        <span class="title-line-2">
+                            <span class="letter" data-letter="14">s</span><span class="letter" data-letter="15">i</span><span class="letter" data-letter="16">n</span><span class="letter" data-letter="17">d</span> <span class="letter" data-letter="18">k</span><span class="letter" data-letter="19">e</span><span class="letter" data-letter="20">i</span><span class="letter" data-letter="21">n</span> <span class="letter" data-letter="22">Z</span><span class="letter" data-letter="23">u</span><span class="letter" data-letter="24">f</span><span class="letter" data-letter="25">a</span><span class="letter" data-letter="26">l</span><span class="letter" data-letter="27">l</span>
+                        </span>
+                    </h1>
+
+                    <!-- Subtitle -->
+                    <div class="game-subtitle">Finde die richtige Rolle für jede Aufgabe</div>
+
+                    <!-- Press Any Key or Click -->
+                    <div class="press-key" id="pressKey">Drücke eine beliebige Taste</div>
+
+                    <!-- Copyright -->
+                    <div class="copyright">&copy; 2025 AI Bytes</div>
                 </div>
-
-                <!-- Critical Challenge Selection -->
-                <div id="criticalSelection" class="critical-selection active">
-                    <div class="critical-grid">
-                        <div class="critical-card clickable" data-challenge="bias">
-                            <div class="critical-icon">🔍</div>
-                            <h3>Bias-Detektiv</h3>
-                            <p>Finde Voreingenommenheit in AI-Antworten</p>
-                            <div class="critical-status" id="biasStatus">Nicht abgeschlossen</div>
-                        </div>
-
-                        <div class="critical-card clickable" data-challenge="privacy">
-                            <div class="critical-icon">🛡️</div>
-                            <h3>Datenschutz-Check</h3>
-                            <p>Entscheide, welche Informationen sicher geteilt werden können</p>
-                            <div class="critical-status" id="privacyStatus">Nicht abgeschlossen</div>
-                        </div>
-
-                        <div class="critical-card clickable" data-challenge="facts">
-                            <div class="critical-icon">✅</div>
-                            <h3>Fact-Checker</h3>
-                            <p>Überprüfe die Richtigkeit von AI-generierten Informationen</p>
-                            <div class="critical-status" id="factsStatus">Nicht abgeschlossen</div>
-                        </div>
-                    </div>
-
-                    <button id="continueToPhase3" class="continue-btn" disabled>Weiter zu Phase 3</button>
-                </div>
-
-                <!-- Bias Detective Challenge -->
-                <div id="biasChallenge" class="critical-step">
-                    <div class="challenge-card">
-                        <h3>Bias-Detektiv</h3>
-                        <p>Finde Voreingenommenheit in AI-Antworten</p>
-                        <div class="challenge-content">
-                            <div class="ai-response-sample" id="biasExample">
-                                <!-- AI response with bias will be shown here -->
-                            </div>
-                            <div class="bias-options" id="biasOptions">
-                                <!-- Bias detection options -->
-                            </div>
-                        </div>
-                        <div class="challenge-actions">
-                            <button class="challenge-btn" id="submitBias">Bias identifizieren</button>
-                            <button class="action-btn secondary" id="backToCriticalSelection1">Zurück</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Privacy Checker Challenge -->
-                <div id="privacyChallenge" class="critical-step">
-                    <div class="challenge-card">
-                        <h3>Datenschutz-Check</h3>
-                        <p>Entscheide, welche Informationen sicher geteilt werden können</p>
-                        <div class="challenge-content">
-                            <div class="data-samples" id="dataExamples">
-                                <!-- Data examples will be shown here -->
-                            </div>
-                        </div>
-                        <div class="challenge-actions">
-                            <button class="challenge-btn" id="submitPrivacy">Bewertung abgeben</button>
-                            <button class="action-btn secondary" id="backToCriticalSelection2">Zurück</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Fact Checker Challenge -->
-                <div id="factsChallenge" class="critical-step">
-                    <div class="challenge-card">
-                        <h3>Fact-Checker</h3>
-                        <p>Überprüfe die Richtigkeit von AI-generierten Informationen</p>
-                        <div class="challenge-content">
-                            <div class="fact-claims" id="factExamples">
-                                <!-- Fact claims will be shown here -->
-                            </div>
-                        </div>
-                        <div class="challenge-actions">
-                            <button class="challenge-btn" id="submitFacts">Fakten prüfen</button>
-                            <button class="action-btn secondary" id="backToCriticalSelection3">Zurück</button>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-        </div>
 
-        <!-- Phase 3: Master Challenge -->
-        <div id="masterChallengeScreen" class="game-screen">
-            <div class="master-container">
-                <div class="master-header">
-                    <h2>Phase 3: Meister-Challenge</h2>
-                    <p>Beantworte Fragen zu den erlernten Techniken!</p>
+            <!-- Loading Screen -->
+            <div class="game-screen" id="loadingScreen">
+                <div class="loading-content">
+                    <h2 class="loading-title">Lade Game...</h2>
+                    <div class="loading-bar-container">
+                        <div class="loading-bar" id="loadingBar"></div>
+                    </div>
+                    <div class="loading-text" id="loadingText">0%</div>
+                </div>
+            </div>
+
+            <!-- Level Selection Screen -->
+            <div class="game-screen" id="levelSelectScreen">
+                <div class="level-select-container">
+                    <h2 class="level-select-title">Gute Ergebnisse sind kein Zufall</h2>
+                    <div class="level-select-subtitle">Wähle deine Challenge</div>
+
+                    <!-- Challenge Grid -->
+                    <div class="challenges-grid">
+                        <!-- Challenge 1 -->
+                        <div class="challenge-card unlocked" data-level="1">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
+                            <div class="challenge-number">1</div>
+                            <div class="challenge-icon">🍳</div>
+                            <div class="challenge-name">Der Koch</div>
+                            <div class="challenge-status">&#9654; Starten</div>
+                        </div>
+
+                        <!-- Challenge 2 -->
+                        <div class="challenge-card locked" data-level="2">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
+                            <div class="challenge-number">2</div>
+                            <div class="challenge-icon">📋</div>
+                            <div class="challenge-name">Der Projektmanager</div>
+                            <div class="challenge-status">&#128274; Gesperrt</div>
+                        </div>
+
+                        <!-- Challenge 3 -->
+                        <div class="challenge-card locked" data-level="3">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
+                            <div class="challenge-number">3</div>
+                            <div class="challenge-icon">🤖</div>
+                            <div class="challenge-name">Der Roboter-Techniker</div>
+                            <div class="challenge-status">&#128274; Gesperrt</div>
+                        </div>
+
+                        <!-- Challenge 4 -->
+                        <div class="challenge-card locked" data-level="4">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
+                            <div class="challenge-number">4</div>
+                            <div class="challenge-icon">💻</div>
+                            <div class="challenge-name">Der Software-Entwickler</div>
+                            <div class="challenge-status">&#128274; Gesperrt</div>
+                        </div>
+
+                        <!-- Challenge 5 -->
+                        <div class="challenge-card locked final-challenge" data-level="5">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
+                            <div class="challenge-number">5</div>
+                            <div class="challenge-icon">🎯</div>
+                            <div class="challenge-name">Der Finale Test</div>
+                            <div class="challenge-status">&#128274; Gesperrt</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Info -->
+                    <div class="progress-info">
+                        <div class="progress-stats">
+                            <div class="progress-item">
+                                <span class="progress-label">Gesamtpunkte:</span>
+                                <span class="progress-value" id="totalPointsDisplay">0 / 500</span>
+                            </div>
+                            <div class="progress-item">
+                                <span class="progress-label">Aktueller Rang:</span>
+                                <span class="progress-value" id="currentRankDisplay">Anfänger</span>
+                            </div>
+                        </div>
+                        <div class="rank-info">
+                            <div class="rank-item">&#129353; Bronze: 300 Punkte</div>
+                            <div class="rank-item">&#129352; Silber: 400 Punkte</div>
+                            <div class="rank-item">&#129351; Gold: 500 Punkte</div>
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="quiz-container" id="masterQuiz">
-                    <div class="quiz-header">
-                        <h3 id="quizTitle">Frage 1/5</h3>
-                        <div class="quiz-progress">
-                            <div class="progress-fill" id="quizProgress"></div>
+                <!-- Scroll Down Arrow -->
+                <div class="scroll-arrow" id="scrollArrow" style="display: none;"></div>
+            </div>
+
+            <!-- Game Play Screen (Platformer) -->
+            <div class="game-screen" id="gameScreen">
+
+                <!-- Mo Man Player -->
+                <div class="mo-player" id="moPlayer">
+                    <img id="moPlayerImg" src="Mo_man_Stand_Pose/Mo man Stand Pose_00000.png" alt="Mo Man">
+                </div>
+
+                <!-- TXP NPC (In-Game) -->
+                <div class="txp-npc" id="txpNpc" style="display: none;">
+                    <img id="txpNpcImg" src="TXP/TXP_Stand_Pose/TXP Stand Pose_00000.png" alt="TXP Roboter">
+                </div>
+
+                <!-- TXP Speech Bubble (In-Game) -->
+                <div class="txp-npc-speech" id="txpNpcSpeech" style="display: none;">
+                    <div class="speech-bubble-content">
+                        <p id="txpNpcSpeechText"></p>
+                        <div class="speech-continue-hint">Drücke [E] zum Fortfahren</div>
+                    </div>
+                </div>
+
+                <!-- Controls Display -->
+                <div class="controls-display" id="controlsDisplay" style="display: none;">
+                    <div class="controls-title">Steuerung</div>
+                    <div class="controls-list">
+                        <div class="control-item">
+                            <span class="control-key">&larr;</span>
+                            <span class="control-action">Links</span>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-key">&rarr;</span>
+                            <span class="control-action">Rechts</span>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-key">E</span>
+                            <span class="control-action">Portal betreten</span>
                         </div>
                     </div>
+                </div>
 
-                    <div class="quiz-question">
-                        <h4 id="questionText">Welche Prompting-Technik eignet sich am besten für komplexe Problemlösungen?</h4>
+                <!-- Portals Container (moves with camera) -->
+                <div id="portalsContainer"></div>
 
-                        <div class="quiz-options" id="quizOptions">
-                            <div class="quiz-option" data-answer="A">
-                                <span class="option-letter">A</span>
-                                <span class="option-text">Few Shot Prompting</span>
-                            </div>
-                            <div class="quiz-option" data-answer="B">
-                                <span class="option-letter">B</span>
-                                <span class="option-text">Chain-of-Thought</span>
-                            </div>
-                            <div class="quiz-option" data-answer="C">
-                                <span class="option-letter">C</span>
-                                <span class="option-text">Tree of Thoughts</span>
-                            </div>
-                            <div class="quiz-option" data-answer="D">
-                                <span class="option-letter">D</span>
-                                <span class="option-text">ReAct</span>
-                            </div>
+                <!-- Platforms Container (moves with camera) -->
+                <div id="platformsContainer"></div>
+
+                <!-- Death Overlay -->
+                <div class="death-overlay" id="deathOverlay" style="display: none;">
+                    <div class="death-content">
+                        <h2>Falsche Rolle!</h2>
+                        <p id="deathHintText">Das war leider nicht die richtige Rolle für diese Aufgabe.</p>
+                        <div class="death-hint">Drücke <span class="key-highlight">R</span> zum Neustarten</div>
+                    </div>
+                </div>
+
+                <!-- Pause Menu -->
+                <div class="pause-menu-overlay" id="pauseMenu" style="display: none;">
+                    <div class="pause-menu-content">
+                        <h2 class="pause-menu-title">Pause</h2>
+                        <div class="pause-menu-buttons">
+                            <button class="pause-menu-button" onclick="resumeGame()">
+                                <span>&#9654; Weiterspielen</span>
+                            </button>
+                            <button class="pause-menu-button" onclick="returnToLevelSelect()">
+                                <span>Zur Challenge-Auswahl</span>
+                            </button>
                         </div>
-                    </div>
-
-                    <div class="quiz-actions">
-                        <button id="submitQuizAnswer" class="action-btn primary" disabled>Antwort bestätigen</button>
-                        <button id="nextQuizQuestion" class="action-btn success" style="display: none;">Nächste Frage</button>
-                    </div>
-
-                    <div class="quiz-feedback" id="quizFeedback" style="display: none;">
-                        <h4>Feedback:</h4>
-                        <p id="feedbackText">Erklärung zur Antwort...</p>
+                        <div class="pause-menu-hint">Drücke <span class="key-highlight">ESC</span> zum Fortfahren</div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Victory Screen -->
-        <div id="victoryScreen" class="game-screen">
-            <div class="victory-container">
-                <div class="victory-header">
-                    <h2>Prompt-Meisterschaft erreicht!</h2>
-                    <div class="victory-animation">
-                        <div class="rank-display">
-                            <div id="finalRank" class="final-rank">Gold 🥇</div>
-                            <div id="rankDescription" class="rank-desc">Prompt-Engineering Experte</div>
-                        </div>
+            <!-- Challenge Complete Screen -->
+            <div class="game-screen" id="challengeCompleteScreen">
+                <div class="complete-content">
+                    <h2 class="complete-title">Challenge Geschafft!</h2>
+
+                    <!-- Correct Role Display -->
+                    <div class="correct-role-display" id="correctRoleDisplay">
+                        <!-- Wird dynamisch gefüllt -->
                     </div>
-                </div>
 
-                <div class="victory-stats">
-                    <div class="stat-card">
-                        <h3>Gesamtscore</h3>
-                        <div id="finalScore" class="stat-value">950/1000</div>
+                    <!-- Prompt Comparison Side-by-Side -->
+                    <div class="prompt-comparison" id="promptComparison">
+                        <!-- Wird dynamisch gefüllt -->
                     </div>
-                </div>
 
-                <div class="rank-legend">
-                    <h3>Rang-Legende</h3>
-                    <div class="legend-items">
-                        <div class="legend-item gold">
-                            <div class="legend-icon">🥇</div>
-                            <div class="legend-info">
-                                <span class="legend-rank">Gold</span>
-                                <span class="legend-requirement">500+ Punkte</span>
-                            </div>
-                        </div>
-                        <div class="legend-item silver">
-                            <div class="legend-icon">🥈</div>
-                            <div class="legend-info">
-                                <span class="legend-rank">Silber</span>
-                                <span class="legend-requirement">400-499 Punkte</span>
-                            </div>
-                        </div>
-                        <div class="legend-item bronze">
-                            <div class="legend-icon">🥉</div>
-                            <div class="legend-info">
-                                <span class="legend-rank">Bronze</span>
-                                <span class="legend-requirement">250-399 Punkte</span>
-                            </div>
-                        </div>
+                    <!-- Learning Takeaway -->
+                    <div class="learning-takeaway" id="learningTakeaway">
+                        <!-- Wird dynamisch gefüllt -->
                     </div>
-                </div>
 
-                <div class="victory-actions">
-                    <button id="playAgainLevel3" class="victory-btn primary">Nochmal spielen</button>
-                    <button id="backToHomeLevel3" class="victory-btn">Zur Startseite</button>
+                    <div class="complete-actions">
+                        <button class="next-level-button" onclick="nextChallenge()"><span>Nächste Challenge</span></button>
+                        <button class="menu-button" onclick="goToLevelSelectWithAnimation()"><span>Challenge-Auswahl</span></button>
+                    </div>
                 </div>
             </div>
-        </div>
+
+        </main>
+
     </div>
 
     <script src="script.js"></script>

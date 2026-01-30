@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Label Tool - Til Sander</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            color: #ffffff;
+            margin-bottom: 12px;
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .developer {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .upload-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .upload-box {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.02);
+            position: relative;
+        }
+
+        .upload-box::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            padding: 2px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .upload-box:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .upload-box:hover::before {
+            opacity: 1;
+        }
+
+        .upload-box.dragover {
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.01);
+        }
+
+        .upload-box h3 {
+            color: #ffffff;
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .upload-box p {
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .upload-box input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .upload-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .label-preview {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .label-preview img {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px;
+        }
+
+        .settings {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .settings h3 {
+            color: #ffffff;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .setting-row label {
+            color: rgba(255, 255, 255, 0.7);
+            min-width: 140px;
+            font-weight: 500;
+        }
+
+        .setting-row input[type="range"] {
+            flex: 1;
+            max-width: 350px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .setting-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .setting-row input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .setting-row input[type="number"] {
+            width: 70px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .setting-row input[type="number"]:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .setting-row span {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .preview-item {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.3s ease;
+        }
+
+        .preview-item:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-2px);
+        }
+
+        .preview-item canvas {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .preview-item .filename {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.2px;
+        }
+
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.95);
+            color: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 25px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            display: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .status.success {
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status.info {
+            background: rgba(59, 130, 246, 0.15);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .upload-section {
+                grid-template-columns: 1fr;
+            }
+
+            .setting-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .setting-row input[type="range"] {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Label Tool</h1>
+            <p class="subtitle">Label unten rechts auf deine Bilder packen</p>
+            <p class="developer">Entwickelt von Til Sander</p>
+        </header>
+
+        <div class="upload-section">
+            <!-- AI Label Upload -->
+            <div class="upload-box" id="labelUploadBox">
+                <h3>AI Label hochladen</h3>
+                <p>PNG mit transparentem Hintergrund</p>
+                <input type="file" id="labelInput" accept="image/png">
+                <button class="upload-btn" onclick="document.getElementById('labelInput').click()">
+                    Label auswählen
+                </button>
+                <div class="label-preview" id="labelPreview">
+                    <img id="labelPreviewImg" src="" alt="Label Preview">
+                </div>
+            </div>
+
+            <!-- Images Upload -->
+            <div class="upload-box" id="imagesUploadBox">
+                <h3>Bilder hochladen</h3>
+                <p>PNG-Dateien (Mehrfachauswahl möglich)</p>
+                <input type="file" id="imagesInput" accept="image/png" multiple>
+                <button class="upload-btn" onclick="document.getElementById('imagesInput').click()">
+                    Bilder auswählen
+                </button>
+                <p id="imageCount" style="margin-top: 15px; color: rgba(255, 255, 255, 0.7); font-weight: 500;"></p>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="settings">
+            <h3>Einstellungen</h3>
+            <div class="setting-row">
+                <label>Label-Größe:</label>
+                <input type="range" id="labelSize" min="5" max="50" value="15" step="1">
+                <input type="number" id="labelSizeValue" min="5" max="50" value="15">
+                <span>% der Bildbreite</span>
+            </div>
+            <div class="setting-row">
+                <label>Abstand rechts:</label>
+                <input type="range" id="paddingRight" min="0" max="50" value="10" step="1">
+                <input type="number" id="paddingRightValue" min="0" max="50" value="10">
+                <span>px</span>
+            </div>
+            <div class="setting-row">
+                <label>Abstand unten:</label>
+                <input type="range" id="paddingBottom" min="0" max="50" value="10" step="1">
+                <input type="number" id="paddingBottomValue" min="0" max="50" value="10">
+                <span>px</span>
+            </div>
+        </div>
+
+        <!-- Preview Grid -->
+        <div id="previewContainer" style="display: none;">
+            <h3 style="margin-bottom: 20px; color: #ffffff; font-size: 1.3rem; font-weight: 600;">Vorschau</h3>
+            <div class="preview-grid" id="previewGrid"></div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" id="generateBtn" onclick="generatePreviews()" disabled>
+                Vorschau erstellen
+            </button>
+            <button class="btn btn-primary" id="downloadBtn" onclick="downloadAll()" disabled>
+                Alle herunterladen
+            </button>
+            <button class="btn btn-secondary" onclick="reset()">
+                Zurücksetzen
+            </button>
+        </div>
+
+        <!-- Status Messages -->
+        <div class="status" id="statusMsg"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        let labelImage = null;
+        let sourceImages = [];
+        let processedCanvases = [];
+
+        // Drag & Drop Support
+        ['labelUploadBox', 'imagesUploadBox'].forEach(boxId => {
+            const box = document.getElementById(boxId);
+
+            box.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                box.classList.add('dragover');
+            });
+
+            box.addEventListener('dragleave', () => {
+                box.classList.remove('dragover');
+            });
+
+            box.addEventListener('drop', (e) => {
+                e.preventDefault();
+                box.classList.remove('dragover');
+
+                const files = e.dataTransfer.files;
+                if (boxId === 'labelUploadBox' && files.length > 0) {
+                    handleLabelUpload(files[0]);
+                } else if (boxId === 'imagesUploadBox') {
+                    handleImagesUpload(files);
+                }
+            });
+        });
+
+        // Label Upload
+        document.getElementById('labelInput').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleLabelUpload(e.target.files[0]);
+            }
+        });
+
+        function handleLabelUpload(file) {
+            if (!file.type.match('image/png')) {
+                showStatus('Bitte nur PNG-Dateien hochladen!', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    labelImage = img;
+                    document.getElementById('labelPreviewImg').src = e.target.result;
+                    document.getElementById('labelPreview').style.display = 'block';
+                    showStatus('AI Label erfolgreich geladen', 'success');
+                    updateGenerateButton();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Images Upload
+        document.getElementById('imagesInput').addEventListener('change', (e) => {
+            handleImagesUpload(e.target.files);
+        });
+
+        function handleImagesUpload(files) {
+            const pngFiles = Array.from(files).filter(f => f.type.match('image/png'));
+
+            if (pngFiles.length === 0) {
+                showStatus('Keine PNG-Dateien gefunden!', 'error');
+                return;
+            }
+
+            sourceImages = [];
+            let loaded = 0;
+
+            pngFiles.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        sourceImages.push({
+                            name: file.name,
+                            image: img
+                        });
+                        loaded++;
+
+                        if (loaded === pngFiles.length) {
+                            document.getElementById('imageCount').textContent =
+                                `${sourceImages.length} Bild${sourceImages.length > 1 ? 'er' : ''} geladen`;
+                            showStatus(`${sourceImages.length} Bild(er) erfolgreich geladen`, 'success');
+                            updateGenerateButton();
+                        }
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Settings - Sync sliders with number inputs
+        ['labelSize', 'paddingRight', 'paddingBottom'].forEach(id => {
+            const slider = document.getElementById(id);
+            const numberInput = document.getElementById(id + 'Value');
+
+            slider.addEventListener('input', () => {
+                numberInput.value = slider.value;
+                if (processedCanvases.length > 0) {
+                    generatePreviews();
+                }
+            });
+
+            numberInput.addEventListener('input', () => {
+                slider.value = numberInput.value;
+                if (processedCanvases.length > 0) {
+                    generatePreviews();
+                }
+            });
+        });
+
+        function updateGenerateButton() {
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = !(labelImage && sourceImages.length > 0);
+        }
+
+        function generatePreviews() {
+            if (!labelImage || sourceImages.length === 0) {
+                showStatus('Bitte Label und Bilder hochladen!', 'error');
+                return;
+            }
+
+            processedCanvases = [];
+            const previewGrid = document.getElementById('previewGrid');
+            previewGrid.innerHTML = '';
+
+            const labelSizePercent = parseInt(document.getElementById('labelSize').value);
+            const paddingRight = parseInt(document.getElementById('paddingRight').value);
+            const paddingBottom = parseInt(document.getElementById('paddingBottom').value);
+
+            sourceImages.forEach((src, index) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                // Set canvas size to source image size
+                canvas.width = src.image.width;
+                canvas.height = src.image.height;
+
+                // Draw source image
+                ctx.drawImage(src.image, 0, 0);
+
+                // Calculate label size
+                const labelWidth = (canvas.width * labelSizePercent) / 100;
+                const labelHeight = (labelImage.height / labelImage.width) * labelWidth;
+
+                // Position: bottom right with padding
+                const x = canvas.width - labelWidth - paddingRight;
+                const y = canvas.height - labelHeight - paddingBottom;
+
+                // Draw label
+                ctx.drawImage(labelImage, x, y, labelWidth, labelHeight);
+
+                // Store canvas
+                processedCanvases.push({
+                    canvas: canvas,
+                    name: src.name
+                });
+
+                // Create preview
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+
+                const previewCanvas = document.createElement('canvas');
+                previewCanvas.width = canvas.width;
+                previewCanvas.height = canvas.height;
+                const previewCtx = previewCanvas.getContext('2d');
+                previewCtx.drawImage(canvas, 0, 0);
+
+                const filename = document.createElement('div');
+                filename.className = 'filename';
+                filename.textContent = src.name;
+
+                previewItem.appendChild(previewCanvas);
+                previewItem.appendChild(filename);
+                previewGrid.appendChild(previewItem);
+            });
+
+            document.getElementById('previewContainer').style.display = 'block';
+            document.getElementById('downloadBtn').disabled = false;
+            showStatus(`${processedCanvases.length} Vorschau(en) erstellt`, 'success');
+        }
+
+        async function downloadAll() {
+            if (processedCanvases.length === 0) {
+                showStatus('Keine verarbeiteten Bilder vorhanden!', 'error');
+                return;
+            }
+
+            showStatus('Erstelle ZIP-Datei...', 'info');
+
+            const zip = new JSZip();
+            const imgFolder = zip.folder("ai-labeled-images");
+
+            // Add all canvases to zip
+            for (let i = 0; i < processedCanvases.length; i++) {
+                const item = processedCanvases[i];
+                const blob = await new Promise(resolve => {
+                    item.canvas.toBlob(resolve, 'image/png');
+                });
+
+                const newName = item.name.replace('.png', '_labeled.png');
+                imgFolder.file(newName, blob);
+            }
+
+            // Generate and download zip
+            zip.generateAsync({type: 'blob'}).then(content => {
+                const url = URL.createObjectURL(content);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ai-labeled-images.zip';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showStatus('Download erfolgreich', 'success');
+            });
+        }
+
+        function reset() {
+            labelImage = null;
+            sourceImages = [];
+            processedCanvases = [];
+
+            document.getElementById('labelInput').value = '';
+            document.getElementById('imagesInput').value = '';
+            document.getElementById('labelPreview').style.display = 'none';
+            document.getElementById('imageCount').textContent = '';
+            document.getElementById('previewContainer').style.display = 'none';
+            document.getElementById('previewGrid').innerHTML = '';
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('downloadBtn').disabled = true;
+
+            showStatus('Zurückgesetzt', 'info');
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('statusMsg');
+            status.textContent = message;
+            status.className = 'status ' + type;
+            status.style.display = 'block';
+
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

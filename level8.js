@@ -5,7 +5,7 @@ const GAME_CONFIG = {
     totalChallenges: 5,
     pointsPerChallenge: 100,
     totalPoints: 500,
-    storageKey: 'aiBytes_level8_progress'
+    storageKey: 'aiBytes_level6_progress_data'
 };
 
 // ===== TXP ANIMATIONS =====
@@ -27,6 +27,7 @@ const CHALLENGE_DATA = {
     1: {
         name: "Basis-Struktur",
         icon: "🎯",
+        technique: null, // Keine spezielle Technik
         scenarios: [
             {
                 id: "scenario-1a",
@@ -83,6 +84,10 @@ const CHALLENGE_DATA = {
     2: {
         name: "Few-Shot",
         icon: "💡",
+        technique: {
+            name: "Few-Shot:",
+            description: "Man gibt der KI mehrere Beispiele"
+        },
         scenarios: [
             {
                 id: "scenario-2a",
@@ -146,6 +151,10 @@ const CHALLENGE_DATA = {
     3: {
         name: "Chain-of-Thought",
         icon: "🔗",
+        technique: {
+            name: "Chain-of-Thought:",
+            description: "KI zeigt ihren Denkprozess Schritt für Schritt"
+        },
         scenarios: [
             {
                 id: "scenario-3a",
@@ -216,6 +225,10 @@ const CHALLENGE_DATA = {
     4: {
         name: "Tree of Thoughts",
         icon: "🌳",
+        technique: {
+            name: "Tree of Thoughts:",
+            description: "KI prüft mehrere Lösungswege parallel"
+        },
         scenarios: [
             {
                 id: "scenario-4a",
@@ -293,6 +306,10 @@ const CHALLENGE_DATA = {
     5: {
         name: "Guardrails",
         icon: "⚠️",
+        technique: {
+            name: "Guardrails:",
+            description: "Sicherheitsregeln schützen vor Fehlern und Datenlecks"
+        },
         scenarios: [
             {
                 id: "scenario-5a",
@@ -325,7 +342,7 @@ const CHALLENGE_DATA = {
                 id: "block-5a",
                 type: "Promptbaustein 2",
                 icon: "📋",
-                text: "Analysiere Mitarbeiter-Feedback. WICHTIG: Anonymisiere alle Namen bevor du die Ergebnisse zeigst.",
+                text: "Analysiere Mitarbeiter-Feedback. Anonymisiere alle Namen bevor du die Ergebnisse zeigst.",
                 correctScenario: "scenario-5a"
             },
             {
@@ -339,7 +356,7 @@ const CHALLENGE_DATA = {
                 id: "block-5b",
                 type: "Promptbaustein 4",
                 icon: "⭐",
-                text: "Bewerte Lieferanten. WICHTIG: Nutze nur objektive Kriterien (Qualität, Lieferzeit, Preis). Keine Vorurteile.",
+                text: "Bewerte Lieferanten. Nutze nur objektive Kriterien (Qualität, Lieferzeit, Preis). Keine Vorurteile.",
                 correctScenario: "scenario-5b"
             },
             {
@@ -353,7 +370,7 @@ const CHALLENGE_DATA = {
                 id: "block-5c",
                 type: "Promptbaustein 6",
                 icon: "🚨",
-                text: "Werte Unfallbericht aus. WICHTIG: DSGVO-konform arbeiten. Keine Namen nennen, nur Ursachen analysieren.",
+                text: "Werte Unfallbericht aus. DSGVO-konform arbeiten. Keine Namen nennen, nur Ursachen analysieren.",
                 correctScenario: "scenario-5c"
             },
             {
@@ -639,6 +656,19 @@ function startChallenge(level) {
 // ===== MATCHING SCREEN =====
 function initMatchingScreen(level) {
     const challengeData = CHALLENGE_DATA[level];
+
+    // Update technique legend
+    const techniqueLegend = document.getElementById('techniqueLegend');
+    const techniqueName = document.getElementById('techniqueName');
+    const techniqueDescription = document.getElementById('techniqueDescription');
+
+    if (challengeData.technique && techniqueLegend && techniqueName && techniqueDescription) {
+        techniqueName.textContent = challengeData.technique.name;
+        techniqueDescription.textContent = challengeData.technique.description;
+        techniqueLegend.style.display = 'flex';
+    } else if (techniqueLegend) {
+        techniqueLegend.style.display = 'none';
+    }
 
     // Hide HUD (not needed)
     const challengePointsDisplay = document.getElementById('challengePointsDisplay');
@@ -1032,6 +1062,12 @@ function nextChallenge() {
 }
 
 function goToLevelSelectWithAnimation() {
+    // Hide technique legend
+    const techniqueLegend = document.getElementById('techniqueLegend');
+    if (techniqueLegend) {
+        techniqueLegend.style.display = 'none';
+    }
+
     transitionToScreen('levelSelectScreen');
     updateLevelSelectDisplay();
 }
@@ -1039,6 +1075,12 @@ function goToLevelSelectWithAnimation() {
 function returnToLevelSelect() {
     if (gameState.isPaused) {
         resumeGame();
+    }
+
+    // Hide technique legend
+    const techniqueLegend = document.getElementById('techniqueLegend');
+    if (techniqueLegend) {
+        techniqueLegend.style.display = 'none';
     }
 
     transitionToScreen('levelSelectScreen');

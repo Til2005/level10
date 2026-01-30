@@ -746,6 +746,73 @@ body:has(#introScreen.active) .hud-wrapper {
     transform: translateX(-5px);
 }
 
+/* Technique Legend */
+.technique-legend {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;
+    background: rgba(21, 16, 55, 0.95);
+    border: 2px solid var(--amethyst);
+    border-radius: 8px;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+}
+
+.technique-name {
+    color: var(--saffron);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.technique-description {
+    color: white;
+    font-size: 0.9rem;
+}
+
+@media screen and (min-width: 1200px) {
+    .technique-legend {
+        top: 40px;
+        padding: 12px 28px;
+    }
+
+    .technique-name,
+    .technique-description {
+        font-size: 0.95rem;
+    }
+}
+
+@media screen and (max-height: 700px) {
+    .technique-legend {
+        top: 15px;
+        padding: 8px 20px;
+    }
+
+    .technique-name,
+    .technique-description {
+        font-size: 0.85rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .technique-legend {
+        max-width: 90%;
+        white-space: normal;
+        text-align: center;
+        padding: 8px 16px;
+    }
+
+    .technique-name,
+    .technique-description {
+        font-size: 0.8rem;
+    }
+}
+
 /* Scenarios Area (Top) */
 .scenarios-area {
     position: absolute;

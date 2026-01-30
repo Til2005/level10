@@ -320,7 +320,7 @@ function updateTotalProgress() {
     const level5Points = JSON.parse(localStorage.getItem('aiBytes_level6_progress') || '{}').totalPoints || 0;
     const level6Points = JSON.parse(localStorage.getItem('aiBytes_level6_progress_data') || '{}').totalPoints || 0;
     const level7Points = JSON.parse(localStorage.getItem('aiBytes_level7_progress') || '{}').totalPoints || 0;
-    const level8Points = JSON.parse(localStorage.getItem('aiBytes_level8_progress') || '{}').totalPoints || 0;
+    const level8Points = JSON.parse(localStorage.getItem('aiBytes_level3_progress') || '{}').totalPoints || 0;
     const level9Points = JSON.parse(localStorage.getItem('aiBytes_level9_progress') || '{}').totalPoints || 0;
 
     const totalPoints = level1Points + level2Points + level3Points + level4Points + level5Points +
@@ -468,8 +468,8 @@ function loadLevelRanks() {
         updateLevelProgress(level7Card, 0);
     }
 
-    // Level 8: Gute Ergebnisse sind kein Zufall
-    const level8Progress = localStorage.getItem('aiBytes_level8_progress');
+    // Level 8: Gute Ergebnisse sind kein Zufall (level3.html)
+    const level8Progress = localStorage.getItem('aiBytes_level3_progress');
     const level8Card = document.querySelector('.level-card[data-level="level9"]');
 
     if (level8Progress) {
@@ -613,7 +613,7 @@ function updateMysteryLevel() {
     const level5Points = JSON.parse(localStorage.getItem('aiBytes_level6_progress') || '{}').totalPoints || 0;
     const level6Points = JSON.parse(localStorage.getItem('aiBytes_level6_progress_data') || '{}').totalPoints || 0;
     const level7Points = JSON.parse(localStorage.getItem('aiBytes_level7_progress') || '{}').totalPoints || 0;
-    const level8Points = JSON.parse(localStorage.getItem('aiBytes_level8_progress') || '{}').totalPoints || 0;
+    const level8Points = JSON.parse(localStorage.getItem('aiBytes_level3_progress') || '{}').totalPoints || 0;
     const level9Points = JSON.parse(localStorage.getItem('aiBytes_level9_progress') || '{}').totalPoints || 0;
 
     const totalPoints = level1Points + level2Points + level3Points + level4Points + level5Points +
@@ -1597,6 +1597,96 @@ document.addEventListener('click', function(event) {
                 unlockMysteryLevel();
                 currentSequence = [];
                 clearTimeout(resetTimeout);
+            }
+        }
+    });
+})();
+
+// ===============================
+//   DEVELOPER CHEAT CODE (5x T)
+// ===============================
+(function() {
+    let tPresses = [];
+    let cheatActivated = false;
+
+    function activateDebugCheat() {
+        if (cheatActivated) return;
+        cheatActivated = true;
+
+        // Set points for all 9 levels
+        // Level 1: 500 Punkte (playerPoints)
+        localStorage.setItem('playerPoints', '500');
+
+        // Level 2: 485 Punkte (aiBytes_level4_progress)
+        localStorage.setItem('aiBytes_level4_progress', JSON.stringify({ score: 485 }));
+
+        // Level 3: 400 Punkte (aiBytes_level1_progress)
+        localStorage.setItem('aiBytes_level1_progress', JSON.stringify({ score: 400 }));
+
+        // Level 4: 300 Punkte (powerAutomateProgress)
+        localStorage.setItem('powerAutomateProgress', JSON.stringify({ totalPoints: 300 }));
+
+        // Level 5: 425 Punkte (aiBytes_level6_progress)
+        localStorage.setItem('aiBytes_level6_progress', JSON.stringify({ totalPoints: 425 }));
+
+        // Level 6: 500 Punkte (aiBytes_level6_progress_data - level8.html Advanced Prompting)
+        localStorage.setItem('aiBytes_level6_progress_data', JSON.stringify({ totalPoints: 500 }));
+
+        // Level 7: 400 Punkte (aiBytes_level7_progress - level7.html Daten-Spezialist)
+        localStorage.setItem('aiBytes_level7_progress', JSON.stringify({ totalPoints: 400 }));
+
+        // Level 8: 300 Punkte (aiBytes_level3_progress - level3.html)
+        localStorage.setItem('aiBytes_level3_progress', JSON.stringify({ totalPoints: 300 }));
+
+        // Level 9: 500 Punkte (aiBytes_level9_progress)
+        localStorage.setItem('aiBytes_level9_progress', JSON.stringify({ totalPoints: 500 }));
+
+        // Update UI
+        loadLevelRanks();
+
+        // TXP celebration
+        if (window.txpCharacter) {
+            window.txpCharacter.speak('🎮 DEBUG CHEAT AKTIVIERT! Alle Level-Punkte wurden gesetzt! 🚀');
+        }
+
+        // Visual feedback
+        const levelCards = document.querySelectorAll('.level-card');
+        levelCards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.animation = 'pulse 0.5s ease-in-out';
+                setTimeout(() => {
+                    card.style.animation = '';
+                }, 500);
+            }, index * 100);
+        });
+
+        // Reset after 2 seconds
+        setTimeout(() => {
+            cheatActivated = false;
+        }, 2000);
+    }
+
+    document.addEventListener('keydown', function(event) {
+        // Ignore if user is typing in an input field
+        if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+            return;
+        }
+
+        const key = event.key.toLowerCase();
+
+        if (key === 't') {
+            const now = Date.now();
+
+            // Remove old presses (older than 1 second)
+            tPresses = tPresses.filter(timestamp => now - timestamp < 1000);
+
+            // Add new press
+            tPresses.push(now);
+
+            // Check if 5 presses within 1 second
+            if (tPresses.length >= 5) {
+                activateDebugCheat();
+                tPresses = []; // Reset
             }
         }
     });
