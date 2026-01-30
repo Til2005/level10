@@ -274,6 +274,26 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            margin-bottom: 8px;
+        }
+
+        .download-single-btn {
+            width: 100%;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .download-single-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
         }
 
         .action-buttons {
@@ -281,6 +301,7 @@
             gap: 15px;
             justify-content: center;
             margin-top: 30px;
+            margin-bottom: 40px;
         }
 
         .btn {
@@ -412,8 +433,8 @@
             <!-- Images Upload -->
             <div class="upload-box" id="imagesUploadBox">
                 <h3>Bilder hochladen</h3>
-                <p>PNG-Dateien (Mehrfachauswahl möglich)</p>
-                <input type="file" id="imagesInput" accept="image/png" multiple>
+                <p>PNG/JPG-Dateien (Mehrfachauswahl möglich)</p>
+                <input type="file" id="imagesInput" accept="image/png,image/jpeg,image/jpg" multiple>
                 <button class="upload-btn" onclick="document.getElementById('imagesInput').click()">
                     Bilder auswählen
                 </button>
@@ -432,29 +453,20 @@
             </div>
             <div class="setting-row">
                 <label>Abstand rechts:</label>
-                <input type="range" id="paddingRight" min="0" max="50" value="10" step="1">
-                <input type="number" id="paddingRightValue" min="0" max="50" value="10">
+                <input type="range" id="paddingRight" min="0" max="100" value="10" step="1">
+                <input type="number" id="paddingRightValue" min="0" max="100" value="10">
                 <span>px</span>
             </div>
             <div class="setting-row">
                 <label>Abstand unten:</label>
-                <input type="range" id="paddingBottom" min="0" max="50" value="10" step="1">
-                <input type="number" id="paddingBottomValue" min="0" max="50" value="10">
+                <input type="range" id="paddingBottom" min="0" max="100" value="10" step="1">
+                <input type="number" id="paddingBottomValue" min="0" max="100" value="10">
                 <span>px</span>
             </div>
         </div>
 
-        <!-- Preview Grid -->
-        <div id="previewContainer" style="display: none;">
-            <h3 style="margin-bottom: 20px; color: #ffffff; font-size: 1.3rem; font-weight: 600;">Vorschau</h3>
-            <div class="preview-grid" id="previewGrid"></div>
-        </div>
-
         <!-- Action Buttons -->
         <div class="action-buttons">
-            <button class="btn btn-primary" id="generateBtn" onclick="generatePreviews()" disabled>
-                Vorschau erstellen
-            </button>
             <button class="btn btn-primary" id="downloadBtn" onclick="downloadAll()" disabled>
                 Alle herunterladen
             </button>
@@ -463,11 +475,16 @@
             </button>
         </div>
 
+        <!-- Preview Grid -->
+        <div id="previewContainer" style="display: none;">
+            <h3 style="margin-bottom: 20px; color: #ffffff; font-size: 1.3rem; font-weight: 600;">Vorschau</h3>
+            <div class="preview-grid" id="previewGrid"></div>
+        </div>
+
         <!-- Status Messages -->
         <div class="status" id="statusMsg"></div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
         let labelImage = null;
         let sourceImages = [];
@@ -520,7 +537,7 @@
                     document.getElementById('labelPreviewImg').src = e.target.result;
                     document.getElementById('labelPreview').style.display = 'block';
                     showStatus('AI Label erfolgreich geladen', 'success');
-                    updateGenerateButton();
+                    autoGeneratePreview();
                 };
                 img.src = e.target.result;
             };
@@ -533,32 +550,36 @@
         });
 
         function handleImagesUpload(files) {
-            const pngFiles = Array.from(files).filter(f => f.type.match('image/png'));
+            const imageFiles = Array.from(files).filter(f => f.type.match('image/(png|jpeg|jpg)'));
 
-            if (pngFiles.length === 0) {
-                showStatus('Keine PNG-Dateien gefunden!', 'error');
+            if (imageFiles.length === 0) {
+                showStatus('Keine Bilddateien gefunden!', 'error');
                 return;
             }
 
             sourceImages = [];
             let loaded = 0;
 
-            pngFiles.forEach(file => {
+            imageFiles.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const img = new Image();
                     img.onload = () => {
+                        // Detect if original was JPG/JPEG
+                        const isJpeg = file.type === 'image/jpeg' || file.name.toLowerCase().endsWith('.jpg') || file.name.toLowerCase().endsWith('.jpeg');
+
                         sourceImages.push({
                             name: file.name,
-                            image: img
+                            image: img,
+                            isJpeg: isJpeg
                         });
                         loaded++;
 
-                        if (loaded === pngFiles.length) {
+                        if (loaded === imageFiles.length) {
                             document.getElementById('imageCount').textContent =
                                 `${sourceImages.length} Bild${sourceImages.length > 1 ? 'er' : ''} geladen`;
                             showStatus(`${sourceImages.length} Bild(er) erfolgreich geladen`, 'success');
-                            updateGenerateButton();
+                            autoGeneratePreview();
                         }
                     };
                     img.src = e.target.result;
@@ -574,22 +595,24 @@
 
             slider.addEventListener('input', () => {
                 numberInput.value = slider.value;
-                if (processedCanvases.length > 0) {
+                if (labelImage && sourceImages.length > 0) {
                     generatePreviews();
                 }
             });
 
             numberInput.addEventListener('input', () => {
                 slider.value = numberInput.value;
-                if (processedCanvases.length > 0) {
+                if (labelImage && sourceImages.length > 0) {
                     generatePreviews();
                 }
             });
         });
 
-        function updateGenerateButton() {
-            const btn = document.getElementById('generateBtn');
-            btn.disabled = !(labelImage && sourceImages.length > 0);
+        function autoGeneratePreview() {
+            // Automatically generate preview when both label and images are loaded
+            if (labelImage && sourceImages.length > 0) {
+                generatePreviews();
+            }
         }
 
         function generatePreviews() {
@@ -631,7 +654,8 @@
                 // Store canvas
                 processedCanvases.push({
                     canvas: canvas,
-                    name: src.name
+                    name: src.name,
+                    isJpeg: src.isJpeg
                 });
 
                 // Create preview
@@ -648,8 +672,16 @@
                 filename.className = 'filename';
                 filename.textContent = src.name;
 
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'download-single-btn';
+                downloadBtn.textContent = 'Download';
+                downloadBtn.onclick = function() {
+                    downloadSingle(canvas, src.name, src.isJpeg);
+                };
+
                 previewItem.appendChild(previewCanvas);
                 previewItem.appendChild(filename);
+                previewItem.appendChild(downloadBtn);
                 previewGrid.appendChild(previewItem);
             });
 
@@ -658,41 +690,50 @@
             showStatus(`${processedCanvases.length} Vorschau(en) erstellt`, 'success');
         }
 
-        async function downloadAll() {
-            if (processedCanvases.length === 0) {
-                showStatus('Keine verarbeiteten Bilder vorhanden!', 'error');
-                return;
-            }
+        function downloadSingle(canvas, originalName, isJpeg = false) {
+            const mimeType = isJpeg ? 'image/jpeg' : 'image/png';
+            const quality = isJpeg ? 0.95 : undefined;
 
-            showStatus('Erstelle ZIP-Datei...', 'info');
-
-            const zip = new JSZip();
-            const imgFolder = zip.folder("ai-labeled-images");
-
-            // Add all canvases to zip
-            for (let i = 0; i < processedCanvases.length; i++) {
-                const item = processedCanvases[i];
-                const blob = await new Promise(resolve => {
-                    item.canvas.toBlob(resolve, 'image/png');
-                });
-
-                const newName = item.name.replace('.png', '_labeled.png');
-                imgFolder.file(newName, blob);
-            }
-
-            // Generate and download zip
-            zip.generateAsync({type: 'blob'}).then(content => {
-                const url = URL.createObjectURL(content);
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'ai-labeled-images.zip';
+
+                // Replace extension based on original format
+                let newName;
+                if (isJpeg) {
+                    newName = originalName.replace(/\.(jpg|jpeg)$/i, '_labeled.jpg');
+                } else {
+                    newName = originalName.replace(/\.png$/i, '_labeled.png');
+                }
+                a.download = newName;
+
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
+            }, mimeType, quality);
+        }
 
-                showStatus('Download erfolgreich', 'success');
-            });
+        async function downloadAll() {
+            if (processedCanvases.length === 0) {
+                showStatus('Keine verarbeiteten Bilder vorhanden', 'error');
+                return;
+            }
+
+            showStatus('Starte Downloads...', 'info');
+
+            // Download each image individually with a small delay
+            for (let i = 0; i < processedCanvases.length; i++) {
+                const item = processedCanvases[i];
+                setTimeout(() => {
+                    downloadSingle(item.canvas, item.name, item.isJpeg);
+                }, i * 300); // 300ms delay between downloads
+            }
+
+            setTimeout(() => {
+                showStatus(`${processedCanvases.length} Download(s) gestartet`, 'success');
+            }, processedCanvases.length * 300);
         }
 
         function reset() {
@@ -706,7 +747,6 @@
             document.getElementById('imageCount').textContent = '';
             document.getElementById('previewContainer').style.display = 'none';
             document.getElementById('previewGrid').innerHTML = '';
-            document.getElementById('generateBtn').disabled = true;
             document.getElementById('downloadBtn').disabled = true;
 
             showStatus('Zurückgesetzt', 'info');
