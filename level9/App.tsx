@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { GoogleGenAI } from '@google/genai';
 import { QuizQuestion, QuizState } from './types';
 import { Sparkles, ArrowRight, RotateCcw, Copy, Check, Wand2, PartyPopper } from 'lucide-react';
 
@@ -16,6 +15,128 @@ const QUESTIONS: QuizQuestion[] = [
   { id: 9, question: "Wie soll die KI mit schwierigen Fragen umgehen?", emoji: "🤔", options: ["Direkt sagen, wenn sie es nicht weiß", "Vorsichtig schätzen", "Immer eine kreative Lösung finden"] },
   { id: 10, question: "Gib deinem neuen KI-Kollegen einen Namen!", emoji: "🤖", placeholder: "z.B. Jarvis, Schlaubi, Work-Buddy..." },
 ];
+
+// Smart Template-based Prompt Generator
+function generateSmartPrompt(answers: Record<number, string>): string {
+  const branche = answers[1] || "verschiedenen Bereichen";
+  const ansprache = answers[2] || "Locker per 'Du'";
+  const vibe = answers[3] || "Kreativ & inspirierend";
+  const länge = answers[4] || "Ausführlich mit Details";
+  const aufgabe = answers[5] || "verschiedenen Aufgaben";
+  const korrektur = answers[6] || "Ja, bitte sei gnadenlos!";
+  const sprachniveau = answers[7] || "Einfaches Deutsch";
+  const emojis = answers[8] || "Nur ganz dezent";
+  const schwierigeFragen = answers[9] || "Direkt sagen, wenn sie es nicht weiß";
+  const name = answers[10] || "KI-Assistent";
+
+  // Tonalität bestimmen
+  let tonalität = "";
+  let persönlichkeit = "";
+
+  if (vibe.includes("professionell")) {
+    tonalität = "streng professionell und sachlich";
+    persönlichkeit = "Du bist fokussiert, effizient und gehst direkt auf den Punkt.";
+  } else if (vibe.includes("kreativ")) {
+    tonalität = "kreativ, inspirierend und motivierend";
+    persönlichkeit = "Du denkst über den Tellerrand hinaus und bringst frische Perspektiven ein.";
+  } else if (vibe.includes("Sarkastisch")) {
+    tonalität = "witzig, leicht sarkastisch aber immer hilfreich";
+    persönlichkeit = "Du hast einen trockenen Humor, bleibst aber konstruktiv und lösungsorientiert.";
+  } else if (vibe.includes("Empathisch")) {
+    tonalität = "empathisch, verständnisvoll und sanft";
+    persönlichkeit = "Du nimmst Rücksicht auf Gefühle und gehst behutsam auf Anliegen ein.";
+  }
+
+  // Antwortlänge
+  let antwortStil = "";
+  if (länge.includes("Kurz")) {
+    antwortStil = "Halte deine Antworten kurz und prägnant. Maximal 2-3 Sätze, wenn möglich.";
+  } else if (länge.includes("Stichpunkte")) {
+    antwortStil = "Antworte immer in Stichpunkten oder kurzen Listen. Vermeide lange Fließtexte.";
+  } else {
+    antwortStil = "Gib ausführliche, detaillierte Antworten mit Hintergrundinformationen und Beispielen.";
+  }
+
+  // Anrede
+  let anredeStil = "";
+  if (ansprache.includes("Sie")) {
+    anredeStil = "Sprich den Nutzer mit 'Sie' an und bleibe formell höflich.";
+  } else if (ansprache.includes("Kumpel")) {
+    anredeStil = "Sprich den Nutzer locker per 'Du' an, wie ein guter Kumpel. Sei entspannt und authentisch.";
+  } else {
+    anredeStil = "Sprich den Nutzer freundlich per 'Du' an.";
+  }
+
+  // Emoji-Nutzung
+  let emojiRegel = "";
+  if (emojis.includes("Ja")) {
+    emojiRegel = "Nutze Emojis großzügig, um deine Antworten lebendiger zu machen. 🎨✨";
+  } else if (emojis.includes("dezent")) {
+    emojiRegel = "Nutze gelegentlich ein passendes Emoji, aber übertreibe es nicht.";
+  } else {
+    emojiRegel = "Verzichte komplett auf Emojis. Bleibe rein textbasiert.";
+  }
+
+  // Korrekturverhalten
+  let korrekturVerhalten = "";
+  if (korrektur.includes("gnadenlos")) {
+    korrekturVerhalten = "Wenn der Nutzer falsch liegt oder einen Fehler macht, korrigiere ihn direkt und deutlich. Sachlichkeit geht vor Höflichkeit.";
+  } else if (korrektur.includes("wichtig")) {
+    korrekturVerhalten = "Korrigiere den Nutzer nur bei wirklich wichtigen Fehlern. Bei Kleinigkeiten lass es durchgehen.";
+  } else {
+    korrekturVerhalten = "Setze immer die Anweisungen des Nutzers um, auch wenn du anderer Meinung bist. Keine Korrekturen.";
+  }
+
+  // Sprachniveau
+  let sprache = "";
+  if (sprachniveau.includes("Einfaches")) {
+    sprache = "Nutze einfache, verständliche Sprache. Vermeide Fachbegriffe oder erkläre sie sofort.";
+  } else if (sprachniveau.includes("Fachchinesisch")) {
+    sprache = "Nutze Fachsprache und technische Begriffe. Der Nutzer ist Experte und erwartet präzise Terminologie.";
+  } else {
+    sprache = "Mische deutsches und englisches Vokabular natürlich (Denglisch). Nutze gängige englische Fachbegriffe.";
+  }
+
+  // Umgang mit schwierigen Fragen
+  let unsicherheit = "";
+  if (schwierigeFragen.includes("nicht weiß")) {
+    unsicherheit = "Wenn du etwas nicht weißt oder unsicher bist, sag das ehrlich und transparent.";
+  } else if (schwierigeFragen.includes("schätzen")) {
+    unsicherheit = "Bei Unsicherheit darfst du vorsichtig schätzen, weise aber darauf hin dass es eine Vermutung ist.";
+  } else {
+    unsicherheit = "Finde immer eine kreative Lösung oder Annäherung, auch wenn du nicht 100% sicher bist.";
+  }
+
+  // Finaler Prompt
+  return `Du bist ${name}, ein spezialisierter KI-Assistent für ${branche}.
+
+# DEINE PERSÖNLICHKEIT
+${persönlichkeit}
+Dein Kommunikationsstil ist ${tonalität}.
+
+# KOMMUNIKATIONSREGELN
+${anredeStil}
+${antwortStil}
+${sprache}
+${emojiRegel}
+
+# KERNAUFGABE
+Deine Hauptaufgabe ist es, bei folgenden Tätigkeiten zu unterstützen: ${aufgabe}
+Konzentriere dich darauf, in diesem Bereich maximalen Mehrwert zu liefern.
+
+# VERHALTEN BEI FEHLERN
+${korrekturVerhalten}
+
+# UMGANG MIT UNSICHERHEIT
+${unsicherheit}
+
+# WICHTIG
+- Bleibe immer in deiner definierten Rolle als ${name}
+- Passe deine Antworten an die Bedürfnisse im Bereich ${branche} an
+- Sei konsistent in deinem ${vibe.toLowerCase()} Stil
+
+Starte jetzt deine Arbeit als ${name}!`;
+}
 
 const App: React.FC = () => {
   const [state, setState] = useState<QuizState>({
@@ -50,23 +171,14 @@ const App: React.FC = () => {
 
   const generatePrompt = async (answers: Record<number, string>) => {
     setState(prev => ({ ...prev, isGenerating: true, currentStep: QUESTIONS.length + 1 }));
-    
-    try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const promptContext = Object.entries(answers)
-        .map(([id, ans]) => `Frage ${id} (${QUESTIONS[parseInt(id)-1].question}): ${ans}`)
-        .join("\n");
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: `Erstelle einen hochqualitativen, professionellen System-Prompt für eine KI basierend auf diesen Nutzerpräferenzen aus einem Quiz:\n\n${promptContext}\n\nDer System-Prompt soll in der "Du"-Form an die KI geschrieben sein (z.B. "Du bist ein..."). Er soll alle Aspekte wie Tonalität, Formatierung, Fachwissen und Persönlichkeit abdecken. Gib NUR den fertigen System-Prompt zurück, ohne Einleitung oder Erklärung.`,
-      });
+    // Simulate "thinking" time for better UX
+    await new Promise(resolve => setTimeout(resolve, 2500));
 
-      setState(prev => ({ ...prev, isGenerating: false, finalPrompt: response.text }));
-    } catch (err) {
-      console.error(err);
-      setState(prev => ({ ...prev, isGenerating: false, finalPrompt: "Ups! Da ist etwas schiefgelaufen beim Kochen deines Prompts. Versuche es nochmal!" }));
-    }
+    // Generate prompt using smart template
+    const generatedPrompt = generateSmartPrompt(answers);
+
+    setState(prev => ({ ...prev, isGenerating: false, finalPrompt: generatedPrompt }));
   };
 
   const reset = () => {
