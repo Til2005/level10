@@ -1188,7 +1188,7 @@ body:has(#introScreen.active) .hud-wrapper {
     left: 40px;
     width: 120px;
     height: 120px;
-    z-index: 50;
+    z-index: 56;
     cursor: pointer;
     transition: transform 0.3s ease;
 }

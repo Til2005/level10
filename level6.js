@@ -271,7 +271,6 @@ const CHALLENGE_DATA = {
             // Chat analysieren - Normal 30s, Urgent 14s
             { description: "5 parallele Teams Krisen Chats analysieren", correctAction: "chat-points", priority: "urgent", timeLimit: 14 },
             { description: "Teams Chat von einer bestimmten Person suchen", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
-            { description: "Kraftausdrücke von meiner Frau in altem Teams Chat suchen", correctAction: "chat-points", priority: "normal", timeLimit: 30 },
 
             // Doc Draft - Normal 30s, Urgent 16s
             { description: "Vertrags Dokument für großen Deal erstellen", correctAction: "doc-draft", priority: "urgent", timeLimit: 16 },

@@ -16,11 +16,9 @@ const GAME_CONFIG = {
     // Base reference height für Skalierung (Design-Höhe)
     baseViewportHeight: 1080,
 
-    // Berechne Skalierungsfaktor basierend auf Viewport-Höhe
+    // Fixed scale - no viewport-based scaling for consistent game speed
     getScale() {
-        const vh = window.innerHeight;
-        // Minimum 0.65x für kleine Laptops, Maximum 1.0x für große Monitore
-        return Math.max(0.65, Math.min(1.0, vh / this.baseViewportHeight));
+        return 1.0;
     },
 
     // Skalierte Werte
@@ -58,7 +56,7 @@ const GAME_CONFIG = {
         return {
             groundY: vh * 0.75,  // 75% der Höhe
             playerY: vh * 0.50,  // 50% der Höhe
-            txpY: vh * 0.75 - this.getTxpSize().height,  // Auf dem Boden
+            txpY: vh * 0.75 - this.getTxpSize().height + 2,  // Auf dem Boden (+2px lower)
             portalY: vh * 0.38,  // 38% der Höhe
             platformHeight: Math.round(50 * scale)
         };
@@ -931,6 +929,9 @@ class RolePromptingGame {
         this.lastTime = 0;
         this.gameLoopId = null;
 
+        // Shooting star animation
+        this.shootingStarInterval = null;
+
         // Input
         this.keys = {};
         this.setupInputHandlers();
@@ -1159,6 +1160,9 @@ class RolePromptingGame {
         // Create game objects
         this.createGameObjects(challengeNum);
 
+        // Start shooting stars animation
+        this.startShootingStars();
+
         // Start game loop
         this.isRunning = true;
         this.lastTime = performance.now();
@@ -1199,7 +1203,53 @@ class RolePromptingGame {
         this.txpNpc.setMessages(challengeData.txpMessages);
     }
 
+    // ===== SHOOTING STAR ANIMATION =====
+    createShootingStar() {
+        const hudWrapper = document.querySelector('.hud-wrapper');
+        if (!hudWrapper) return;
+
+        const star = document.createElement('div');
+        star.className = 'shooting-star';
+
+        // Random starting position near top-right of scenario display
+        const startX = Math.random() * 200 + 300;  // Range: 300-500px from left
+        const startY = 80 + Math.random() * 20;     // Range: 80-100px from top
+
+        star.style.left = startX + 'px';
+        star.style.top = startY + 'px';
+
+        hudWrapper.appendChild(star);
+
+        // Trigger animation
+        setTimeout(() => star.classList.add('active'), 10);
+
+        // Remove after animation completes
+        setTimeout(() => star.remove(), 1300);
+    }
+
+    startShootingStars() {
+        // Stop any existing interval first
+        this.stopShootingStars();
+
+        // Trigger shooting star every 5 seconds
+        this.shootingStarInterval = setInterval(() => {
+            if (this.currentScreen === 'game' && !this.isPaused && this.isRunning) {
+                this.createShootingStar();
+            }
+        }, 5000);
+    }
+
+    stopShootingStars() {
+        if (this.shootingStarInterval) {
+            clearInterval(this.shootingStarInterval);
+            this.shootingStarInterval = null;
+        }
+    }
+
     cleanupGameObjects() {
+        // Stop shooting stars
+        this.stopShootingStars();
+
         // Destroy platforms
         this.platforms.forEach(p => p.destroy());
         this.platforms = [];

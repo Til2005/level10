@@ -489,6 +489,12 @@ html {
 .intro-content {
     text-align: center;
     padding: 20px 15px;
+    max-height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 /* ===============================
@@ -639,6 +645,66 @@ body.intro-active .mo-host-container {
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
+}
+
+/* Intro Tutorial Section */
+.intro-tutorial-section {
+    margin: 30px auto;
+    padding: 25px;
+    background: rgba(21, 16, 55, 0.6);
+    border: 2px solid var(--maya-blue);
+    border-radius: 15px;
+    max-width: 600px;
+}
+
+.intro-tutorial-title {
+    font-family: 'Ithaca', sans-serif;
+    font-size: 22px;
+    color: var(--maya-blue);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.intro-tutorial-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.intro-step {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: rgba(103, 199, 255, 0.1);
+    border-radius: 10px;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.intro-step:hover {
+    transform: translateX(5px);
+    background: rgba(103, 199, 255, 0.15);
+}
+
+.step-number {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: var(--maya-blue);
+    color: var(--russian-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.step-text {
+    color: white;
+    font-size: 16px;
+    line-height: 1.4;
+    text-align: left;
 }
 
 .start-button {

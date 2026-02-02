@@ -871,6 +871,25 @@ function startGame() {
     showTutorial();
 }
 
+function startGameDirectly() {
+    currentChallenge = 0;
+    totalScore = 0;
+    gameState = 'challenge';
+
+    // Select 5 random challenges
+    selectRandomChallenges();
+
+    // MoMan welcome message
+    if (moHost) {
+        moHost.speak("Perfekt! Lass uns zusammen die Geheimnisse des Promptens entdecken! 🚀");
+    }
+
+    updateScore(0);
+
+    // Skip tutorial and go directly to first challenge
+    showChallenge();
+}
+
 function showTutorial() {
     // Only show tutorial at the very beginning (currentChallenge = 0)
     const tutorial = tutorials[0];
@@ -1388,7 +1407,7 @@ function restartGame() {
 
 function updateScore(score) {
     const scoreElement = document.getElementById('scoreValue');
-    scoreElement.textContent = score;
+    scoreElement.textContent = `${score}/500`;
 
     // Add animation class
     scoreElement.classList.add('updated');

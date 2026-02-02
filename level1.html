@@ -33,7 +33,7 @@
                     </div>
                     <div class="score-container">
                         <span class="score-label">Score:</span>
-                        <span class="score-value" id="scoreValue">0</span>
+                        <span class="score-value" id="scoreValue">0/500</span>
                     </div>
                 </div>
                 <span class="rank-badge" id="rankBadge" style="display: none;"></span>
@@ -43,8 +43,28 @@
             <div class="game-screen active" id="introScreen">
                 <div class="intro-content">
                     <h1 class="game-title">Level: Nicht suchen, sondern Prompten!</h1>
-                    <p class="game-description">Lerne in 5 spannenden Challenges, wie du AI richtig "promptest"!</p>
-                    <button class="start-button" onclick="startGame()">Spiel starten!</button>
+                    <p class="game-description">Lerne in 5 spannenden Challenges, wie du richtig "promptest"!</p>
+
+                    <!-- Tutorial Section -->
+                    <div class="intro-tutorial-section">
+                        <h3 class="intro-tutorial-title">So funktioniert's:</h3>
+                        <div class="intro-tutorial-steps">
+                            <div class="intro-step">
+                                <span class="step-number">1</span>
+                                <span class="step-text">Wähle den besten Prompt für die Aufgabe</span>
+                            </div>
+                            <div class="intro-step">
+                                <span class="step-number">2</span>
+                                <span class="step-text">Schau dir die AI-Antwort an</span>
+                            </div>
+                            <div class="intro-step">
+                                <span class="step-number">3</span>
+                                <span class="step-text">Passe deinen Prompt an und sende ihn erneut</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="start-button" onclick="startGameDirectly()">Spiel starten!</button>
                 </div>
             </div>
 
