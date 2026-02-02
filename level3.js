@@ -2,18 +2,67 @@
 
 // ===== CONSTANTS =====
 const GAME_CONFIG = {
-    playerSpeed: 8,
-    playerWidth: 150,
-    playerHeight: 150,
-    jumpForce: -18,
-    gravity: 0.7,
+    playerSpeed: 7,
+    jumpForce: -16,
+    gravity: 0.6,
     groundLevel: 50,
     debugHitboxes: false,
     cameraOffset: 400,
     levelWidth: 5000,
     totalChallenges: 5,
     basePoints: 100,
-    portalProximity: 120
+    portalProximity: 120,
+
+    // Base reference height für Skalierung (Design-Höhe)
+    baseViewportHeight: 1080,
+
+    // Berechne Skalierungsfaktor basierend auf Viewport-Höhe
+    getScale() {
+        const vh = window.innerHeight;
+        // Minimum 0.65x für kleine Laptops, Maximum 1.0x für große Monitore
+        return Math.max(0.65, Math.min(1.0, vh / this.baseViewportHeight));
+    },
+
+    // Skalierte Werte
+    getPlayerSize() {
+        const scale = this.getScale();
+        return {
+            width: Math.round(150 * scale),
+            height: Math.round(150 * scale)
+        };
+    },
+
+    getTxpSize() {
+        const scale = this.getScale();
+        return {
+            width: Math.round(120 * scale),
+            height: Math.round(120 * scale)
+        };
+    },
+
+    getPortalSize() {
+        const scale = this.getScale();
+        return {
+            frameSize: Math.round(140 * scale),
+            ovalWidth: Math.round(120 * scale),
+            ovalHeight: Math.round(160 * scale)
+        };
+    },
+
+    // Verhältnisbasierte Y-Positionen (Prozent der Viewport-Höhe)
+    getGamePositions() {
+        const vh = window.innerHeight;
+        const scale = this.getScale();
+
+        // Alles relativ zur Viewport-Höhe
+        return {
+            groundY: vh * 0.75,  // 75% der Höhe
+            playerY: vh * 0.50,  // 50% der Höhe
+            txpY: vh * 0.75 - this.getTxpSize().height,  // Auf dem Boden
+            portalY: vh * 0.38,  // 38% der Höhe
+            platformHeight: Math.round(50 * scale)
+        };
+    }
 };
 
 // ===== ANIMATION PATHS =====
@@ -56,9 +105,9 @@ const CHALLENGE_DATA = {
         name: "Der Koch",
         scenario: "Du brauchst ein 3-Gänge-Menü für deine Gäste. Du willst die KI um Hilfe bitten.",
         portals: [
-            { role: "Küchenchef", emoji: "👨‍🍳", correct: true },
-            { role: "Buchhalter", emoji: "🧮", correct: false },
-            { role: "Mechaniker", emoji: "🔧", correct: false }
+            { role: "Küchenchef", image: "assets/level3/byteman_koch.png", correct: true },
+            { role: "Buchhalter", image: "assets/level3/byteman_buchhalter.png", correct: false },
+            { role: "Mechaniker", image: "assets/level3/byteman_mechaniker.png", correct: false }
         ],
         txpMessages: [
             "Willkommen bei Level 3! Hier lernst du, warum Rollen in Prompts wichtig sind.",
@@ -68,7 +117,7 @@ const CHALLENGE_DATA = {
         ],
         wrongHint: "Ein Buchhalter oder Mechaniker kann kein Menü kochen! Versuche es mit jemandem, der sich in der Küche auskennt.",
         educational: {
-            roleEmoji: "👨‍🍳",
+            roleImage: "assets/level3/byteman_koch.png",
             roleName: "Küchenchef",
             explanation: "Ein Küchenchef hat das Fachwissen über Zutaten, Zubereitungstechniken und Menüplanung. Wenn du die KI bittest, sich wie ein Küchenchef zu verhalten, bekommst du fachlich fundierte Antworten.",
             promptWithout: "Erstelle ein 3-Gänge-Menü für Gäste.",
@@ -82,9 +131,9 @@ const CHALLENGE_DATA = {
         name: "Der Projektmanager",
         scenario: "Du musst einen strukturierten Projektplan mit klaren Verantwortlichkeiten erstellen.",
         portals: [
-            { role: "Gärtner", emoji: "🌱", correct: false },
-            { role: "Projektmanager", emoji: "📊", correct: true },
-            { role: "Musiker", emoji: "🎵", correct: false }
+            { role: "Gärtner", image: "assets/level3/byteman_gärtner.png", correct: false },
+            { role: "Projektmanager", image: "assets/level3/byteman_projektmanager.png", correct: true },
+            { role: "Musiker", image: "assets/level3/byteman_musiker.png", correct: false }
         ],
         txpMessages: [
             "Super gemacht! Nächstes Szenario:",
@@ -93,7 +142,7 @@ const CHALLENGE_DATA = {
         ],
         wrongHint: "Ein Gärtner oder Musiker hat keine Erfahrung mit Projektplanung! Wähle jemanden mit Organisationstalent.",
         educational: {
-            roleEmoji: "📊",
+            roleImage: "assets/level3/byteman_projektmanager.png",
             roleName: "Projektmanager",
             explanation: "Ein Projektmanager kennt Methoden wie Gantt-Charts, Meilensteine und RACI-Matrizen. Mit dieser Rolle liefert die KI professionelle Projektstrukturpläne.",
             promptWithout: "Erstelle einen Projektplan.",
@@ -107,10 +156,10 @@ const CHALLENGE_DATA = {
         name: "Der Roboter-Techniker",
         scenario: "Du brauchst Sicherheitshinweise für die Programmierung eines Industrieroboters.",
         portals: [
-            { role: "Journalist", emoji: "📰", correct: false },
-            { role: "Roboter-Techniker", emoji: "🤖", correct: true },
-            { role: "Designer", emoji: "🎨", correct: false },
-            { role: "Tierarzt", emoji: "🐾", correct: false }
+            { role: "Journalist", image: "assets/level3/byte_journalist.png", correct: false },
+            { role: "Roboter-Techniker", image: "assets/level3/byteman_industrieroboter.png", correct: true },
+            { role: "Designer", image: "assets/level3/byteman_designer.png", correct: false },
+            { role: "Tierarzt", image: "assets/level3/byteman_tierarzt.png", correct: false }
         ],
         txpMessages: [
             "Jetzt wird es technischer!",
@@ -119,7 +168,7 @@ const CHALLENGE_DATA = {
         ],
         wrongHint: "Sicherheitshinweise für Roboter erfordern technisches Fachwissen! Wähle jemanden aus der Robotik.",
         educational: {
-            roleEmoji: "🤖",
+            roleImage: "assets/level3/byteman_industrieroboter.png",
             roleName: "Roboter-Techniker",
             explanation: "Ein Roboter-Techniker kennt Sicherheitsprotokolle, Not-Aus-Systeme und Programmierstandards für Industrieroboter. Diese Expertise fehlt bei anderen Rollen komplett.",
             promptWithout: "Gib mir Sicherheitshinweise für Roboter-Programmierung.",
@@ -133,10 +182,10 @@ const CHALLENGE_DATA = {
         name: "Der Software-Entwickler",
         scenario: "Du brauchst einen Python-Code für eine Datenbank-Abfrage mit Fehlerbehandlung.",
         portals: [
-            { role: "Marketing-Experte", emoji: "📢", correct: false },
-            { role: "Software-Entwickler", emoji: "💻", correct: true },
-            { role: "Historiker", emoji: "📜", correct: false },
-            { role: "Architekt", emoji: "🏗️", correct: false }
+            { role: "Gärtner", image: "assets/level3/byteman_gärtner.png", correct: false },
+            { role: "Software-Entwickler", image: "assets/level3/byteman_softwareentwickler.png", correct: true },
+            { role: "Historiker", image: "assets/level3/byteman_historiker.png", correct: false },
+            { role: "Designer", image: "assets/level3/byteman_designer.png", correct: false }
         ],
         txpMessages: [
             "Gut gemacht! Weiter geht's.",
@@ -145,7 +194,7 @@ const CHALLENGE_DATA = {
         ],
         wrongHint: "Nur ein Software-Entwickler kann professionellen, funktionierenden Code schreiben!",
         educational: {
-            roleEmoji: "💻",
+            roleImage: "assets/level3/byteman_softwareentwickler.png",
             roleName: "Software-Entwickler",
             explanation: "Ein Software-Entwickler kennt Best Practices, Design Patterns und Fehlerbehandlung. Der Code wird sauber, dokumentiert und produktionsreif.",
             promptWithout: "Schreibe Python-Code für eine Datenbank-Abfrage.",
@@ -156,30 +205,30 @@ const CHALLENGE_DATA = {
         }
     },
     5: {
-        name: "Der Finale Test",
-        scenario: "Du brauchst eine SEO-optimierte Produktbeschreibung für einen Online-Shop.",
+        name: "Der Journalist",
+        scenario: "Du musst einen objektiven, faktenbasierten Nachrichtenartikel über ein komplexes Ereignis schreiben.",
         portals: [
-            { role: "Koch", emoji: "👨‍🍳", correct: false },
-            { role: "Roboter-Techniker", emoji: "🤖", correct: false },
-            { role: "Marketing-Experte", emoji: "📢", correct: true },
-            { role: "Lehrer", emoji: "👨‍🏫", correct: false },
-            { role: "Programmierer", emoji: "💻", correct: false }
+            { role: "Koch", image: "assets/level3/byteman_koch.png", correct: false },
+            { role: "Musiker", image: "assets/level3/byteman_musiker.png", correct: false },
+            { role: "Journalist", image: "assets/level3/byte_journalist.png", correct: true },
+            { role: "Mechaniker", image: "assets/level3/byteman_mechaniker.png", correct: false },
+            { role: "Tierarzt", image: "assets/level3/byteman_tierarzt.png", correct: false }
         ],
         txpMessages: [
             "Letzte Challenge! Hier wird's knifflig.",
-            "Du brauchst eine SEO-optimierte Produktbeschreibung.",
-            "5 Portale - aber nur eine Rolle passt perfekt. Denke genau nach!"
+            "Du musst einen objektiven Nachrichtenartikel schreiben.",
+            "5 Portale - aber nur eine Rolle passt perfekt. Wer schreibt professionelle Artikel?"
         ],
-        wrongHint: "Eine SEO-optimierte Produktbeschreibung erfordert Marketing-Know-how! Wer kennt sich mit Kundenansprache und Suchmaschinenoptimierung aus?",
+        wrongHint: "Ein objektiver Nachrichtenartikel erfordert journalistische Fähigkeiten! Wer kennt sich mit Recherche, Objektivität und Nachrichtenstruktur aus?",
         educational: {
-            roleEmoji: "📢",
-            roleName: "Marketing-Experte",
-            explanation: "Ein Marketing-Experte versteht SEO-Keywords, Kundenpsychologie und überzeugende Produkttexte. Er weiß, wie man Texte schreibt, die sowohl Suchmaschinen als auch Kunden ansprechen.",
-            promptWithout: "Schreibe eine Produktbeschreibung für einen Online-Shop.",
-            promptWith: "Du bist ein erfahrener Marketing-Experte mit SEO-Spezialisierung. Schreibe eine SEO-optimierte Produktbeschreibung für einen Online-Shop, die sowohl Suchmaschinen als auch Kunden anspricht.",
-            resultWithout: "Langweiliger, generischer Text ohne Keywords oder Handlungsaufforderung.",
-            resultWith: "Überzeugende Beschreibung mit Keywords, Emotional Triggers, USPs und klarer Call-to-Action.",
-            takeaway: "Selbst wenn eine Aufgabe einfach klingt, macht die richtige Rolle den Unterschied zwischen mittelmäßig und exzellent. Denke immer: Welcher Experte wäre für DIESE Aufgabe am besten?"
+            roleImage: "assets/level3/byte_journalist.png",
+            roleName: "Journalist",
+            explanation: "Ein Journalist versteht die Prinzipien von Objektivität, Faktentreue und der umgekehrten Pyramide (wichtigste Infos zuerst). Er weiß, wie man Quellen zitiert und ausgewogen berichtet.",
+            promptWithout: "Schreibe einen Artikel über ein Ereignis.",
+            promptWith: "Du bist ein erfahrener Journalist. Schreibe einen objektiven, faktenbasierten Nachrichtenartikel mit Überschrift, Lead-Absatz und strukturiertem Aufbau nach journalistischen Standards.",
+            resultWithout: "Subjektiver, unstrukturierter Text ohne Quellenangaben oder klare Nachrichtenstruktur.",
+            resultWith: "Professioneller Artikel mit 5-W-Fragen, Zitaten, objektiver Sprache und umgekehrter Pyramide.",
+            takeaway: "Die richtige Rolle vermittelt nicht nur Fachwissen, sondern auch professionelle Standards und Methoden. Ein Journalist liefert objektive Berichterstattung, während andere Rollen subjektiv oder unsachlich schreiben würden."
         }
     }
 };
@@ -227,6 +276,15 @@ class MoManPlayer {
         this.gameArea = gameArea;
         this.element = document.getElementById('moPlayer');
         this.img = document.getElementById('moPlayerImg');
+
+        // Get dynamic size
+        const size = GAME_CONFIG.getPlayerSize();
+        this.width = size.width;
+        this.height = size.height;
+
+        // Apply size to element
+        this.element.style.width = `${this.width}px`;
+        this.element.style.height = `${this.height}px`;
 
         this.x = startX;
         this.y = startY;
@@ -315,7 +373,7 @@ class MoManPlayer {
         // Prevent moving left of level start
         if (this.x < 0) this.x = 0;
 
-        const previousBottom = this.y + GAME_CONFIG.playerHeight;
+        const previousBottom = this.y + this.height;
 
         // Apply gravity
         this.velocityY += GAME_CONFIG.gravity * deltaTime;
@@ -341,7 +399,7 @@ class MoManPlayer {
                 previousBottom <= platformBox.top &&
                 this.velocityY > 0
             ) {
-                this.y = platformBox.top - GAME_CONFIG.playerHeight;
+                this.y = platformBox.top - this.height;
                 this.velocityY = 0;
                 this.isGrounded = true;
                 this.isJumping = false;
@@ -370,14 +428,14 @@ class MoManPlayer {
     }
 
     getHitbox() {
-        const hitboxWidth = GAME_CONFIG.playerWidth * 0.6;
+        const hitboxWidth = this.width * 0.6;
         return {
-            left: this.x + (GAME_CONFIG.playerWidth - hitboxWidth) / 2,
-            right: this.x + (GAME_CONFIG.playerWidth + hitboxWidth) / 2,
+            left: this.x + (this.width - hitboxWidth) / 2,
+            right: this.x + (this.width + hitboxWidth) / 2,
             top: this.y,
-            bottom: this.y + GAME_CONFIG.playerHeight,
-            centerX: this.x + GAME_CONFIG.playerWidth / 2,
-            centerY: this.y + GAME_CONFIG.playerHeight / 2
+            bottom: this.y + this.height,
+            centerX: this.x + this.width / 2,
+            centerY: this.y + this.height / 2
         };
     }
 
@@ -451,8 +509,8 @@ class Camera {
         this.targetX = Math.max(0, this.targetX);
         this.targetX = Math.min(GAME_CONFIG.levelWidth - this.gameArea.offsetWidth, this.targetX);
 
-        // Smooth camera movement
-        this.x += (this.targetX - this.x) * 0.1;
+        // Smooth camera movement - höhere Smoothness für weniger Ruckeln
+        this.x += (this.targetX - this.x) * 0.15;
     }
 
     apply(player) {
@@ -483,13 +541,18 @@ class Portal {
         this.x = x;
         this.y = y;
         this.role = data.role;
-        this.emoji = data.emoji;
+        this.image = data.image;
         this.isCorrect = data.correct;
         this.index = index;
         this.isActive = false;
 
-        this.width = 90;
-        this.totalHeight = 270; // frame + oval + label
+        // Get skalierte Größe
+        const portalSize = GAME_CONFIG.getPortalSize();
+        this.width = portalSize.frameSize;
+        this.frameSize = portalSize.frameSize;
+        this.ovalWidth = portalSize.ovalWidth;
+        this.ovalHeight = portalSize.ovalHeight;
+        this.totalHeight = this.frameSize + this.ovalHeight + 60; // frame + oval + label + margins
 
         this.createElement();
     }
@@ -500,36 +563,54 @@ class Portal {
         this.element.style.left = `${this.x}px`;
         this.element.style.top = `${this.y}px`;
 
-        // Picture frame with emoji
+        // Interaction prompt (hidden by default) - OVER the frame now
+        this.interactPrompt = document.createElement('div');
+        this.interactPrompt.className = 'portal-interact-prompt';
+        this.interactPrompt.textContent = 'Drücke [E]';
+        this.interactPrompt.style.display = 'none';
+
+        // Picture frame with character image
         const frame = document.createElement('div');
         frame.className = 'portal-frame';
-        frame.textContent = this.emoji;
+        frame.style.width = `${this.frameSize}px`;
+        frame.style.height = `${this.frameSize}px`;
 
-        // Oval portal
+        if (this.image) {
+            const img = document.createElement('img');
+            img.src = this.image;
+            img.className = 'portal-character-image';
+            frame.appendChild(img);
+        }
+
+        // Oval portal with particles
         const oval = document.createElement('div');
         oval.className = 'portal-oval';
+        oval.style.width = `${this.ovalWidth}px`;
+        oval.style.height = `${this.ovalHeight}px`;
+
+        // Add particle elements
+        for (let i = 0; i < 8; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'portal-particle';
+            particle.style.animationDelay = `${i * 0.2}s`;
+            oval.appendChild(particle);
+        }
 
         // Label with role name
         const label = document.createElement('div');
         label.className = 'portal-label';
         label.textContent = this.role;
 
-        // Interaction prompt (hidden by default)
-        this.interactPrompt = document.createElement('div');
-        this.interactPrompt.className = 'portal-interact-prompt';
-        this.interactPrompt.textContent = 'Drücke [E]';
-        this.interactPrompt.style.display = 'none';
-
+        this.element.appendChild(this.interactPrompt);
         this.element.appendChild(frame);
         this.element.appendChild(oval);
         this.element.appendChild(label);
-        this.element.appendChild(this.interactPrompt);
 
         document.getElementById('portalsContainer').appendChild(this.element);
     }
 
     checkProximity(player) {
-        const playerCenterX = player.x + GAME_CONFIG.playerWidth / 2;
+        const playerCenterX = player.x + player.width / 2;
         const portalCenterX = this.x + this.width / 2;
         const distance = Math.abs(playerCenterX - portalCenterX);
 
@@ -560,8 +641,11 @@ class TxpNpc {
         this.gameArea = gameArea;
         this.x = x;
         this.y = y;
-        this.width = 120;
-        this.height = 120;
+
+        // Get skalierte Größe
+        const txpSize = GAME_CONFIG.getTxpSize();
+        this.width = txpSize.width;
+        this.height = txpSize.height;
         this.proximityRange = 150;
         this.isPlayerNear = false;
         this.hasShownTutorial = false;
@@ -585,6 +669,8 @@ class TxpNpc {
     show() {
         if (this.element) {
             this.element.style.display = 'block';
+            this.element.style.width = `${this.width}px`;
+            this.element.style.height = `${this.height}px`;
             this.updatePosition();
         }
     }
@@ -848,6 +934,9 @@ class RolePromptingGame {
         this.keys = {};
         this.setupInputHandlers();
 
+        // Resize handler
+        this.setupResizeHandler();
+
         // Load progress
         this.loadProgress();
 
@@ -1079,9 +1168,12 @@ class RolePromptingGame {
         const challengeData = CHALLENGE_DATA[challengeNum];
         const gameArea = document.getElementById('gameArea');
 
+        // Get verhältnisbasierte Positionen
+        const positions = GAME_CONFIG.getGamePositions();
+
         // Create ground platform
         this.platforms = [
-            new Platform(gameArea, 0, 650, 5000, 50)
+            new Platform(gameArea, 0, positions.groundY, 5000, positions.platformHeight)
         ];
 
         // Create portals - evenly distributed
@@ -1090,20 +1182,19 @@ class RolePromptingGame {
         const spacing = (4000 - startX) / (portalCount + 1);
 
         this.portals = challengeData.portals.map((portalData, index) => {
-            const portalX = startX + spacing * (index + 1) - 45; // center portal
-            const portalY = 370; // portal top (frame + oval + label fits above platform at y:650)
-            return new Portal(gameArea, portalX, portalY, portalData, index);
+            const portalX = startX + spacing * (index + 1) - 70; // center portal
+            return new Portal(gameArea, portalX, positions.portalY, portalData, index);
         });
 
         // Create player
-        this.player = new MoManPlayer(gameArea, 100, 400);
+        this.player = new MoManPlayer(gameArea, 100, positions.playerY);
         this.player.show();
 
         // Create camera
         this.camera = new Camera(gameArea);
 
         // Create TXP NPC
-        this.txpNpc = new TxpNpc(gameArea, 200, 530);
+        this.txpNpc = new TxpNpc(gameArea, 200, positions.txpY);
         this.txpNpc.setMessages(challengeData.txpMessages);
     }
 
@@ -1141,7 +1232,8 @@ class RolePromptingGame {
     gameLoop(currentTime) {
         if (!this.isRunning) return;
 
-        const deltaTime = Math.min((currentTime - this.lastTime) / 16.67, 3); // Cap at 3x
+        // Besseres Frame-Timing für smootheres Gameplay
+        const deltaTime = Math.min((currentTime - this.lastTime) / 16.67, 2); // Cap at 2x statt 3x
         this.lastTime = currentTime;
 
         if (!this.isPaused && !this.isDead) {
@@ -1219,9 +1311,12 @@ class RolePromptingGame {
         const deathOverlay = document.getElementById('deathOverlay');
         if (deathOverlay) deathOverlay.style.display = 'none';
 
+        // Get verhältnisbasierte Position
+        const positions = GAME_CONFIG.getGamePositions();
+
         // Reset player position
         if (this.player) {
-            this.player.reset(100, 400);
+            this.player.reset(100, positions.playerY);
         }
 
         // Reset TXP
@@ -1243,10 +1338,12 @@ class RolePromptingGame {
         this.isRunning = false;
         this.stopGameLoop();
 
-        // Award points
+        // Award points (nur einmalig pro Challenge)
         const wasAlreadyCompleted = this.isChallengeCompleted(this.currentChallenge);
         if (!wasAlreadyCompleted) {
             this.totalPoints += 100;
+            // Cap bei 500 Punkten
+            this.totalPoints = Math.min(this.totalPoints, 500);
         }
 
         // Mark completed
@@ -1265,9 +1362,10 @@ class RolePromptingGame {
         // Correct Role Display
         const correctRoleDisplay = document.getElementById('correctRoleDisplay');
         if (correctRoleDisplay) {
+            const imageHtml = edu.roleImage ? `<img src="${edu.roleImage}" class="role-image" />` : '';
             correctRoleDisplay.innerHTML = `
                 <h3>Richtige Rolle</h3>
-                <div class="role-emoji">${edu.roleEmoji}</div>
+                ${imageHtml}
                 <div class="role-name">${edu.roleName}</div>
                 <div class="role-explanation">${edu.explanation}</div>
             `;
@@ -1334,6 +1432,86 @@ class RolePromptingGame {
         const hudWrapper = document.querySelector('.hud-wrapper');
         if (hudWrapper) {
             hudWrapper.style.display = (screenId === 'gameScreen') ? 'flex' : 'none';
+        }
+    }
+
+    // ===== RESIZE HANDLER =====
+    setupResizeHandler() {
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            // Debounce resize events
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                if (this.isRunning && this.currentScreen === 'gameScreen') {
+                    this.handleResize();
+                }
+            }, 100);
+        });
+    }
+
+    handleResize() {
+        if (!this.player || !this.platforms.length || !this.portals.length || !this.txpNpc) {
+            return;
+        }
+
+        // Get neue Positionen und Größen
+        const positions = GAME_CONFIG.getGamePositions();
+        const playerSize = GAME_CONFIG.getPlayerSize();
+        const txpSize = GAME_CONFIG.getTxpSize();
+        const portalSize = GAME_CONFIG.getPortalSize();
+
+        // Update Player Größe und Position
+        this.player.width = playerSize.width;
+        this.player.height = playerSize.height;
+        this.player.element.style.width = `${playerSize.width}px`;
+        this.player.element.style.height = `${playerSize.height}px`;
+
+        // Berechne neue Y basierend auf altem Verhältnis
+        const oldGroundY = this.platforms[0].y;
+        const oldPlayerRelativeY = oldGroundY - (this.player.y + this.player.height);
+        this.player.y = positions.groundY - this.player.height - oldPlayerRelativeY;
+
+        // Update Platform
+        this.platforms[0].y = positions.groundY;
+        this.platforms[0].height = positions.platformHeight;
+        this.platforms[0].element.style.top = `${positions.groundY}px`;
+        this.platforms[0].element.style.height = `${positions.platformHeight}px`;
+
+        // Update TXP Größe und Position
+        this.txpNpc.width = txpSize.width;
+        this.txpNpc.height = txpSize.height;
+        this.txpNpc.y = positions.txpY;
+        this.txpNpc.element.style.width = `${txpSize.width}px`;
+        this.txpNpc.element.style.height = `${txpSize.height}px`;
+        this.txpNpc.updatePosition();
+
+        // Update Portale Größe und Position
+        this.portals.forEach(portal => {
+            portal.y = positions.portalY;
+            portal.width = portalSize.frameSize;
+            portal.frameSize = portalSize.frameSize;
+            portal.ovalWidth = portalSize.ovalWidth;
+            portal.ovalHeight = portalSize.ovalHeight;
+
+            // Update DOM elements
+            const frame = portal.element.querySelector('.portal-frame');
+            const oval = portal.element.querySelector('.portal-oval');
+            if (frame) {
+                frame.style.width = `${portalSize.frameSize}px`;
+                frame.style.height = `${portalSize.frameSize}px`;
+            }
+            if (oval) {
+                oval.style.width = `${portalSize.ovalWidth}px`;
+                oval.style.height = `${portalSize.ovalHeight}px`;
+            }
+            portal.element.style.top = `${portal.y}px`;
+        });
+
+        // Force redraw
+        this.player.updatePosition();
+        if (this.camera) {
+            this.camera.follow(this.player);
+            this.camera.apply(this.player);
         }
     }
 
