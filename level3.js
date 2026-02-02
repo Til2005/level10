@@ -413,8 +413,9 @@ class MoManPlayer {
             }
         }
 
-        // Death if fall too low
-        if (this.y > 800) {
+        // Death if fall too low (dynamisch basierend auf Viewport)
+        const deathY = window.innerHeight * 0.9; // 90% der Viewport-Höhe
+        if (this.y > deathY) {
             return 'death';
         }
 
