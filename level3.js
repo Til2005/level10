@@ -184,7 +184,7 @@ const CHALLENGE_DATA = {
         portals: [
             { role: "Gärtner", image: "assets/level3/byteman_gärtner.png", correct: false },
             { role: "Software-Entwickler", image: "assets/level3/byteman_softwareentwickler.png", correct: true },
-            { role: "Historiker", image: "assets/level3/byteman_historiker.png", correct: false },
+            { role: "Historiker", image: "assets/level3/byteman_historik.png", correct: false },
             { role: "Designer", image: "assets/level3/byteman_designer.png", correct: false }
         ],
         txpMessages: [
