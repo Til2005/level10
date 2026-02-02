@@ -237,12 +237,15 @@ const CHALLENGE_DATA = {
 class MoManPlayer {
     static preloadedAnimations = {};
 
-    static async preloadFrames() {
+    static async preloadFrames(onProgress) {
         if (Object.keys(MoManPlayer.preloadedAnimations).length > 0) {
             return Promise.resolve();
         }
 
         const animations = ['stand', 'run', 'jump'];
+        const totalFrames = animations.reduce((sum, name) => sum + ANIMATIONS[name].frames, 0);
+        let loadedFrames = 0;
+
         const promises = [];
 
         for (const animName of animations) {
@@ -263,8 +266,20 @@ class MoManPlayer {
                 MoManPlayer.preloadedAnimations[animName][i] = img;
 
                 promises.push(new Promise((resolve) => {
-                    img.onload = resolve;
-                    img.onerror = resolve;
+                    img.onload = () => {
+                        loadedFrames++;
+                        if (onProgress) {
+                            onProgress(loadedFrames, totalFrames);
+                        }
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        loadedFrames++;
+                        if (onProgress) {
+                            onProgress(loadedFrames, totalFrames);
+                        }
+                        resolve();
+                    };
                 }));
             }
         }
@@ -989,10 +1004,29 @@ class RolePromptingGame {
     async startLoading() {
         this.showScreen('loadingScreen');
 
-        // Preload MoMan + TXP sprites
-        await MoManPlayer.preloadFrames();
+        const loadingBar = document.getElementById('loadingBar');
+        const loadingText = document.getElementById('loadingText');
 
-        // Also preload TXP frames
+        // Calculate total images to load
+        const moManFrames = ['stand', 'run', 'jump'].reduce((sum, name) => sum + ANIMATIONS[name].frames, 0);
+        const txpFrames = ['stand', 'talk'].reduce((sum, name) => sum + TXP_ANIMATIONS[name].frames, 0);
+        const portalImages = 12; // 12 character images
+        const totalImages = moManFrames + txpFrames + portalImages;
+        let loadedImages = 0;
+
+        const updateProgress = () => {
+            const progress = Math.floor((loadedImages / totalImages) * 100);
+            if (loadingBar) loadingBar.style.width = progress + '%';
+            if (loadingText) loadingText.textContent = progress + '%';
+        };
+
+        // Preload MoMan sprites with progress
+        await MoManPlayer.preloadFrames((loaded, total) => {
+            loadedImages = loaded;
+            updateProgress();
+        });
+
+        // Preload TXP frames with progress
         const txpPromises = [];
         for (const animName of ['stand', 'talk']) {
             const anim = TXP_ANIMATIONS[animName];
@@ -1001,28 +1035,60 @@ class RolePromptingGame {
                 const paddedNumber = String(i).padStart(5, '0');
                 img.src = `${anim.path}${paddedNumber}.png`;
                 txpPromises.push(new Promise((resolve) => {
-                    img.onload = resolve;
-                    img.onerror = resolve;
+                    img.onload = () => {
+                        loadedImages++;
+                        updateProgress();
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        loadedImages++;
+                        updateProgress();
+                        resolve();
+                    };
                 }));
             }
         }
         await Promise.all(txpPromises);
 
-        // Simulate loading bar
-        const loadingBar = document.getElementById('loadingBar');
-        const loadingText = document.getElementById('loadingText');
+        // Preload portal character images
+        const portalImagePaths = [
+            'assets/level3/byteman_koch.png',
+            'assets/level3/byteman_buchhalter.png',
+            'assets/level3/byteman_mechaniker.png',
+            'assets/level3/byteman_gärtner.png',
+            'assets/level3/byteman_projektmanager.png',
+            'assets/level3/byteman_musiker.png',
+            'assets/level3/byte_journalist.png',
+            'assets/level3/byteman_industrieroboter.png',
+            'assets/level3/byteman_designer.png',
+            'assets/level3/byteman_tierarzt.png',
+            'assets/level3/byteman_softwareentwickler.png',
+            'assets/level3/byteman_historiker.png'
+        ];
 
-        let progress = 0;
-        const loadingInterval = setInterval(() => {
-            progress += Math.random() * 15;
-            if (progress >= 100) {
-                progress = 100;
-                clearInterval(loadingInterval);
-                setTimeout(() => this.showLevelSelect(), 500);
-            }
-            if (loadingBar) loadingBar.style.width = progress + '%';
-            if (loadingText) loadingText.textContent = Math.floor(progress) + '%';
-        }, 100);
+        const portalPromises = portalImagePaths.map(path => {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    loadedImages++;
+                    updateProgress();
+                    resolve();
+                };
+                img.onerror = () => {
+                    loadedImages++;
+                    updateProgress();
+                    resolve();
+                };
+                img.src = path;
+            });
+        });
+        await Promise.all(portalPromises);
+
+        // Ensure we show 100% for a moment
+        if (loadingBar) loadingBar.style.width = '100%';
+        if (loadingText) loadingText.textContent = '100%';
+
+        setTimeout(() => this.showLevelSelect(), 500);
     }
 
     // ===== LEVEL SELECT =====
