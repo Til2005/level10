@@ -1,9 +1,0 @@
-
-{
-  "name": "WorkPersona Architect",
-  "description": "A professional tool for designing, testing, and managing custom system prompts for AI-driven workflows. Features include a context-aware chatbot and high-fidelity image generation.",
-  "requestFramePermissions": [
-    "camera",
-    "microphone"
-  ]
-}
