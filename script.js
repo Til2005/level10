@@ -138,7 +138,7 @@ function downloadCalendar() {
 
     // Add each Friday as an event
     fridays.forEach((friday, index) => {
-        const startTime = formatICSDate(friday, 8, 15); // 08:15
+        const startTime = formatICSDate(friday, 9, 0); // 09:00
         const endTime = formatICSDate(friday, 9, 15);   // 09:15
         const uid = `ai-bytes-${friday.getTime()}-${index}@ai-bytes.de`;
         const now = formatICSDate(new Date(), null, null, true);
@@ -149,7 +149,7 @@ function downloadCalendar() {
         icsContent += `DTSTART:${startTime}\r\n`;
         icsContent += `DTEND:${endTime}\r\n`;
         icsContent += 'SUMMARY:AI-Bytes Training\r\n';
-        icsContent += 'DESCRIPTION:Hey!\\n\\nDie Lerneinheiten dauern nur wenige Minuten.\\nDafür halten wir dir dieses Zeitfenster frei\\, natürlich kannst du die AI Bytes Level auch jederzeit flexibel starten.\\nUnter folgendem Link findest du deine Lernreise:\\n\\nhttps://les.mo360cp.i.mercedes-benz.com/cms/aibytes?sesskey=r59vhX43Qm\\n\\nViel Spaß beim Leveln! 🚀\\nDein AI-Bytes Team\\n\\nℹ️ Hinweis: Wenn du die Erinnerung nicht mehr brauchst\\,\\nkannst du den Serientermin einfach aus deinem Kalender löschen.\r\n';
+        icsContent += 'DESCRIPTION:Hey!\\n\\nDie Lerneinheiten dauern nur wenige Minuten.\\nDafür halten wir dir dieses Zeitfenster frei\\, natürlich kannst du die AI Bytes Level auch jederzeit flexibel starten.\\n\\n👉 Starten: https://les.mo360cp.i.mercedes-benz.com/cms/aibytes?sesskey=r59vhX43Qm\\n\\nViel Spaß beim Leveln! 🚀\\nDein AI-Bytes Team\\n\\nℹ️ Hinweis: Wenn du die Erinnerung nicht mehr brauchst\\,\\nkannst du den Serientermin einfach aus deinem Kalender löschen.\r\n';
         icsContent += 'STATUS:CONFIRMED\r\n';
         icsContent += 'SEQUENCE:0\r\n';
         icsContent += 'BEGIN:VALARM\r\n';
