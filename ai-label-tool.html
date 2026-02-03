@@ -265,6 +265,11 @@
             margin-bottom: 12px;
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: move;
+        }
+
+        .preview-item canvas:hover {
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
         .preview-item .filename {
@@ -453,14 +458,14 @@
             </div>
             <div class="setting-row">
                 <label>Abstand rechts:</label>
-                <input type="range" id="paddingRight" min="0" max="100" value="10" step="1">
-                <input type="number" id="paddingRightValue" min="0" max="100" value="10">
+                <input type="range" id="paddingRight" min="0" max="2000" value="10" step="1">
+                <input type="number" id="paddingRightValue" min="0" max="2000" value="10">
                 <span>px</span>
             </div>
             <div class="setting-row">
                 <label>Abstand unten:</label>
-                <input type="range" id="paddingBottom" min="0" max="100" value="10" step="1">
-                <input type="number" id="paddingBottomValue" min="0" max="100" value="10">
+                <input type="range" id="paddingBottom" min="0" max="2000" value="10" step="1">
+                <input type="number" id="paddingBottomValue" min="0" max="2000" value="10">
                 <span>px</span>
             </div>
         </div>
@@ -487,8 +492,10 @@
 
     <script>
         let labelImage = null;
+        let labelImageSrc = null; // Store the data URL for the label
         let sourceImages = [];
         let processedCanvases = [];
+        let labelPositions = []; // Store custom positions for each image
 
         // Drag & Drop Support
         ['labelUploadBox', 'imagesUploadBox'].forEach(boxId => {
@@ -534,6 +541,7 @@
                 const img = new Image();
                 img.onload = () => {
                     labelImage = img;
+                    labelImageSrc = e.target.result; // Store the data URL
                     document.getElementById('labelPreviewImg').src = e.target.result;
                     document.getElementById('labelPreview').style.display = 'block';
                     showStatus('AI Label erfolgreich geladen', 'success');
@@ -589,6 +597,8 @@
         }
 
         // Settings - Sync sliders with number inputs
+        let isUpdatingFromSlider = false;
+
         ['labelSize', 'paddingRight', 'paddingBottom'].forEach(id => {
             const slider = document.getElementById(id);
             const numberInput = document.getElementById(id + 'Value');
@@ -596,17 +606,70 @@
             slider.addEventListener('input', () => {
                 numberInput.value = slider.value;
                 if (labelImage && sourceImages.length > 0) {
-                    generatePreviews();
+                    isUpdatingFromSlider = true;
+                    updateAllLabelsFromSettings();
+                    isUpdatingFromSlider = false;
                 }
             });
 
             numberInput.addEventListener('input', () => {
                 slider.value = numberInput.value;
                 if (labelImage && sourceImages.length > 0) {
-                    generatePreviews();
+                    isUpdatingFromSlider = true;
+                    updateAllLabelsFromSettings();
+                    isUpdatingFromSlider = false;
                 }
             });
         });
+
+        function updateSliderValues(imageWidth, imageHeight, labelX, labelY, labelWidth, labelHeight) {
+            if (isUpdatingFromSlider) return; // Prevent circular updates
+
+            // Calculate distances from edges
+            const paddingRight = Math.round(imageWidth - labelX - labelWidth);
+            const paddingBottom = Math.round(imageHeight - labelY - labelHeight);
+
+            // Update sliders
+            document.getElementById('paddingRight').value = paddingRight;
+            document.getElementById('paddingRightValue').value = paddingRight;
+            document.getElementById('paddingBottom').value = paddingBottom;
+            document.getElementById('paddingBottomValue').value = paddingBottom;
+        }
+
+        function updateAllLabelsFromSettings() {
+            // Update all label positions based on current slider values
+            const labelSizePercent = parseInt(document.getElementById('labelSize').value);
+            const paddingRight = parseInt(document.getElementById('paddingRight').value);
+            const paddingBottom = parseInt(document.getElementById('paddingBottom').value);
+
+            sourceImages.forEach((src, index) => {
+                const labelWidth = (src.image.width * labelSizePercent) / 100;
+                const labelHeight = (labelImage.height / labelImage.width) * labelWidth;
+                const newX = src.image.width - labelWidth - paddingRight;
+                const newY = src.image.height - labelHeight - paddingBottom;
+
+                labelPositions[index].x = newX;
+                labelPositions[index].y = newY;
+                labelPositions[index].width = labelWidth;
+                labelPositions[index].height = labelHeight;
+            });
+
+            // Redraw all canvases
+            redrawAllCanvases();
+        }
+
+        let allCanvases = [];
+
+        function redrawAllCanvases() {
+            allCanvases.forEach((canvasInfo, index) => {
+                const ctx = canvasInfo.canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvasInfo.canvas.width, canvasInfo.canvas.height);
+                ctx.drawImage(canvasInfo.sourceImage, 0, 0);
+
+                const pos = labelPositions[index];
+                ctx.drawImage(labelImage, pos.x, pos.y, pos.width, pos.height);
+            });
+        }
 
         function autoGeneratePreview() {
             // Automatically generate preview when both label and images are loaded
@@ -622,6 +685,8 @@
             }
 
             processedCanvases = [];
+            labelPositions = [];
+            allCanvases = [];
             const previewGrid = document.getElementById('previewGrid');
             previewGrid.innerHTML = '';
 
@@ -630,43 +695,105 @@
             const paddingBottom = parseInt(document.getElementById('paddingBottom').value);
 
             sourceImages.forEach((src, index) => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-
-                // Set canvas size to source image size
-                canvas.width = src.image.width;
-                canvas.height = src.image.height;
-
-                // Draw source image
-                ctx.drawImage(src.image, 0, 0);
-
-                // Calculate label size
-                const labelWidth = (canvas.width * labelSizePercent) / 100;
+                // Calculate default label size and position
+                const labelWidth = (src.image.width * labelSizePercent) / 100;
                 const labelHeight = (labelImage.height / labelImage.width) * labelWidth;
+                const defaultX = src.image.width - labelWidth - paddingRight;
+                const defaultY = src.image.height - labelHeight - paddingBottom;
 
-                // Position: bottom right with padding
-                const x = canvas.width - labelWidth - paddingRight;
-                const y = canvas.height - labelHeight - paddingBottom;
+                // Store default position
+                labelPositions[index] = { x: defaultX, y: defaultY, width: labelWidth, height: labelHeight };
 
-                // Draw label
-                ctx.drawImage(labelImage, x, y, labelWidth, labelHeight);
-
-                // Store canvas
-                processedCanvases.push({
-                    canvas: canvas,
-                    name: src.name,
-                    isJpeg: src.isJpeg
-                });
-
-                // Create preview
+                // Create preview item
                 const previewItem = document.createElement('div');
                 previewItem.className = 'preview-item';
 
-                const previewCanvas = document.createElement('canvas');
-                previewCanvas.width = canvas.width;
-                previewCanvas.height = canvas.height;
-                const previewCtx = previewCanvas.getContext('2d');
-                previewCtx.drawImage(canvas, 0, 0);
+                // Create canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = src.image.width;
+                canvas.height = src.image.height;
+
+                // Store canvas reference
+                allCanvases.push({
+                    canvas: canvas,
+                    sourceImage: src.image
+                });
+
+                // Draw function
+                function drawCanvas() {
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Draw source image
+                    ctx.drawImage(src.image, 0, 0);
+
+                    // Draw label
+                    const pos = labelPositions[index];
+                    ctx.drawImage(labelImage, pos.x, pos.y, pos.width, pos.height);
+                }
+
+                drawCanvas();
+
+                // Drag functionality
+                let isDragging = false;
+                let offsetX, offsetY;
+
+                canvas.addEventListener('mousedown', (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const scaleX = canvas.width / rect.width;
+                    const scaleY = canvas.height / rect.height;
+
+                    const mouseX = (e.clientX - rect.left) * scaleX;
+                    const mouseY = (e.clientY - rect.top) * scaleY;
+
+                    const pos = labelPositions[index];
+
+                    // Check if click is inside label
+                    if (mouseX >= pos.x && mouseX <= pos.x + pos.width &&
+                        mouseY >= pos.y && mouseY <= pos.y + pos.height) {
+                        isDragging = true;
+                        offsetX = mouseX - pos.x;
+                        offsetY = mouseY - pos.y;
+                        e.preventDefault();
+                    }
+                });
+
+                canvas.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+
+                    const rect = canvas.getBoundingClientRect();
+                    const scaleX = canvas.width / rect.width;
+                    const scaleY = canvas.height / rect.height;
+
+                    let newX = (e.clientX - rect.left) * scaleX - offsetX;
+                    let newY = (e.clientY - rect.top) * scaleY - offsetY;
+
+                    // Constrain to canvas bounds
+                    newX = Math.max(0, Math.min(canvas.width - labelPositions[index].width, newX));
+                    newY = Math.max(0, Math.min(canvas.height - labelPositions[index].height, newY));
+
+                    labelPositions[index].x = newX;
+                    labelPositions[index].y = newY;
+                    drawCanvas();
+
+                    // Update sliders live
+                    updateSliderValues(
+                        canvas.width,
+                        canvas.height,
+                        labelPositions[index].x,
+                        labelPositions[index].y,
+                        labelPositions[index].width,
+                        labelPositions[index].height
+                    );
+                });
+
+                canvas.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+
+                canvas.addEventListener('mouseleave', () => {
+                    isDragging = false;
+                });
 
                 const filename = document.createElement('div');
                 filename.className = 'filename';
@@ -676,35 +803,58 @@
                 downloadBtn.className = 'download-single-btn';
                 downloadBtn.textContent = 'Download';
                 downloadBtn.onclick = function() {
-                    downloadSingle(canvas, src.name, src.isJpeg);
+                    downloadSingleWithPosition(index);
                 };
 
-                previewItem.appendChild(previewCanvas);
+                previewItem.appendChild(canvas);
                 previewItem.appendChild(filename);
                 previewItem.appendChild(downloadBtn);
                 previewGrid.appendChild(previewItem);
+
+                // Store canvas info
+                processedCanvases.push({
+                    sourceImage: src.image,
+                    name: src.name,
+                    isJpeg: src.isJpeg,
+                    index: index
+                });
             });
 
             document.getElementById('previewContainer').style.display = 'block';
             document.getElementById('downloadBtn').disabled = false;
-            showStatus(`${processedCanvases.length} Vorschau(en) erstellt`, 'success');
+            showStatus(`${processedCanvases.length} Vorschau(en) erstellt - Label verschiebbar!`, 'success');
         }
 
-        function downloadSingle(canvas, originalName, isJpeg = false) {
-            const mimeType = isJpeg ? 'image/jpeg' : 'image/png';
-            const quality = isJpeg ? 0.95 : undefined;
+        function downloadSingleWithPosition(index) {
+            const item = processedCanvases[index];
+            const pos = labelPositions[index];
+
+            // Create final canvas with label at custom position
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = item.sourceImage.width;
+            canvas.height = item.sourceImage.height;
+
+            // Draw source image
+            ctx.drawImage(item.sourceImage, 0, 0);
+
+            // Draw label at custom position
+            ctx.drawImage(labelImage, pos.x, pos.y, pos.width, pos.height);
+
+            // Download
+            const mimeType = item.isJpeg ? 'image/jpeg' : 'image/png';
+            const quality = item.isJpeg ? 0.95 : undefined;
 
             canvas.toBlob(blob => {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
 
-                // Replace extension based on original format
                 let newName;
-                if (isJpeg) {
-                    newName = originalName.replace(/\.(jpg|jpeg)$/i, '_labeled.jpg');
+                if (item.isJpeg) {
+                    newName = item.name.replace(/\.(jpg|jpeg)$/i, '_labeled.jpg');
                 } else {
-                    newName = originalName.replace(/\.png$/i, '_labeled.png');
+                    newName = item.name.replace(/\.png$/i, '_labeled.png');
                 }
                 a.download = newName;
 
@@ -725,9 +875,8 @@
 
             // Download each image individually with a small delay
             for (let i = 0; i < processedCanvases.length; i++) {
-                const item = processedCanvases[i];
                 setTimeout(() => {
-                    downloadSingle(item.canvas, item.name, item.isJpeg);
+                    downloadSingleWithPosition(i);
                 }, i * 300); // 300ms delay between downloads
             }
 
@@ -738,8 +887,11 @@
 
         function reset() {
             labelImage = null;
+            labelImageSrc = null;
             sourceImages = [];
             processedCanvases = [];
+            labelPositions = [];
+            allCanvases = [];
 
             document.getElementById('labelInput').value = '';
             document.getElementById('imagesInput').value = '';
