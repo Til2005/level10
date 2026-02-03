@@ -411,10 +411,13 @@ class MoManPlayer {
             }
         }
 
-        // Death if fall too low (dynamisch basierend auf Viewport)
-        const deathY = window.innerHeight * 0.9; // 90% der Viewport-Höhe
-        if (this.y > deathY) {
-            return 'death';
+        // Death if fall too low (basierend auf niedrigster Plattform)
+        if (platforms.length > 0) {
+            const lowestPlatformY = Math.max(...platforms.map(p => p.y));
+            const deathY = lowestPlatformY + 200; // 200px unter der niedrigsten Plattform
+            if (this.y > deathY) {
+                return 'death';
+            }
         }
 
         this.updatePosition();
@@ -572,7 +575,7 @@ class Portal {
         const frame = document.createElement('div');
         frame.className = 'portal-frame';
         frame.style.width = `${this.frameSize}px`;
-        frame.style.height = `${this.frameSize}px`;
+        frame.style.height = `${Math.round(this.frameSize * 0.92)}px`; // 92% Höhe wegen 8% Clip
 
         if (this.image) {
             const img = document.createElement('img');
@@ -1549,7 +1552,7 @@ class RolePromptingGame {
             const oval = portal.element.querySelector('.portal-oval');
             if (frame) {
                 frame.style.width = `${portalSize.frameSize}px`;
-                frame.style.height = `${portalSize.frameSize}px`;
+                frame.style.height = `${Math.round(portalSize.frameSize * 0.92)}px`; // 92% Höhe wegen 8% Clip
             }
             if (oval) {
                 oval.style.width = `${portalSize.ovalWidth}px`;
@@ -1659,10 +1662,9 @@ class RolePromptingGame {
 
     updateRankBadge() {
         const rankBadge = document.getElementById('rankBadge');
-        const rankIcon = document.getElementById('rankIcon');
         const rankLabel = document.getElementById('rankLabel');
 
-        if (!rankBadge || !rankIcon || !rankLabel) return;
+        if (!rankBadge || !rankLabel) return;
 
         const rank = this.calculateTotalRank();
 
@@ -1674,7 +1676,6 @@ class RolePromptingGame {
         rankBadge.style.display = 'flex';
         rankBadge.className = `rank-badge ${rank.toLowerCase()}`;
         rankLabel.textContent = rank;
-        rankIcon.textContent = '';
 
         rankBadge.onclick = () => {
             rankBadge.classList.add('rank-badge-clicked');
