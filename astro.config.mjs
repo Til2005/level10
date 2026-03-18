@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   site: "https://til2005.github.io",
-  base: "/AI-Bytes",
+  base: "/level10",
   devToolbar: {
     enabled: false,
   },
