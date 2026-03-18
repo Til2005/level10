@@ -133,30 +133,32 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
     type AnimationName = "jump" | "idle" | "walk" | "talk";
 
+    const BASE = import.meta.env.BASE_URL;
+
     const ANIMATIONS: Record<AnimationName, AnimationConfig> = {
-      jump: { frames: 120, fps: 15, path: "/animations/txp/jump/TXP%20Sprung_" },
-      idle: { frames: 24, fps: 24, path: "/animations/txp/idle/TXP%20Stand%20Pose_" },
-      walk: { frames: 24, fps: 24, path: "/animations/txp/walk/TXP%20Lauf%20Loop_" },
-      talk: { frames: 24, fps: 24, path: "/animations/txp/talk/TXP_Talk%20Pose_" },
+      jump: { frames: 120, fps: 15, path: `${BASE}animations/txp/jump/TXP%20Sprung_` },
+      idle: { frames: 24, fps: 24, path: `${BASE}animations/txp/idle/TXP%20Stand%20Pose_` },
+      walk: { frames: 24, fps: 24, path: `${BASE}animations/txp/walk/TXP%20Lauf%20Loop_` },
+      talk: { frames: 24, fps: 24, path: `${BASE}animations/txp/talk/TXP_Talk%20Pose_` },
     };
 
     const ENEMY_WALK = {
       frames: 12,
       fps: 24,
-      path: "/animations/enemy1/walk/AI%20Gegner_FPS%2012",
+      path: `${BASE}animations/enemy1/walk/AI%20Gegner_FPS%2012`,
     };
 
     const ENEMY2_JUMP = {
       frames: 24,
       fps: 36,
-      path: "/animations/enemy2/Gegner%20Loop_",
+      path: `${BASE}animations/enemy2/Gegner%20Loop_`,
     };
 
     const ENEMY3_FLY = {
       frames: 9,
       fps: 10,
-      path: "/animations/enemy3/frame_",
-      darkPath: "/animations/enemy3/darkmode/frame_",
+      path: `${BASE}animations/enemy3/frame_`,
+      darkPath: `${BASE}animations/enemy3/darkmode/frame_`,
       suffix: "_delay-0.1s.png",
     };
 
