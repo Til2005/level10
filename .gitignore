@@ -2,3 +2,5 @@ node_modules/
 dist/
 .astro/
 .claude/
+nul
+wird_nicht_genutzt/

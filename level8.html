@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Prompting</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="level8.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- Game HUD -->
+        <div class="hud-wrapper">
+            <!-- Challenge Points Display (nur im Matching-Screen sichtbar) -->
+            <div class="challenge-points-display" id="challengePointsDisplay" style="display: none;">
+                <div class="points-badge">100P</div>
+                <div class="challenge-name" id="challengeNameDisplay">Challenge Name</div>
+            </div>
+        </div>
+
+        <!-- Rank Badge (Top Right) -->
+        <div class="rank-badge" id="rankBadge" style="display: none;">
+            <span class="rank-label" id="rankLabel"></span>
+        </div>
+
+        <!-- Main Game Area -->
+        <main class="game-area" id="gameArea">
+
+            <!-- Intro Screen -->
+            <div class="game-screen active" id="introScreen">
+                <div class="intro-content">
+                    <!-- Animated Neural Background -->
+                    <canvas class="flow-canvas" id="flowCanvas"></canvas>
+
+                    <!-- Scanlines Effect -->
+                    <div class="scanlines"></div>
+
+                    <!-- Main Title -->
+                    <h1 class="game-title">
+                        <span class="title-line-1">
+                            <span class="letter" data-letter="0">A</span><span class="letter" data-letter="1">d</span><span class="letter" data-letter="2">v</span><span class="letter" data-letter="3">a</span><span class="letter" data-letter="4">n</span><span class="letter" data-letter="5">c</span><span class="letter" data-letter="6">e</span><span class="letter" data-letter="7">d</span>
+                        </span>
+                        <span class="title-line-2">
+                            <span class="letter" data-letter="8">P</span><span class="letter" data-letter="9">r</span><span class="letter" data-letter="10">o</span><span class="letter" data-letter="11">m</span><span class="letter" data-letter="12">p</span><span class="letter" data-letter="13">t</span><span class="letter" data-letter="14">i</span><span class="letter" data-letter="15">n</span><span class="letter" data-letter="16">g</span>
+                        </span>
+                    </h1>
+
+                    <!-- Subtitle -->
+                    <div class="game-subtitle">Meistere fortgeschrittene KI-Techniken</div>
+
+                    <!-- Press Any Key or Click -->
+                    <div class="press-key" id="pressKey">Drücke eine beliebige Taste</div>
+
+                    <!-- Copyright -->
+                    <div class="copyright">© 2026 AI Bytes</div>
+                </div>
+            </div>
+
+            <!-- Loading Screen -->
+            <div class="game-screen" id="loadingScreen">
+                <div class="loading-content">
+                    <h2 class="loading-title">Lade Game...</h2>
+                    <div class="loading-bar-container">
+                        <div class="loading-bar" id="loadingBar"></div>
+                    </div>
+                    <div class="loading-text" id="loadingText">0%</div>
+                </div>
+            </div>
+
+            <!-- Level Selection Screen -->
+            <div class="game-screen" id="levelSelectScreen">
+                <div class="level-select-container">
+                    <h2 class="level-select-title">Advanced Prompting</h2>
+                    <div class="level-select-subtitle">Wähle deine Challenge</div>
+
+                    <!-- Challenge Grid -->
+                    <div class="challenges-grid">
+                        <!-- Challenge 1 -->
+                        <div class="challenge-card unlocked" data-level="1">
+                            <div class="challenge-price-tag">100P</div>
+                            <div class="challenge-number">1</div>
+                            <div class="challenge-icon">🎯</div>
+                            <div class="challenge-name">Basis-Struktur</div>
+                            <div class="challenge-status">▶ Starten</div>
+                        </div>
+
+                        <!-- Challenge 2 -->
+                        <div class="challenge-card locked" data-level="2">
+                            <div class="challenge-price-tag">100P</div>
+                            <div class="challenge-number">2</div>
+                            <div class="challenge-icon">💡</div>
+                            <div class="challenge-name">Few-Shot</div>
+                            <div class="challenge-status">🔒 Gesperrt</div>
+                        </div>
+
+                        <!-- Challenge 3 -->
+                        <div class="challenge-card locked" data-level="3">
+                            <div class="challenge-price-tag">100P</div>
+                            <div class="challenge-number">3</div>
+                            <div class="challenge-icon">🔗</div>
+                            <div class="challenge-name">Chain-of-Thought</div>
+                            <div class="challenge-status">🔒 Gesperrt</div>
+                        </div>
+
+                        <!-- Challenge 4 -->
+                        <div class="challenge-card locked" data-level="4">
+                            <div class="challenge-price-tag">100P</div>
+                            <div class="challenge-number">4</div>
+                            <div class="challenge-icon">🌳</div>
+                            <div class="challenge-name">Tree of Thoughts</div>
+                            <div class="challenge-status">🔒 Gesperrt</div>
+                        </div>
+
+                        <!-- Challenge 5 -->
+                        <div class="challenge-card locked final-challenge" data-level="5">
+                            <div class="challenge-price-tag">100P</div>
+                            <div class="challenge-number">5</div>
+                            <div class="challenge-icon">⚠️</div>
+                            <div class="challenge-name">Guardrails</div>
+                            <div class="challenge-status">🔒 Gesperrt</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Info -->
+                    <div class="progress-info">
+                        <div class="progress-stats">
+                            <div class="progress-item">
+                                <span class="progress-label">Gesamtpunkte:</span>
+                                <span class="progress-value" id="totalPointsDisplay">0 / 500</span>
+                            </div>
+                            <div class="progress-item">
+                                <span class="progress-label">Aktueller Rang:</span>
+                                <span class="progress-value" id="currentRankDisplay">Anfänger</span>
+                            </div>
+                        </div>
+                        <div class="rank-info">
+                            <div class="rank-item">🥉 Bronze: 300 Punkte</div>
+                            <div class="rank-item">🥈 Silber: 400 Punkte</div>
+                            <div class="rank-item">🥇 Gold: 500 Punkte</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Scroll Down Arrow -->
+                <div class="scroll-arrow" id="scrollArrow" style="display: none;"></div>
+            </div>
+
+            <!-- Matching Screen -->
+            <div class="game-screen" id="matchingScreen">
+
+                <!-- TXP Intro Overlay -->
+                <div class="txp-intro-overlay" id="txpIntroOverlay" style="display: none;"></div>
+
+                <!-- TXP Tutorial Assistant -->
+                <div class="txp-assistant" id="txpAssistant" style="display: none;">
+                    <img id="txpAssistantImg" src="TXP/TXP_Stand_Pose/TXP Stand Pose_00000.png" alt="TXP Roboter">
+                </div>
+
+                <!-- TXP Speech Bubble -->
+                <div class="txp-speech-bubble" id="txpSpeech" style="display: none;">
+                    <div class="speech-bubble-content">
+                        <p id="txpSpeechText"></p>
+                        <div class="speech-continue-hint">Klicke zum Fortfahren</div>
+                    </div>
+                </div>
+
+                <!-- Back Button -->
+                <button class="editor-back-btn" onclick="returnToLevelSelect()" title="Zurück zur Levelauswahl">
+                    ← Zurück zur Levelauswahl
+                </button>
+
+                <!-- Begriffserklärung (dynamisch) -->
+                <div class="technique-legend" id="techniqueLegend" style="display: none;">
+                    <span class="technique-name" id="techniqueName"></span>
+                    <span class="technique-description" id="techniqueDescription"></span>
+                </div>
+
+                <!-- Scenario Cards Area (Top) -->
+                <div class="scenarios-area" id="scenariosArea">
+                    <div class="scenarios-label">Szenarien:</div>
+                    <div class="scenarios-grid" id="scenariosGrid">
+                        <!-- 3 Scenario Cards werden hier generiert -->
+                    </div>
+                </div>
+
+                <!-- Prompt Blocks Palette (Bottom) -->
+                <div class="blocks-palette-area" id="blocksArea">
+                    <div class="blocks-label">Prompt-Bausteine:</div>
+                    <div class="blocks-hint">Ziehe die passenden Bausteine zu den Szenarien</div>
+                    <div class="blocks-palette" id="blocksPalette">
+                        <!-- Prompt Blocks werden hier generiert -->
+                    </div>
+                </div>
+
+                <!-- Validate Button -->
+                <button class="validate-btn" id="validateBtn" onclick="validateMatching()">
+                    ✓ Prüfen
+                </button>
+
+                <!-- Tutorial Overlay -->
+                <div class="tutorial-overlay" id="tutorialOverlay" style="display: none;">
+                    <div class="tutorial-content">
+                        <h3>🎓 Tutorial</h3>
+                        <div class="tutorial-steps">
+                            <div class="tutorial-step">
+                                <span class="tutorial-number">1</span>
+                                <span class="tutorial-text">Lies die 3 Produktions-Szenarien oben</span>
+                            </div>
+                            <div class="tutorial-step">
+                                <span class="tutorial-number">2</span>
+                                <span class="tutorial-text">Ziehe die passenden Prompt-Bausteine zu den Szenarien</span>
+                            </div>
+                            <div class="tutorial-step">
+                                <span class="tutorial-number">3</span>
+                                <span class="tutorial-text">Nicht alle Bausteine passen - manche sind falsch!</span>
+                            </div>
+                            <div class="tutorial-step">
+                                <span class="tutorial-number">4</span>
+                                <span class="tutorial-text">Klicke auf "Prüfen" wenn du fertig bist</span>
+                            </div>
+                        </div>
+                        <button class="tutorial-close-btn" onclick="closeTutorial()">Verstanden!</button>
+                    </div>
+                </div>
+
+                <!-- Pause Menu -->
+                <div class="pause-menu-overlay" id="pauseMenu" style="display: none;">
+                    <div class="pause-menu-content">
+                        <h2 class="pause-menu-title">⏸️ Pause</h2>
+                        <div class="pause-menu-buttons">
+                            <button class="pause-menu-button" onclick="resumeGame()">
+                                <span>▶ Weiterspielen</span>
+                            </button>
+                            <button class="pause-menu-button" onclick="returnToLevelSelect()">
+                                <span>Zur Challenge-Auswahl</span>
+                            </button>
+                        </div>
+                        <div class="pause-menu-hint">Drücke <span class="key-highlight">ESC</span> zum Fortfahren</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge Complete Screen -->
+            <div class="game-screen" id="challengeCompleteScreen">
+                <div class="complete-content">
+                    <h2 class="complete-title">🎉 Challenge Geschafft!</h2>
+
+                    <!-- Success Message -->
+                    <div class="success-message" id="successMessage">
+                        <!-- Wird dynamisch gefüllt -->
+                    </div>
+
+                    <!-- Matched Prompts Display -->
+                    <div class="matched-prompts-display" id="matchedPromptsDisplay">
+                        <!-- Zeigt die richtige Zuordnung -->
+                    </div>
+
+                    <div class="complete-actions">
+                        <button class="next-level-button" onclick="nextChallenge()"><span>Nächste Challenge</span></button>
+                        <button class="menu-button" onclick="goToLevelSelectWithAnimation()"><span>Challenge-Auswahl</span></button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="script.js"></script>
+    <script src="level8.js"></script>
+</body>
+</html>

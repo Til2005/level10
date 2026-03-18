@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copilot</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="level6.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- Game HUD -->
+        <div class="hud-wrapper">
+            <!-- Timer Display (nur im Gameplay sichtbar) -->
+            <div class="timer-display" id="timerDisplay" style="display: none;">
+                <div class="timer-icon">⏱️</div>
+                <div class="timer-text" id="timerText">02:30</div>
+            </div>
+
+            <!-- Streak Display -->
+            <div class="streak-display" id="streakDisplay" style="display: none;">
+                <div class="streak-icon">🔥</div>
+                <div class="streak-text"><span id="streakCount">0</span>x Streak</div>
+            </div>
+
+            <!-- Score Display -->
+            <div class="score-display" id="scoreDisplay" style="display: none;">
+                <div class="score-label">Punkte:</div>
+                <div class="score-text" id="scoreText">0</div>
+            </div>
+        </div>
+
+        <!-- Rank Badge (Top Right) -->
+        <div class="rank-badge" id="rankBadge" style="display: none;">
+            <span class="rank-icon" id="rankIcon"></span>
+            <span class="rank-label" id="rankLabel"></span>
+        </div>
+
+        <!-- Main Game Area -->
+        <main class="game-area" id="gameArea">
+
+            <!-- Intro Screen -->
+            <div class="game-screen active" id="introScreen">
+                <div class="intro-content">
+                    <!-- Animated Background -->
+                    <canvas class="office-canvas" id="officeCanvas"></canvas>
+
+                    <!-- Scanlines Effect -->
+                    <div class="scanlines"></div>
+
+                    <!-- Main Title -->
+                    <div class="title-container">
+                        <div class="title-border-top"></div>
+                        <h1 class="game-title">
+                            <span class="title-main" id="titleMain">Copilot - Das Upgrade für deinen Arbeitsplatz</span>
+                            <div class="title-glitch" aria-hidden="true">Copilot - Das Upgrade für deinen Arbeitsplatz</div>
+                        </h1>
+                        <div class="title-border-bottom"></div>
+                    </div>
+
+                    <!-- Press Any Key or Click -->
+                    <div class="press-key" id="pressKey">Drücke eine beliebige Taste</div>
+
+                    <!-- Copyright -->
+                    <div class="copyright">© 2026 AI Bytes</div>
+                </div>
+            </div>
+
+            <!-- Loading Screen -->
+            <div class="game-screen" id="loadingScreen">
+                <div class="loading-content">
+                    <h2 class="loading-title">Lade Game...</h2>
+                    <div class="loading-bar-container">
+                        <div class="loading-bar" id="loadingBar"></div>
+                    </div>
+                    <div class="loading-text" id="loadingText">0%</div>
+                </div>
+            </div>
+
+            <!-- Level Selection Screen -->
+            <div class="game-screen" id="levelSelectScreen">
+                <div class="level-select-container">
+                    <h2 class="level-select-title">Copilot - Das Upgrade für deinen Arbeitsplatz</h2>
+                    <div class="level-select-subtitle">Wähle deinen Bürotag</div>
+
+                    <!-- Challenge Grid -->
+                    <div class="challenges-grid">
+                        <!-- Challenge 1 -->
+                        <div class="challenge-card unlocked" data-level="1">
+                            <div class="challenge-number">1</div>
+                            <div class="challenge-icon">😊</div>
+                            <div class="challenge-name">Montag</div>
+                            <div class="challenge-difficulty">Einfach</div>
+                            <div class="challenge-points">0/100 Punkte</div>
+                            <div class="challenge-status">▶ Starten</div>
+                        </div>
+
+                        <!-- Challenge 2 -->
+                        <div class="challenge-card locked" data-level="2">
+                            <div class="challenge-number">2</div>
+                            <div class="challenge-icon">😐</div>
+                            <div class="challenge-name">Dienstag</div>
+                            <div class="challenge-difficulty">Mittel</div>
+                            <div class="challenge-points">0/100 Punkte</div>
+                            <div class="challenge-status">🔒 Gesperrt</div>
+                        </div>
+
+                        <!-- Challenge 3 -->
+                        <div class="challenge-card locked" data-level="3">
+                            <div class="challenge-number">3</div>
+                            <div class="challenge-icon">😅</div>
+                            <div class="challenge-name">Mittwoch</div>
+                            <div class="challenge-difficulty">Mittel-Schwer</div>
+                            <div class="challenge-points">0/100 Punkte</div>
+                            <div class="challenge-status">🔒 Gesperrt</div>
+                        </div>
+
+                        <!-- Challenge 4 -->
+                        <div class="challenge-card locked" data-level="4">
+                            <div class="challenge-number">4</div>
+                            <div class="challenge-icon">😰</div>
+                            <div class="challenge-name">Donnerstag</div>
+                            <div class="challenge-difficulty">Schwer</div>
+                            <div class="challenge-points">0/100 Punkte</div>
+                            <div class="challenge-status">🔒 Gesperrt</div>
+                        </div>
+
+                        <!-- Challenge 5 -->
+                        <div class="challenge-card locked final-challenge" data-level="5">
+                            <div class="challenge-number">5</div>
+                            <div class="challenge-icon">🔥</div>
+                            <div class="challenge-name">Freitag</div>
+                            <div class="challenge-difficulty">Sehr Schwer</div>
+                            <div class="challenge-points">0/100 Punkte</div>
+                            <div class="challenge-status">🔒 Gesperrt</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Info -->
+                    <div class="progress-info">
+                        <div class="progress-stats">
+                            <div class="progress-item">
+                                <span class="progress-label">Gesamtpunkte:</span>
+                                <span class="progress-value" id="totalPointsDisplay">0 / 500</span>
+                            </div>
+                            <div class="progress-item">
+                                <span class="progress-label">Aktueller Rang:</span>
+                                <span class="progress-value" id="currentRankDisplay">Anfänger</span>
+                            </div>
+                        </div>
+                        <div class="rank-info">
+                            <div class="rank-item">Bronze: 300 Punkte</div>
+                            <div class="rank-item">Silber: 400 Punkte</div>
+                            <div class="rank-item">Gold: 500 Punkte</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Scroll Down Arrow -->
+                <div class="scroll-arrow" id="scrollArrow" style="display: none;"></div>
+            </div>
+
+            <!-- Reset Confirmation Popup -->
+            <div class="reset-popup-overlay" id="resetPopup" style="display: none;">
+                <div class="reset-popup">
+                    <h3>⚠️ Fortschritt zurücksetzen?</h3>
+                    <p>Dies setzt deinen kompletten Fortschritt zurück:</p>
+                    <ul>
+                        <li>Alle Challenges werden wieder gesperrt</li>
+                        <li>Du startest wieder bei Challenge 1</li>
+                        <li>✅ Dein Rang und deine Punkte bleiben erhalten</li>
+                    </ul>
+                    <div class="reset-popup-actions">
+                        <button class="reset-confirm-btn" onclick="confirmReset()">Ja, zurücksetzen</button>
+                        <button class="reset-cancel-btn" onclick="hideResetConfirmation()">Abbrechen</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unlock Requirements Popup -->
+            <div class="reset-popup-overlay" id="unlockRequirementPopup" style="display: none;">
+                <div class="reset-popup">
+                    <h3>🔒 Challenge noch nicht freigeschaltet</h3>
+                    <p id="unlockRequirementText"></p>
+                    <div class="reset-popup-actions">
+                        <button class="reset-cancel-btn" onclick="hideUnlockRequirementPopup()">Verstanden</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gameplay Screen -->
+            <div class="game-screen" id="gameplayScreen">
+
+                <!-- TXP Intro Overlay (darkens screen until dialog is done) -->
+                <div class="txp-intro-overlay" id="txpIntroOverlay" style="display: none;"></div>
+
+                <!-- TXP Assistant (Bottom Left) -->
+                <div class="txp-assistant" id="txpAssistant" style="display: none;">
+                    <img id="txpAssistantImg" src="TXP/TXP_Stand_Pose/TXP Stand Pose_00000.png" alt="TXP Roboter">
+                </div>
+
+                <!-- TXP Speech Bubble -->
+                <div class="txp-speech-bubble" id="txpSpeech" style="display: none;">
+                    <div class="speech-bubble-content">
+                        <p id="txpSpeechText"></p>
+                        <div class="speech-continue-hint">Klicke zum Fortfahren</div>
+                    </div>
+                </div>
+
+                <!-- Task Queue Area (Top) -->
+                <div class="task-queue-area" id="taskQueueArea">
+                    <div class="task-queue-label">Aufgaben:</div>
+                    <div class="task-queue" id="taskQueue">
+                        <!-- Tasks werden dynamisch hinzugefügt -->
+                    </div>
+                </div>
+
+                <!-- Copilot Actions Bar (Center) -->
+                <div class="copilot-actions-container">
+                    <div class="copilot-actions-label">Copilot Aktionen:</div>
+                    <div class="copilot-actions-bar" id="copilotActionsBar">
+                        <!-- Wird dynamisch gefüllt -->
+                    </div>
+                    <div class="copilot-actions-hint">Klicke auf eine Aufgabe, dann auf die passende Aktion</div>
+                </div>
+
+                <!-- Tutorial Overlay (Challenge 1 only) -->
+                <div class="tutorial-overlay" id="tutorialOverlay" style="display: none;">
+                    <div class="tutorial-content">
+                        <h3>🎓 Tutorial</h3>
+                        <div class="tutorial-steps">
+                            <div class="tutorial-step">
+                                <span class="tutorial-number">1</span>
+                                <span class="tutorial-text">Aufgaben erscheinen oben mit Timer ⏰</span>
+                            </div>
+                            <div class="tutorial-step">
+                                <span class="tutorial-number">2</span>
+                                <span class="tutorial-text">Klicke auf eine Aufgabe, um Details zu sehen</span>
+                            </div>
+                            <div class="tutorial-step">
+                                <span class="tutorial-number">3</span>
+                                <span class="tutorial-text">Wähle die richtige Copilot-Aktion</span>
+                            </div>
+                            <div class="tutorial-step">
+                                <span class="tutorial-number">4</span>
+                                <span class="tutorial-text">Schaffe so viele Aufgaben wie möglich!</span>
+                            </div>
+                        </div>
+                        <button class="tutorial-close-btn" onclick="closeTutorial()">Verstanden!</button>
+                    </div>
+                </div>
+
+                <!-- Pause Menu -->
+                <div class="pause-menu-overlay" id="pauseMenu" style="display: none;">
+                    <div class="pause-menu-content">
+                        <h2 class="pause-menu-title">⏸️ Pause</h2>
+                        <div class="pause-menu-buttons">
+                            <button class="pause-menu-button" onclick="resumeGame()">
+                                <span>▶ Weiterspielen</span>
+                            </button>
+                            <button class="pause-menu-button" onclick="returnToLevelSelect()">
+                                <span>Zur Challenge-Auswahl</span>
+                            </button>
+                        </div>
+                        <div class="pause-menu-hint">Drücke <span class="key-highlight">ESC</span> zum Fortfahren</div>
+                    </div>
+                </div>
+
+                <!-- Action Feedback (Center) -->
+                <div class="action-feedback" id="actionFeedback" style="display: none;">
+                    <div class="feedback-icon" id="feedbackIcon"></div>
+                    <div class="feedback-text" id="feedbackText"></div>
+                </div>
+            </div>
+
+            <!-- Challenge Complete Screen -->
+            <div class="game-screen" id="challengeCompleteScreen">
+                <div class="complete-content">
+                    <h2 class="complete-title">🎉 Challenge Geschafft!</h2>
+
+                    <!-- Stats Display -->
+                    <div class="complete-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Aufgaben erledigt:</div>
+                            <div class="stat-value" id="tasksCompleted">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Bester Streak:</div>
+                            <div class="stat-value" id="bestStreak">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Punkte:</div>
+                            <div class="stat-value" id="finalScore">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div class="success-message" id="successMessage">
+                        <!-- Wird dynamisch gefüllt -->
+                    </div>
+
+                    <div class="complete-actions">
+                        <button class="next-level-button" onclick="nextChallenge()"><span>Nächste Challenge</span></button>
+                        <button class="menu-button" onclick="goToLevelSelect()"><span>Challenge-Auswahl</span></button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="script.js"></script>
+    <script src="level6.js"></script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gute Ergebnisse sind kein Zufall</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="level3.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- Game HUD -->
+        <div class="hud-wrapper">
+            <!-- Scenario Display (nur im Gameplay sichtbar) -->
+            <div class="scenario-display" id="scenarioDisplay" style="display: none;">
+                <div class="scenario-label">Szenario:</div>
+                <div class="scenario-text" id="scenarioText">
+                    <!-- Wird dynamisch gefüllt -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Rank Badge (Top Right) -->
+        <div class="rank-badge" id="rankBadge" style="display: none;">
+            <span class="rank-label" id="rankLabel"></span>
+        </div>
+
+        <!-- Main Game Area -->
+        <main class="game-area" id="gameArea">
+
+            <!-- Intro Screen -->
+            <div class="game-screen active" id="introScreen">
+                <div class="intro-content">
+                    <!-- Animated Background Canvas -->
+                    <canvas class="flow-canvas" id="flowCanvas"></canvas>
+
+                    <!-- Scanlines Effect -->
+                    <div class="scanlines"></div>
+
+                    <!-- Main Title -->
+                    <h1 class="game-title">
+                        <span class="title-line-1">
+                            <span class="letter" data-letter="0">G</span><span class="letter" data-letter="1">u</span><span class="letter" data-letter="2">t</span><span class="letter" data-letter="3">e</span> <span class="letter" data-letter="4">E</span><span class="letter" data-letter="5">r</span><span class="letter" data-letter="6">g</span><span class="letter" data-letter="7">e</span><span class="letter" data-letter="8">b</span><span class="letter" data-letter="9">n</span><span class="letter" data-letter="10">i</span><span class="letter" data-letter="11">s</span><span class="letter" data-letter="12">s</span><span class="letter" data-letter="13">e</span>
+                        </span>
+                        <span class="title-line-2">
+                            <span class="letter" data-letter="14">s</span><span class="letter" data-letter="15">i</span><span class="letter" data-letter="16">n</span><span class="letter" data-letter="17">d</span> <span class="letter" data-letter="18">k</span><span class="letter" data-letter="19">e</span><span class="letter" data-letter="20">i</span><span class="letter" data-letter="21">n</span> <span class="letter" data-letter="22">Z</span><span class="letter" data-letter="23">u</span><span class="letter" data-letter="24">f</span><span class="letter" data-letter="25">a</span><span class="letter" data-letter="26">l</span><span class="letter" data-letter="27">l</span>
+                        </span>
+                    </h1>
+
+                    <!-- Subtitle -->
+                    <div class="game-subtitle">Finde die richtige Rolle für jede Aufgabe</div>
+
+                    <!-- Press Any Key or Click -->
+                    <div class="press-key" id="pressKey">Drücke eine beliebige Taste</div>
+
+                    <!-- Copyright -->
+                    <div class="copyright">&copy; 2026 AI Bytes</div>
+                </div>
+            </div>
+
+            <!-- Loading Screen -->
+            <div class="game-screen" id="loadingScreen">
+                <div class="loading-content">
+                    <h2 class="loading-title">Lade Game...</h2>
+                    <div class="loading-bar-container">
+                        <div class="loading-bar" id="loadingBar"></div>
+                    </div>
+                    <div class="loading-text" id="loadingText">0%</div>
+                </div>
+            </div>
+
+            <!-- Level Selection Screen -->
+            <div class="game-screen" id="levelSelectScreen">
+                <div class="level-select-container">
+                    <h2 class="level-select-title">Gute Ergebnisse sind kein Zufall</h2>
+                    <div class="level-select-subtitle">Wähle deine Challenge</div>
+
+                    <!-- Challenge Grid -->
+                    <div class="challenges-grid">
+                        <!-- Challenge 1 -->
+                        <div class="challenge-card unlocked" data-level="1">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
+                            <div class="challenge-number">1</div>
+                            <div class="challenge-icon">🍳</div>
+                            <div class="challenge-name">Der Koch</div>
+                            <div class="challenge-status">&#9654; Starten</div>
+                        </div>
+
+                        <!-- Challenge 2 -->
+                        <div class="challenge-card locked" data-level="2">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
+                            <div class="challenge-number">2</div>
+                            <div class="challenge-icon">📋</div>
+                            <div class="challenge-name">Der Projektmanager</div>
+                            <div class="challenge-status">&#128274; Gesperrt</div>
+                        </div>
+
+                        <!-- Challenge 3 -->
+                        <div class="challenge-card locked" data-level="3">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
+                            <div class="challenge-number">3</div>
+                            <div class="challenge-icon">🤖</div>
+                            <div class="challenge-name">Der Roboter-Techniker</div>
+                            <div class="challenge-status">&#128274; Gesperrt</div>
+                        </div>
+
+                        <!-- Challenge 4 -->
+                        <div class="challenge-card locked" data-level="4">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
+                            <div class="challenge-number">4</div>
+                            <div class="challenge-icon">💻</div>
+                            <div class="challenge-name">Der Software-Entwickler</div>
+                            <div class="challenge-status">&#128274; Gesperrt</div>
+                        </div>
+
+                        <!-- Challenge 5 -->
+                        <div class="challenge-card locked final-challenge" data-level="5">
+                            <div class="challenge-price-tag" style="display: none;">100P</div>
+                            <div class="challenge-number">5</div>
+                            <div class="challenge-icon">🎯</div>
+                            <div class="challenge-name">Der Finale Test</div>
+                            <div class="challenge-status">&#128274; Gesperrt</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Info -->
+                    <div class="progress-info">
+                        <div class="progress-stats">
+                            <div class="progress-item">
+                                <span class="progress-label">Gesamtpunkte:</span>
+                                <span class="progress-value" id="totalPointsDisplay">0 / 500</span>
+                            </div>
+                            <div class="progress-item">
+                                <span class="progress-label">Aktueller Rang:</span>
+                                <span class="progress-value" id="currentRankDisplay">Anfänger</span>
+                            </div>
+                        </div>
+                        <div class="rank-info">
+                            <div class="rank-item">&#129353; Bronze: 300 Punkte</div>
+                            <div class="rank-item">&#129352; Silber: 400 Punkte</div>
+                            <div class="rank-item">&#129351; Gold: 500 Punkte</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Scroll Down Arrow -->
+                <div class="scroll-arrow" id="scrollArrow" style="display: none;"></div>
+            </div>
+
+            <!-- Game Play Screen (Platformer) -->
+            <div class="game-screen" id="gameScreen">
+
+                <!-- Mo Man Player -->
+                <div class="mo-player" id="moPlayer">
+                    <img id="moPlayerImg" src="Mo_man_Stand_Pose/Mo man Stand Pose_00000.png" alt="Mo Man">
+                </div>
+
+                <!-- TXP NPC (In-Game) -->
+                <div class="txp-npc" id="txpNpc" style="display: none;">
+                    <img id="txpNpcImg" src="TXP/TXP_Stand_Pose/TXP Stand Pose_00000.png" alt="TXP Roboter">
+                </div>
+
+                <!-- TXP Speech Bubble (In-Game) -->
+                <div class="txp-npc-speech" id="txpNpcSpeech" style="display: none;">
+                    <div class="speech-bubble-content">
+                        <p id="txpNpcSpeechText"></p>
+                        <div class="speech-continue-hint">Drücke [E] zum Fortfahren</div>
+                    </div>
+                </div>
+
+                <!-- Controls Display -->
+                <div class="controls-display" id="controlsDisplay" style="display: none;">
+                    <div class="controls-title">Steuerung</div>
+                    <div class="controls-list">
+                        <div class="control-item">
+                            <span class="control-key">&larr;</span>
+                            <span class="control-action">Links</span>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-key">&rarr;</span>
+                            <span class="control-action">Rechts</span>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-key">E</span>
+                            <span class="control-action">Portal betreten</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portals Container (moves with camera) -->
+                <div id="portalsContainer"></div>
+
+                <!-- Platforms Container (moves with camera) -->
+                <div id="platformsContainer"></div>
+
+                <!-- Death Overlay -->
+                <div class="death-overlay" id="deathOverlay" style="display: none;">
+                    <div class="death-content">
+                        <h2>Falsche Rolle!</h2>
+                        <p id="deathHintText">Das war leider nicht die richtige Rolle für diese Aufgabe.</p>
+                        <div class="death-hint">Drücke <span class="key-highlight">R</span> zum Neustarten</div>
+                    </div>
+                </div>
+
+                <!-- Pause Menu -->
+                <div class="pause-menu-overlay" id="pauseMenu" style="display: none;">
+                    <div class="pause-menu-content">
+                        <h2 class="pause-menu-title">Pause</h2>
+                        <div class="pause-menu-buttons">
+                            <button class="pause-menu-button" onclick="resumeGame()">
+                                <span>&#9654; Weiterspielen</span>
+                            </button>
+                            <button class="pause-menu-button" onclick="returnToLevelSelect()">
+                                <span>Zur Challenge-Auswahl</span>
+                            </button>
+                        </div>
+                        <div class="pause-menu-hint">Drücke <span class="key-highlight">ESC</span> zum Fortfahren</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge Complete Screen -->
+            <div class="game-screen" id="challengeCompleteScreen">
+                <div class="complete-content">
+                    <h2 class="complete-title">Challenge Geschafft!</h2>
+
+                    <!-- Correct Role Display -->
+                    <div class="correct-role-display" id="correctRoleDisplay">
+                        <!-- Wird dynamisch gefüllt -->
+                    </div>
+
+                    <!-- Prompt Comparison Side-by-Side -->
+                    <div class="prompt-comparison" id="promptComparison">
+                        <!-- Wird dynamisch gefüllt -->
+                    </div>
+
+                    <!-- Learning Takeaway -->
+                    <div class="learning-takeaway" id="learningTakeaway">
+                        <!-- Wird dynamisch gefüllt -->
+                    </div>
+
+                    <div class="complete-actions">
+                        <button class="next-level-button" onclick="nextChallenge()"><span>Nächste Challenge</span></button>
+                        <button class="menu-button" onclick="goToLevelSelectWithAnimation()"><span>Challenge-Auswahl</span></button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="script.js"></script>
+    <script src="level3.js"></script>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abkürzung statt Umweg, schummeln erlaubt!</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="level5.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- Music Toggle Button (Top Right) -->
+        <div class="music-control-container">
+            <button class="music-toggle-btn" id="musicToggle" aria-label="Musik an/aus">
+                🔇
+            </button>
+            <div class="volume-slider-container">
+                <input type="range" min="0" max="100" value="70" class="volume-slider" id="volumeSlider">
+                <div class="volume-label" id="volumeLabel">70%</div>
+            </div>
+        </div>
+
+        <!-- Background Music -->
+        <audio id="backgroundMusic" loop>
+            <source src="Music (lizenziert)/Retro-Chip-Tune-Platform-Game-C22-18868.wav_AdobeStock_1509256706.mp3" type="audio/mpeg">
+        </audio>
+
+        <!-- Lava Section Music -->
+        <audio id="lavaMusic" loop>
+            <source src="Music (lizenziert)/Game-On-Sport_AdobeStock_1555243188_1_.mp3" type="audio/mpeg">
+        </audio>
+
+        <!-- Game HUD -->
+        <div class="hud-wrapper">
+            <!-- Ziel-Prompt Anzeige (nur im Gameplay sichtbar) -->
+            <div class="prompt-goal-display" id="promptGoalDisplay" style="display: none;">
+                <div class="prompt-goal-label" id="promptGoalLabel">Prompt:</div>
+                <div class="prompt-goal-text" id="promptGoalText">
+                    <!-- Wird dynamisch gefüllt -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Rank Badge (Top Left) -->
+        <div class="rank-badge" id="rankBadge" style="display: none;">
+            <span class="rank-icon" id="rankIcon"></span>
+            <span class="rank-label" id="rankLabel"></span>
+        </div>
+
+        <!-- Death Counter (Top Right) -->
+        <div class="death-counter" id="deathCounter" style="display: none;">
+            💀 <span id="deathCount">0</span>
+        </div>
+
+        <!-- Main Game Area -->
+        <main class="game-area" id="gameArea">
+
+            <!-- Intro Screen -->
+            <div class="game-screen active" id="introScreen">
+                <div class="intro-content">
+                    <!-- Starfield Background -->
+                    <div class="starfield" id="starfield"></div>
+
+                    <!-- Background Grid -->
+                    <div class="grid-background"></div>
+
+                    <!-- Scanlines Effect -->
+                    <div class="scanlines"></div>
+
+                    <!-- Light Beams -->
+                    <div class="light-beam light-beam-1"></div>
+                    <div class="light-beam light-beam-2"></div>
+
+                    <!-- Moon -->
+                    <div class="moon"></div>
+
+                    <!-- TXP Walking on Grass -->
+                    <div class="intro-txp">
+                        <img id="introTxpImg" src="TXP/TXP_Lauf_Pose/TXP Lauf Loop_00000.png" alt="TXP Roboter">
+                    </div>
+
+                    <!-- Main Title -->
+                    <h1 class="game-title">
+                        <span class="title-line-1">Abkürzung statt Umweg,</span>
+                        <span class="title-line-2">schummeln erlaubt!</span>
+                    </h1>
+
+                    <!-- Press Any Key -->
+                    <div class="press-key">Drücke eine beliebige Taste</div>
+
+                    <!-- Copyright -->
+                    <div class="copyright">© 2026 AI Bytes</div>
+                </div>
+            </div>
+
+            <!-- Loading Screen -->
+            <div class="game-screen" id="loadingScreen">
+                <div class="loading-content">
+                    <h2 class="loading-title">Lade Game...</h2>
+                    <div class="loading-bar-container">
+                        <div class="loading-bar" id="loadingBar"></div>
+                    </div>
+                    <div class="loading-text" id="loadingText">0%</div>
+                </div>
+            </div>
+
+            <!-- Level Selection Screen - World Map -->
+            <div class="game-screen" id="levelSelectScreen">
+                <div class="world-map-container">
+                    <h2 class="world-map-title">Abkürzung statt Umweg, schummeln erlaubt!</h2>
+
+                    <div class="world-map-levels">
+                        <!-- Level 1 - Bottom Left -->
+                        <div class="map-level" data-level="1" style="left: 150px; top: 300px;">
+                            <div class="map-level-price-tag" style="display: none;">100P</div>
+                            <div class="map-level-icon">
+                                <div class="map-level-number">1</div>
+                                <div class="map-level-glow"></div>
+                            </div>
+                            <div class="map-level-info">
+                                <div class="map-level-name">Erste Anfrage</div>
+                                <div class="map-level-status unlocked">▶ Start</div>
+                            </div>
+                        </div>
+
+                        <!-- Level 2 - Mid Left -->
+                        <div class="map-level locked" data-level="2" style="left: 336px; top: 210px;">
+                            <div class="map-level-price-tag" style="display: none;">100P</div>
+                            <div class="map-level-icon">
+                                <div class="map-level-number">2</div>
+                                <div class="map-level-lock">🔒</div>
+                                <div class="map-level-glow"></div>
+                            </div>
+                            <div class="map-level-info">
+                                <div class="map-level-name">Zeitfilter</div>
+                                <div class="map-level-status">Gesperrt</div>
+                            </div>
+                        </div>
+
+                        <!-- Level 3 - Center -->
+                        <div class="map-level locked" data-level="3" style="left: 540px; top: 150px;">
+                            <div class="map-level-price-tag" style="display: none;">100P</div>
+                            <div class="map-level-icon">
+                                <div class="map-level-number">3</div>
+                                <div class="map-level-lock">🔒</div>
+                                <div class="map-level-glow"></div>
+                            </div>
+                            <div class="map-level-info">
+                                <div class="map-level-name">Visualisierung</div>
+                                <div class="map-level-status">Gesperrt</div>
+                            </div>
+                        </div>
+
+                        <!-- Level 4 - Mid Right -->
+                        <div class="map-level locked" data-level="4" style="left: 744px; top: 90px;">
+                            <div class="map-level-price-tag" style="display: none;">100P</div>
+                            <div class="map-level-icon">
+                                <div class="map-level-number">4</div>
+                                <div class="map-level-lock">🔒</div>
+                                <div class="map-level-glow"></div>
+                            </div>
+                            <div class="map-level-info">
+                                <div class="map-level-name">Filter & Sortierung</div>
+                                <div class="map-level-status">Gesperrt</div>
+                            </div>
+                        </div>
+
+                        <!-- Level 5 - Top Right (Final Boss) -->
+                        <div class="map-level locked final-level" data-level="5" style="left: 936px; top: 30px;">
+                            <div class="map-level-price-tag" style="display: none;">100P</div>
+                            <div class="map-level-icon">
+                                <div class="map-level-number">5</div>
+                                <div class="map-level-lock">🔒</div>
+                                <div class="map-level-glow"></div>
+                                <div class="final-crown">👑</div>
+                            </div>
+                            <div class="map-level-info">
+                                <div class="map-level-name">Finale Prüfung</div>
+                                <div class="map-level-status">Gesperrt</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rank Legend -->
+                    <div class="rank-legend">
+                        <div class="rank-legend-header">
+                            <div class="rank-legend-title">Ränge:</div>
+                            <div class="rank-legend-current-points" id="rankLegendPoints">0 / 500 Punkte</div>
+                        </div>
+                        <div class="rank-legend-items">
+                            <div class="rank-legend-item bronze">
+                                <span class="rank-legend-badge">Bronze</span>
+                                <span class="rank-legend-points">300 Punkte</span>
+                            </div>
+                            <div class="rank-legend-item silver">
+                                <span class="rank-legend-badge">Silber</span>
+                                <span class="rank-legend-points">400 Punkte</span>
+                            </div>
+                            <div class="rank-legend-item gold">
+                                <span class="rank-legend-badge">Gold</span>
+                                <span class="rank-legend-points">500 Punkte</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scroll Down Arrow -->
+                    <div class="scroll-arrow" id="scrollArrow" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Reset Confirmation Popup -->
+            <div class="reset-popup-overlay" id="resetPopup" style="display: none;">
+                <div class="reset-popup">
+                    <h3>⚠️ Fortschritt zurücksetzen?</h3>
+                    <p>Dies setzt deinen kompletten Fortschritt zurück:</p>
+                    <ul>
+                        <li>Alle Level werden wieder gesperrt</li>
+                        <li>Du startest wieder bei Level 1</li>
+                        <li>Dein Death-Counter wird zurückgesetzt</li>
+                        <li>✅ Dein Rang und deine Punkte bleiben erhalten</li>
+                    </ul>
+                    <div class="reset-popup-actions">
+                        <button class="reset-confirm-btn" onclick="confirmReset()">Ja, zurücksetzen</button>
+                        <button class="reset-cancel-btn" onclick="hideResetConfirmation()">Abbrechen</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Play Screen -->
+            <div class="game-screen" id="gameScreen">
+                <canvas id="gameCanvas"></canvas>
+
+                <!-- Mo Man Player -->
+                <div class="mo-player" id="moPlayer">
+                    <img id="moPlayerImg" src="Mo_man_Stand_Pose/Mo man Stand Pose_00000.png" alt="Mo Man">
+                </div>
+
+                <!-- TXP NPC (In-Game) -->
+                <div class="txp-npc" id="txpNpc" style="display: none;">
+                    <img id="txpNpcImg" src="TXP/TXP_Stand_Pose/TXP Stand Pose_00000.png" alt="TXP Roboter">
+                </div>
+
+                <!-- TXP Speech Bubble (In-Game) -->
+                <div class="txp-npc-speech" id="txpNpcSpeech" style="display: none;">
+                    <div class="speech-bubble-content">
+                        <p id="txpNpcSpeechText"></p>
+                        <div class="speech-continue-hint">Drücke [E] zum Fortfahren</div>
+                    </div>
+                </div>
+
+                <!-- Controls Display (Level 1 only) -->
+                <div class="controls-display" id="controlsDisplay" style="display: none;">
+                    <div class="controls-title">Steuerung</div>
+                    <div class="controls-list">
+                        <div class="control-item">
+                            <span class="control-key">←</span>
+                            <span class="control-action">Links</span>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-key">→</span>
+                            <span class="control-action">Rechts</span>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-key">Space</span>
+                            <span class="control-action">Springen</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prompt Pieces Container -->
+                <div id="promptPiecesContainer"></div>
+
+                <!-- Platforms Container -->
+                <div id="platformsContainer"></div>
+
+                <!-- Death Overlay -->
+                <div class="death-overlay" id="deathOverlay" style="display: none;">
+                    <div class="death-content">
+                        <h2>💀 Oh nein!</h2>
+                        <p>Error 404: Skills not found</p>
+                        <div class="death-hint">Drücke <span class="key-highlight">R</span> zum Respawnen</div>
+                    </div>
+                </div>
+
+                <!-- Note Popup (Level 4) -->
+                <div class="note-popup-overlay" id="notePopup" style="display: none;">
+                    <div class="note-popup-content">
+                        <img src="schriftrolle.png" alt="Prompt Zettel" class="note-scroll-image">
+                        <div class="note-popup-hint">Drücke <span class="key-highlight">E</span> um fortzufahren</div>
+                    </div>
+                </div>
+
+                <!-- Sign Message Popup (Level 1) -->
+                <div class="sign-popup-overlay" id="signPopup" style="display: none;">
+                    <div class="sign-popup-content">
+                        <div class="sign-popup-wood-frame">
+                            <div class="sign-popup-text" id="signPopupText">
+                                <!-- Text wird dynamisch gefüllt -->
+                            </div>
+                        </div>
+                        <div class="sign-popup-hint">Drücke <span class="key-highlight">E</span> um fortzufahren</div>
+                    </div>
+                </div>
+
+                <!-- Pause Menu -->
+                <div class="pause-menu-overlay" id="pauseMenu" style="display: none;">
+                    <div class="pause-menu-content">
+                        <h2 class="pause-menu-title">⏸️ Pause</h2>
+                        <div class="pause-menu-buttons">
+                            <button class="pause-menu-button" onclick="resumeGame()">
+                                <span>▶ Weiterspielen</span>
+                            </button>
+                            <button class="pause-menu-button" onclick="returnToLevelSelect()">
+                                <span>Zur Level-Auswahl</span>
+                            </button>
+                        </div>
+                        <div class="pause-menu-hint">Drücke <span class="key-highlight">ESC</span> zum Fortfahren</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level Complete Screen -->
+            <div class="game-screen" id="levelCompleteScreen">
+                <div class="complete-content">
+                    <h2 class="complete-title">🎉 Level Geschafft!</h2>
+
+                    <div class="prompt-result">
+                        <h3>Dein gebauter Prompt:</h3>
+                        <div class="prompt-display" id="promptDisplay">
+                            <!-- Wird dynamisch gefüllt -->
+                        </div>
+                    </div>
+
+                    <!-- AI Result Visualization (Level 1-3) -->
+                    <div class="ai-result-container" id="aiResultContainer" style="display: none;">
+                        <h3>Das Ergebnis deiner Anfrage:</h3>
+                        <div class="ai-result-content" id="aiResultContent">
+                            <!-- Wird dynamisch gefüllt -->
+                        </div>
+                    </div>
+
+                    <div class="lego-dashboard" id="legoDashboard">
+                        <!-- Wird dynamisch gefüllt -->
+                    </div>
+
+                    <div class="complete-actions">
+                        <button class="next-level-button" onclick="nextLevel()"><span>Nächstes Level</span></button>
+                        <button class="menu-button" onclick="goToLevelSelectWithAnimation()"><span>Level-Auswahl</span></button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="script.js"></script>
+    <script src="level5.js"></script>
+</body>
+</html>

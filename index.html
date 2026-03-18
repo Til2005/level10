@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1200, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Bytes - Level Up your AI Skills!</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-buttons-left">
+                <button class="feedback-btn" onclick="openFeedback()" title="Feedback geben">💬</button>
+            </div>
+            <div class="header-buttons">
+                <button class="credits-btn" onclick="openCredits()" title="Projektteam">
+                    <img src="Assets für Credits/DFC-Logo_rgb_blue dunkler Hintergrund (1).png" alt="Credits" class="credits-logo">
+                </button>
+                <button class="calendar-btn" onclick="openCalendar()">📅</button>
+            </div>
+            <div class="logo-container">
+                <img src="logo_horizontal_dark.png" alt="AI Bytes Logo" class="logo logo-dark">
+                <img src="logo_horizontal_white.png" alt="AI Bytes Logo" class="logo logo-white">
+            </div>
+            <div class="intro-text">
+                <p>Auf dieser Seite findest du die Level von AI Bytes.</p>
+                <p>Jedes Level ist ein kurzes Training, das verständlich zeigt, wie KI funktioniert und deinen Arbeitsalltag erleichtert. Die Level bauen nicht aufeinander auf. Wähle, was dich interessiert, sammle Punkte und werde zum KI-Experten.</p>
+            </div>
+        </header>
+
+        <main class="main">
+            <section class="levels">
+                <!-- Total Progress Display with Dynamic Rank Badge -->
+                <div class="total-progress-container">
+                    <div class="rank-badge-wrapper" id="rankBadgeWrapper">
+                        <div class="total-rank-badge" id="totalRankBadge" onclick="openRankLegend()" title="Klicke für Rang-Legende">
+                            <span class="total-rank-icon">⭐</span>
+                            <span class="total-rank-text" id="totalRankText">Kein Rang</span>
+                        </div>
+                        <div class="rank-arrow">▼</div>
+                    </div>
+                    <div class="total-progress-bar-wrapper">
+                        <div class="total-progress-bar">
+                            <div class="total-progress-fill" id="totalProgressFill" data-progress="0"></div>
+                        </div>
+                        <div class="total-progress-text" id="totalProgressText">0/4200 Punkte</div>
+                    </div>
+                </div>
+
+                <div class="level-grid">
+                    <!-- 01: Nicht suchen, Prompten! -->
+                    <a href="https://les.mo360cp.i.mercedes-benz.com/mod/scorm/view.php?id=9269" target="_blank" class="level-card level-1 available" style="text-decoration: none; color: inherit;" data-level="level1">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/01.png" alt="Nicht suchen, Prompten!" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/01.png')" title="Vollbild">⛶</button>
+                        </div>
+                        <span class="level-info" onclick="event.stopPropagation(); event.preventDefault();" data-tooltip="Mit starken Prompts und dem richtigen Kontext lernst du in diesem Level, wie du das Beste aus Chatbots herausholst.">ℹ</span>
+                        <h3 class="level-title">Nicht suchen, sondern Prompten!</h3>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
+                    </a>
+
+                    <!-- 02: Auch Bilder sind kein Problem -->
+                    <a href="https://les.mo360cp.i.mercedes-benz.com/mod/scorm/view.php?id=9274" target="_blank" class="level-card level-2 available" style="text-decoration: none; color: inherit;" data-level="level4">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/06.png" alt="Auch Bilder sind kein Problem" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/06.png')" title="Vollbild">⛶</button>
+                        </div>
+                        <span class="level-info" onclick="event.stopPropagation(); event.preventDefault();" data-tooltip="Von Qualitätssicherung bis Kreativität zeigt dieses Level, wie KI mit Bilddaten arbeitet, Wissen aus Bildern gewinnt und generative Bild-KI im Alltag unterstützt.">ℹ</span>
+                        <h3 class="level-title">Wenn Bilder mitarbeiten</h3>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
+                    </a>
+
+                    <!-- 03: Daten-Spezialist -->
+                    <a href="https://les.mo360cp.i.mercedes-benz.com/mod/scorm/view.php?id=9272" target="_blank" class="level-card level-3 available" style="text-decoration: none; color: inherit;" data-level="level8">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/04.png" alt="Daten-Spezialist" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/04.png')" title="Vollbild">⛶</button>
+                        </div>
+                        <span class="level-info" onclick="event.stopPropagation(); event.preventDefault();" data-tooltip="In diesem Level geht es darum, wie Datendemokratisierung funktioniert und wie ein Prompt-Spickzettel dir hilft, Ergebnisse gezielt abzufragen und richtig zu nutzen.">ℹ</span>
+                        <h3 class="level-title">Abkürzung statt Umweg, schummeln erlaubt!</h3>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
+                    </a>
+
+                    <!-- 04: KI für Dich! -->
+                    <a href="level9/index.html" class="level-card level-4 available" style="text-decoration: none; color: inherit;" data-level="level10">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/08.png" alt="KI für Dich!" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/08.png')" title="Vollbild">⛶</button>
+                        </div>
+                        <span class="level-info" onclick="event.stopPropagation(); event.preventDefault();" data-tooltip="Dieses Level erklärt, wie AI Momentum KI im Unternehmen verankert und wie du mit einem einfachen Systemprompt deinen persönlichen KI-Assistenten erstellst.">ℹ</span>
+                        <h3 class="level-title">KI für DICH!</h3>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
+                    </a>
+
+                    <!-- 05: Copilot -->
+                    <a href="https://les.mo360cp.i.mercedes-benz.com/mod/scorm/view.php?id=9275" target="_blank" class="level-card level-5 available" style="text-decoration: none; color: inherit;" data-level="level6">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/07.png" alt="Copilot" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/07.png')" title="Vollbild">⛶</button>
+                        </div>
+                        <span class="level-info" onclick="event.stopPropagation(); event.preventDefault();" data-tooltip="Als Teil des digitalen Arbeitsplatzes reduziert Copilot Routine, bündelt Informationen und unterstützt dich direkt in deinen täglichen Tools.">ℹ</span>
+                        <h3 class="level-title">Copilot - Das Upgrade für deinen Arbeitsplatz</h3>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
+                    </a>
+
+                    <!-- 06: Advanced Prompting -->
+                    <a href="https://les.mo360cp.i.mercedes-benz.com/mod/scorm/view.php?id=9273" target="_blank" class="level-card level-6 available" style="text-decoration: none; color: inherit;" data-level="level7">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/05.png" alt="Advanced Prompting" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/05.png')" title="Vollbild">⛶</button>
+                        </div>
+                        <span class="level-info" onclick="event.stopPropagation(); event.preventDefault();" data-tooltip="Fortgeschrittene Prompt-Techniken und die Frage, wann du welche sinnvoll einsetzt, stehen im Mittelpunkt dieses Levels.">ℹ</span>
+                        <h3 class="level-title">Advanced Prompting</h3>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
+                    </a>
+
+                    <!-- 07: Schummeln erlaubt -->
+                    <a href="https://les.mo360cp.i.mercedes-benz.com/mod/scorm/view.php?id=9277" target="_blank" class="level-card level-7 available" style="text-decoration: none; color: inherit;" data-level="level5">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/02 (2).png" alt="Schummeln erlaubt" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/02 (2).png')" title="Vollbild">⛶</button>
+                        </div>
+                        <span class="level-info" onclick="event.stopPropagation(); event.preventDefault();" data-tooltip="Statt langer Suchwege durch Ordner, Dateien und Ansprechpartner lernst du hier, wie der DFC-Chatbot Mercedes-Wissen zentral verfügbar macht.">ℹ</span>
+                        <h3 class="level-title">Unternehmensdaten schlau machen</h3>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
+                    </a>
+
+                    <!-- 08: Automatisiere deinen Alltag -->
+                    <a href="https://les.mo360cp.i.mercedes-benz.com/mod/scorm/view.php?id=9271" target="_blank" class="level-card level-8 available" style="text-decoration: none; color: inherit;" data-level="level2">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/03.png" alt="Automatisiere deinen Alltag" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/03.png')" title="Vollbild">⛶</button>
+                        </div>
+                        <span class="level-info" onclick="event.stopPropagation(); event.preventDefault();" data-tooltip="Automatisiere wiederkehrende Aufgaben und spare Zeit im Arbeitsalltag – dieses Level zeigt dir, wie Power Automate dabei hilft.">ℹ</span>
+                        <h3 class="level-title">Automatisiere deinen Alltag</h3>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
+                    </a>
+
+                    <!-- 09: Gute Ergebnisse sind kein Zufall -->
+                    <a href="https://les.mo360cp.i.mercedes-benz.com/mod/scorm/view.php?id=9270" target="_blank" class="level-card level-9 available" style="text-decoration: none; color: inherit;" data-level="level9">
+                        <div class="thumbnail-container">
+                            <img src="Kursbilder LES/02.png" alt="Gute Ergebnisse sind kein Zufall" class="level-thumbnail">
+                            <button class="fullscreen-btn" onclick="openFullscreen(event, 'Kursbilder LES/02.png')" title="Vollbild">⛶</button>
+                        </div>
+                        <span class="level-info" onclick="event.stopPropagation(); event.preventDefault();" data-tooltip="Wie KI im Unternehmen gemeinsam entsteht und warum klare Rollen und guter Kontext entscheidend sind, erfährst du in diesem Level.">ℹ</span>
+                        <h3 class="level-title">Gute Ergebnisse sind kein Zufall</h3>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">0/500 Punkte</div>
+                        </div>
+                    </a>
+
+                    <!-- 10: Mystery Level -->
+                    <a href="#" class="level-card level-10 mystery locked" style="text-decoration: none; color: inherit;" data-level="level11">
+                        <div class="thumbnail-container">
+                            <div class="mystery-thumbnail">?</div>
+                        </div>
+                        <h3 class="level-title">???</h3>
+                        <div class="level-progress-container">
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" data-progress="0"></div>
+                            </div>
+                            <div class="level-progress-text">🔒 Noch 4200 Punkte benötigt</div>
+                        </div>
+                    </a>
+                </div>
+            </section>
+        </main>
+
+        <!-- TXP Character -->
+        <div class="txp-character-container">
+            <div class="txp-speech-bubble" id="txpSpeech" style="display: none;">
+                <p id="txpSpeechText">Hey! Ich bin TXP! 🤖</p>
+            </div>
+            <div id="txpCharacter" class="txp-character">
+                <img src="TXP/TXP_Stand_Pose/TXP Stand Pose_00000.png" alt="TXP Character" class="txp-character-img">
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>&copy; 2026 AI Bytes</p>
+        </footer>
+    </div>
+
+    <!-- Rank Legend Popup -->
+    <div id="rankLegendPopup" class="popup-overlay" onclick="closeRankLegend()">
+        <div class="popup-content rank-legend-popup" onclick="event.stopPropagation()">
+            <div class="popup-header">
+                <h3>Rang-Legende</h3>
+                <button class="close-btn" onclick="closeRankLegend()">✕</button>
+            </div>
+            <div class="rank-legend-container">
+                <div class="rank-legend-item no-rank">
+                    <div class="rank-legend-icon">⭐</div>
+                    <div class="rank-legend-info">
+                        <div class="rank-legend-name">Kein Rang</div>
+                        <div class="rank-legend-requirement">0 - 899 Punkte</div>
+                    </div>
+                </div>
+
+                <div class="rank-legend-item apprentice">
+                    <div class="rank-legend-icon">🎓</div>
+                    <div class="rank-legend-info">
+                        <div class="rank-legend-name">Prompt-Lehrling</div>
+                        <div class="rank-legend-requirement">900 - 1799 Punkte</div>
+                    </div>
+                </div>
+
+                <div class="rank-legend-item enthusiast">
+                    <div class="rank-legend-icon">🌟</div>
+                    <div class="rank-legend-info">
+                        <div class="rank-legend-name">KI-Enthusiast</div>
+                        <div class="rank-legend-requirement">1800 - 2999 Punkte</div>
+                    </div>
+                </div>
+
+                <div class="rank-legend-item expert">
+                    <div class="rank-legend-icon">⚡</div>
+                    <div class="rank-legend-info">
+                        <div class="rank-legend-name">AI-Experte</div>
+                        <div class="rank-legend-requirement">3000 - 4199 Punkte</div>
+                    </div>
+                </div>
+
+                <div class="rank-legend-item champion">
+                    <div class="rank-legend-icon">🏆</div>
+                    <div class="rank-legend-info">
+                        <div class="rank-legend-name">AI-Bytes Champion</div>
+                        <div class="rank-legend-requirement">4200 Punkte</div>
+                    </div>
+                </div>
+
+                <div class="rank-legend-note">
+                    <p>Sammle Punkte in allen 9 Leveln, um höhere Ränge zu erreichen!</p>
+                    <p>Jedes Level hat maximal 500 Punkte.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Popup -->
+    <div id="calendarPopup" class="popup-overlay" onclick="closeCalendar()">
+        <div class="popup-content calendar-popup" onclick="event.stopPropagation()">
+            <div class="popup-header">
+                <h3>Kalenderelement</h3>
+                <button class="close-btn" onclick="closeCalendar()">✕</button>
+            </div>
+            <div class="calendar-container">
+                <p class="calendar-description">
+                    Lade das Kalenderelement herunter und füge es mit einem Klick zu deinem Kalender hinzu.
+                    So ist Freitags automatisch Zeit für AI Bytes geblockt. Dein Zukunfts-Ich wird es dir danken.
+                </p>
+
+                <div class="calendar-steps">
+                    <h4 class="calendar-steps-title">Handlungsablauf:</h4>
+                    <div class="calendar-step">
+                        <span class="calendar-step-number">1</span>
+                        <span class="calendar-step-text">Kalender herunterladen</span>
+                    </div>
+                    <div class="calendar-step">
+                        <span class="calendar-step-number">2</span>
+                        <span class="calendar-step-text">Datei öffnen</span>
+                    </div>
+                    <div class="calendar-step">
+                        <span class="calendar-step-number">3</span>
+                        <span class="calendar-step-text">Auf "Importieren" klicken</span>
+                    </div>
+                </div>
+
+                <button class="download-calendar-btn" onclick="downloadCalendar()">
+                    📥 Kalender herunterladen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Popup -->
+    <div id="feedbackPopup" class="popup-overlay" onclick="closeFeedback()">
+        <div class="popup-content feedback-popup" onclick="event.stopPropagation()">
+            <div class="popup-header">
+                <h3>Feedback geben</h3>
+                <button class="close-btn" onclick="closeFeedback()">✕</button>
+            </div>
+            <div class="feedback-container">
+                <p class="feedback-description">
+                    Deine Meinung ist uns wichtig! Hilf uns, AI Bytes noch besser zu machen.
+                </p>
+                <a href="https://forms.office.com/e/TLy5KzKMN7" target="_blank" class="feedback-link-btn">
+                    💬 Zum Feedback-Formular
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Credits Popup -->
+    <div id="creditsPopup" class="popup-overlay" onclick="closeCredits()">
+        <div class="popup-content credits-popup" onclick="event.stopPropagation()">
+            <button class="close-btn credits-close-btn" onclick="closeCredits()">✕</button>
+
+            <!-- DFC & AIMO Logos (centered, stacked) -->
+            <div class="credits-logos">
+                <a href="https://social.cloud.corpintra.net/start" target="_blank" class="credits-logo-link">
+                    <img src="Assets für Credits/dfc.png" alt="DFC Logo" class="credits-dfc-logo">
+                </a>
+                <a href="https://social.cloud.corpintra.net/start" target="_blank" class="credits-logo-link">
+                    <img src="Assets für Credits/aimo.png" alt="AI Momentum" class="credits-aimo-logo">
+                </a>
+            </div>
+
+            <h3 class="credits-main-title">Projektteam: AI Bytes</h3>
+
+            <div class="credits-container">
+                <!-- David Bokop -->
+                <div class="team-card">
+                    <img src="Assets für Credits/david.png" alt="David Bokop" class="team-card-img">
+                    <div class="team-card-overlay">
+                        <div class="team-card-info">
+                            <h4>David Bokop</h4>
+                            <p class="team-role">Project-Lead/Production</p>
+                            <p class="team-title">Content Manager</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Til Sander -->
+                <div class="team-card">
+                    <img src="Assets für Credits/til.png" alt="Til Sander" class="team-card-img">
+                    <div class="team-card-overlay">
+                        <div class="team-card-info">
+                            <h4>Til Sander</h4>
+                            <p class="team-role">Gamification/Webdesign</p>
+                            <p class="team-title">IT Specialist</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Doris Winckel -->
+                <div class="team-card">
+                    <img src="Assets für Credits/doris.png" alt="Doris Winckel" class="team-card-img">
+                    <div class="team-card-overlay">
+                        <div class="team-card-info">
+                            <h4>Doris Winckel</h4>
+                            <p class="team-role">Authoring/Production</p>
+                            <p class="team-title">Content Manager</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Duc Minh Pham -->
+                <div class="team-card">
+                    <img src="Assets für Credits/duc.png" alt="Duc Minh Pham" class="team-card-img">
+                    <div class="team-card-overlay">
+                        <div class="team-card-info">
+                            <h4>Duc Minh Pham</h4>
+                            <p class="team-role">Design/Motion-Graphics</p>
+                            <p class="team-title"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

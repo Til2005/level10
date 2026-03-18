@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(start level1.html)",
+      "Bash(start level2.html)",
+      "Bash(start level3.html)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(git branch:*)",
+      "Bash(grep:*)",
+      "Bash(start index.html)",
+      "Bash(start level4.html)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(start level_bilder.html)",
+      "Bash(dir \"C:\\Users\\TILSAND\\Desktop\\AI Bytes HTML Game\\TXP\" /b)",
+      "Bash(ls:*)",
+      "Bash(start level5.html)",
+      "Bash(git remote:*)",
+      "Bash(dir \"C:\\Users\\TILSAND\\Desktop\\AI Bytes HTML Game\" /b)",
+      "Bash(findstr:*)",
+      "Bash(cat:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

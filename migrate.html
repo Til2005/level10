@@ -1,0 +1,1159 @@
+<!doctype html>
+<html lang="de">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Spielstand übertragen - AI Bytes</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .container {
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                max-width: 1000px;
+                width: 100%;
+                max-height: 90vh;
+                overflow: auto;
+                padding: 40px;
+            }
+
+            h1 {
+                color: #333;
+                margin-bottom: 10px;
+                font-size: 32px;
+            }
+
+            .subtitle {
+                color: #666;
+                margin-bottom: 30px;
+                font-size: 16px;
+                line-height: 1.6;
+            }
+
+            .info-box {
+                background: #f0f4ff;
+                border-left: 4px solid #667eea;
+                padding: 20px;
+                border-radius: 8px;
+                margin-bottom: 25px;
+            }
+
+            .info-box h3 {
+                color: #667eea;
+                font-size: 16px;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .info-box p {
+                color: #555;
+                line-height: 1.6;
+                font-size: 14px;
+            }
+
+            .step-list {
+                list-style: none;
+                counter-reset: step-counter;
+                margin: 20px 0;
+            }
+
+            .step-list li {
+                counter-increment: step-counter;
+                position: relative;
+                padding-left: 50px;
+                margin-bottom: 20px;
+                line-height: 1.6;
+            }
+
+            .step-list li::before {
+                content: counter(step-counter);
+                position: absolute;
+                left: 0;
+                top: 0;
+                background: #667eea;
+                color: white;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 16px;
+            }
+
+            .status {
+                padding: 18px;
+                border-radius: 10px;
+                margin-bottom: 25px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-size: 15px;
+            }
+
+            .status.loading {
+                background: #e3f2fd;
+                color: #1976d2;
+            }
+
+            .status.error {
+                background: #ffebee;
+                color: #c62828;
+            }
+
+            .status.success {
+                background: #e8f5e9;
+                color: #2e7d32;
+            }
+
+            .status.warning {
+                background: #fff3e0;
+                color: #ef6c00;
+            }
+
+            .spinner {
+                width: 24px;
+                height: 24px;
+                border: 3px solid rgba(0, 0, 0, 0.1);
+                border-top-color: currentColor;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .actions {
+                display: flex;
+                gap: 12px;
+                margin-bottom: 25px;
+                flex-wrap: wrap;
+            }
+
+            button {
+                padding: 14px 28px;
+                border: none;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            button.primary {
+                background: #667eea;
+                color: white;
+                font-size: 18px;
+                padding: 16px 32px;
+            }
+
+            button.primary:hover:not(:disabled) {
+                background: #5568d3;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+            }
+
+            button.secondary {
+                background: #e0e7ff;
+                color: #667eea;
+            }
+
+            button.secondary:hover:not(:disabled) {
+                background: #c7d2fe;
+            }
+
+            .data-grid {
+                margin-top: 30px;
+            }
+
+            .data-category {
+                margin-bottom: 25px;
+                border: 2px solid #e5e7eb;
+                border-radius: 12px;
+                overflow: hidden;
+            }
+
+            .category-header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 16px 20px;
+                font-weight: 600;
+                font-size: 18px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .category-header .icon {
+                font-size: 24px;
+            }
+
+            .data-item {
+                padding: 20px;
+                border-bottom: 1px solid #f3f4f6;
+                transition: background 0.2s;
+                display: grid;
+                grid-template-columns: auto 1fr;
+                gap: 20px;
+                align-items: start;
+            }
+
+            .data-item:last-child {
+                border-bottom: none;
+            }
+
+            .data-item:hover {
+                background: #f9fafb;
+            }
+
+            .data-item.has-conflict {
+                background: #fffbeb;
+            }
+
+            .data-item.has-conflict:hover {
+                background: #fef3c7;
+            }
+
+            .checkbox-wrapper {
+                display: flex;
+                align-items: flex-start;
+                padding-top: 4px;
+            }
+
+            .checkbox-wrapper input[type="checkbox"] {
+                width: 24px;
+                height: 24px;
+                cursor: pointer;
+                accent-color: #667eea;
+            }
+
+            .item-content {
+                flex: 1;
+            }
+
+            .item-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 12px;
+            }
+
+            .item-title {
+                font-weight: 600;
+                font-size: 16px;
+                color: #1f2937;
+            }
+
+            .badge {
+                padding: 4px 12px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            .badge.new {
+                background: #bbf7d0;
+                color: #166534;
+            }
+
+            .badge.conflict {
+                background: #fed7aa;
+                color: #9a3412;
+            }
+
+            .comparison {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+                margin-top: 12px;
+            }
+
+            .comparison-side {
+                background: #f9fafb;
+                padding: 15px;
+                border-radius: 8px;
+                border: 2px solid #e5e7eb;
+            }
+
+            .comparison-side.highlight {
+                border-color: #667eea;
+                background: #f0f4ff;
+            }
+
+            .comparison-label {
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                color: #6b7280;
+                margin-bottom: 8px;
+                letter-spacing: 0.5px;
+            }
+
+            .comparison-value {
+                font-size: 14px;
+                color: #374151;
+                word-wrap: break-word;
+            }
+
+            .comparison-value .points {
+                font-size: 20px;
+                font-weight: 700;
+                color: #667eea;
+                display: block;
+                margin-bottom: 4px;
+            }
+
+            .comparison-value .empty {
+                color: #9ca3af;
+                font-style: italic;
+            }
+
+            .summary-card {
+                background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+                padding: 25px;
+                border-radius: 12px;
+                margin: 25px 0;
+            }
+
+            .summary-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+            }
+
+            .summary-item {
+                text-align: center;
+            }
+
+            .summary-value {
+                font-size: 32px;
+                font-weight: 700;
+                color: #667eea;
+                display: block;
+            }
+
+            .summary-label {
+                font-size: 14px;
+                color: #6b7280;
+                margin-top: 5px;
+            }
+
+            .help-text {
+                background: #f9fafb;
+                padding: 15px;
+                border-radius: 8px;
+                margin: 20px 0;
+                color: #6b7280;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+
+            .center-content {
+                text-align: center;
+                padding: 40px 20px;
+            }
+
+            .big-icon {
+                font-size: 64px;
+                margin-bottom: 20px;
+            }
+
+            @media (max-width: 768px) {
+                .comparison {
+                    grid-template-columns: 1fr;
+                }
+
+                .container {
+                    padding: 25px;
+                }
+
+                h1 {
+                    font-size: 24px;
+                }
+
+                .summary-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div id="content">
+                <!-- Content wird hier dynamisch eingefügt -->
+            </div>
+        </div>
+
+        <script>
+            // Konfiguration für bekannte Spielstand-Schlüssel
+            const KNOWN_KEYS = {
+                playerPoints: {
+                    label: "Level 1 Fortschritt",
+                    category: "levels",
+                    type: "number",
+                },
+                aiBytes_level4_progress: {
+                    label: "Level 2 Fortschritt",
+                    category: "levels",
+                    type: "json",
+                },
+                aiBytes_level1_progress: {
+                    label: "Level 3 Fortschritt",
+                    category: "levels",
+                    type: "json",
+                },
+                powerAutomateProgress: {
+                    label: "Level 4 Fortschritt",
+                    category: "levels",
+                    type: "json",
+                },
+                aiBytes_level6_progress: {
+                    label: "Level 5 Fortschritt",
+                    category: "levels",
+                    type: "json",
+                },
+                aiBytes_level6_progress_data: {
+                    label: "Level 6 Fortschritt",
+                    category: "levels",
+                    type: "json",
+                },
+                aiBytes_level7_progress: {
+                    label: "Level 7 Fortschritt",
+                    category: "levels",
+                    type: "json",
+                },
+                aiBytes_level3_progress: {
+                    label: "Level 8 Fortschritt",
+                    category: "levels",
+                    type: "json",
+                },
+                aiBytes_level9_progress: {
+                    label: "Level 9 Fortschritt",
+                    category: "levels",
+                    type: "json",
+                },
+                completedLevels: {
+                    label: "Abgeschlossene Level",
+                    category: "progress",
+                    type: "json",
+                },
+                levelsAwarded: {
+                    label: "Bewertete Level",
+                    category: "progress",
+                    type: "json",
+                },
+                highestRank: {
+                    label: "Höchster Rang",
+                    category: "progress",
+                    type: "string",
+                },
+                deathCount: {
+                    label: "Tode",
+                    category: "progress",
+                    type: "number",
+                },
+                aiBytes_achievements: {
+                    label: "Erfolge",
+                    category: "achievements",
+                    type: "json",
+                },
+                aiBytes_achievementData: {
+                    label: "Erfolgs-Daten",
+                    category: "achievements",
+                    type: "json",
+                },
+                calendarClicked: {
+                    label: "Kalender angeklickt",
+                    category: "settings",
+                    type: "string",
+                },
+                selectedBackground: {
+                    label: "Ausgewählter Hintergrund",
+                    category: "settings",
+                    type: "string",
+                },
+                level5_volume: {
+                    label: "Lautstärke Level 5",
+                    category: "settings",
+                    type: "number",
+                },
+                level7SelectedSkin: {
+                    label: "Skin Level 7",
+                    category: "settings",
+                    type: "string",
+                },
+                aiBytes_level4_skipTutorial: {
+                    label: "Tutorial überspringen",
+                    category: "settings",
+                    type: "string",
+                },
+            };
+
+            const CATEGORY_LABELS = {
+                levels: {
+                    label: "Level-Fortschritte",
+                    icon: "🎮",
+                    description: "Deine Punktzahlen in allen 9 Leveln",
+                },
+                progress: {
+                    label: "Gesamtfortschritt",
+                    icon: "🏆",
+                    description: "Abgeschlossene Level und Ränge",
+                },
+                achievements: {
+                    label: "Erfolge",
+                    icon: "⭐",
+                    description: "Deine freigeschalteten Achievements",
+                },
+                settings: {
+                    label: "Einstellungen",
+                    icon: "⚙️",
+                    description: "Deine persönlichen Spieleinstellungen",
+                },
+                other: {
+                    label: "Sonstige Daten",
+                    icon: "📦",
+                    description: "Weitere gespeicherte Daten",
+                },
+            };
+
+            // Hilfsfunktionen
+            function getUrlParams() {
+                const params = new URLSearchParams(window.location.search);
+                return {
+                    action: params.get("action"),
+                    target: params.get("target"),
+                    payload: params.get("payload"),
+                };
+            }
+
+            function normalizeUrl(url) {
+                // Wenn die URL bereits ein Protokoll hat, zurückgeben
+                if (url.startsWith("http://") || url.startsWith("https://")) {
+                    return url;
+                }
+
+                // Wenn es mit // startet, verwende das aktuelle Protokoll
+                if (url.startsWith("//")) {
+                    return window.location.protocol + url;
+                }
+
+                // Für localhost immer http:// verwenden
+                if (
+                    url.startsWith("localhost") ||
+                    url.startsWith("127.0.0.1")
+                ) {
+                    return "http://" + url;
+                }
+
+                // Für alle anderen URLs das aktuelle Protokoll verwenden
+                // Oder https:// als Standard für Produktions-URLs
+                return (
+                    (window.location.protocol === "http:"
+                        ? "http://"
+                        : "https://") + url
+                );
+            }
+
+            function encodeToBase64(obj) {
+                const jsonString = JSON.stringify(obj);
+                return btoa(unescape(encodeURIComponent(jsonString)));
+            }
+
+            function decodeFromBase64(base64String) {
+                try {
+                    const jsonString = decodeURIComponent(
+                        escape(atob(base64String)),
+                    );
+                    return JSON.parse(jsonString);
+                } catch (error) {
+                    throw new Error("Die Daten konnten nicht gelesen werden");
+                }
+            }
+
+            function getAllLocalStorage() {
+                const data = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    data[key] = localStorage.getItem(key);
+                }
+                return data;
+            }
+
+            function extractPoints(value) {
+                if (!value) return null;
+                try {
+                    const parsed = JSON.parse(value);
+                    return parsed.totalPoints || parsed.score || null;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function formatValueSimple(value, key) {
+                if (!value) return '<span class="empty">Nicht vorhanden</span>';
+
+                const points = extractPoints(value);
+                if (points !== null) {
+                    return `<span class="points">${points} Punkte</span>`;
+                }
+
+                try {
+                    const parsed = JSON.parse(value);
+                    if (Array.isArray(parsed)) {
+                        return `${parsed.length} Einträge`;
+                    }
+                    return "Gespeichert";
+                } catch (e) {
+                    return (
+                        value.substring(0, 50) +
+                        (value.length > 50 ? "..." : "")
+                    );
+                }
+            }
+
+            function categorizeData(data) {
+                const categories = {};
+
+                for (const key in data) {
+                    const keyInfo = KNOWN_KEYS[key];
+                    const category = keyInfo ? keyInfo.category : "other";
+
+                    if (!categories[category]) {
+                        categories[category] = [];
+                    }
+
+                    categories[category].push(key);
+                }
+
+                return categories;
+            }
+
+            // Export-Funktion (Daten von alter Domain)
+            function handleExport(targetUrl) {
+                const content = document.getElementById("content");
+
+                // URL normalisieren (http:// oder https:// hinzufügen falls nötig)
+                targetUrl = normalizeUrl(targetUrl);
+
+                content.innerHTML = `
+                <div class="center-content">
+                    <div class="big-icon">📦</div>
+                    <h1>Spielstand wird vorbereitet...</h1>
+                    <p class="subtitle">Bitte einen Moment Geduld</p>
+                    <div class="status loading">
+                        <div class="spinner"></div>
+                        <span>Deine Spieldaten werden gesammelt...</span>
+                    </div>
+                </div>
+            `;
+
+                setTimeout(() => {
+                    try {
+                        const data = getAllLocalStorage();
+                        const dataCount = Object.keys(data).length;
+
+                        if (dataCount === 0) {
+                            content.innerHTML = `
+                            <div class="center-content">
+                                <div class="big-icon">😕</div>
+                                <h1>Keine Daten gefunden</h1>
+                                <p class="subtitle">Auf dieser Webseite sind keine Spielstände gespeichert.</p>
+                                <div class="status warning">
+                                    <span class="icon">⚠️</span>
+                                    <span>Stelle sicher, dass du auf der richtigen Domain bist, wo dein Spielstand gespeichert ist.</span>
+                                </div>
+                            </div>
+                        `;
+                            return;
+                        }
+
+                        const payload = {
+                            version: "1.0",
+                            timestamp: new Date().toISOString(),
+                            sourceDomain: window.location.hostname,
+                            data: data,
+                        };
+
+                        const encoded = encodeToBase64(payload);
+                        const separator = targetUrl.includes("?") ? "&" : "?";
+                        const redirectUrl = `${targetUrl}${separator}action=in&payload=${encoded}`;
+
+                        content.innerHTML = `
+                        <div class="center-content">
+                            <div class="big-icon">✅</div>
+                            <h1>Bereit zum Übertragen!</h1>
+                            <p class="subtitle">Deine Spielstände wurden erfolgreich vorbereitet.</p>
+                            <div class="status success">
+                                <span class="icon">✓</span>
+                                <span>${dataCount} Einträge wurden gepackt</span>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-grid">
+                                    <div class="summary-item">
+                                        <span class="summary-value">${dataCount}</span>
+                                        <span class="summary-label">Gespeicherte Einträge</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-box">
+                                <h3><span>ℹ️</span> Was passiert jetzt?</h3>
+                                <p>Du wirst gleich zur neuen Webseite weitergeleitet, wo du entscheiden kannst, welche Daten du übernehmen möchtest.</p>
+                            </div>
+                            <p style="color: #6b7280; margin: 20px 0;">Weiterleitung in <span id="countdown">3</span> Sekunden...</p>
+                            <button class="primary" onclick="window.location.href='${redirectUrl.replace(/'/g, "\\'")}'">
+                                Jetzt weiter →
+                            </button>
+                        </div>
+                    `;
+
+                        let count = 3;
+                        const interval = setInterval(() => {
+                            count--;
+                            const countdownEl =
+                                document.getElementById("countdown");
+                            if (countdownEl) countdownEl.textContent = count;
+
+                            if (count === 0) {
+                                clearInterval(interval);
+                                window.location.href = redirectUrl;
+                            }
+                        }, 1000);
+                    } catch (error) {
+                        content.innerHTML = `
+                        <div class="center-content">
+                            <div class="big-icon">❌</div>
+                            <h1>Fehler beim Exportieren</h1>
+                            <div class="status error">
+                                <span class="icon">✗</span>
+                                <span>Fehler: ${error.message}</span>
+                            </div>
+                            <button class="primary" onclick="location.reload()">Nochmal versuchen</button>
+                        </div>
+                    `;
+                    }
+                }, 800);
+            }
+
+            // Import-Funktion (Daten auf neue Domain)
+            function handleImport(payloadBase64) {
+                const content = document.getElementById("content");
+
+                content.innerHTML = `
+                <div class="center-content">
+                    <div class="big-icon">📥</div>
+                    <h1>Spielstand wird geladen...</h1>
+                    <p class="subtitle">Deine Daten werden überprüft</p>
+                    <div class="status loading">
+                        <div class="spinner"></div>
+                        <span>Einen Moment bitte...</span>
+                    </div>
+                </div>
+            `;
+
+                setTimeout(() => {
+                    try {
+                        const payload = decodeFromBase64(payloadBase64);
+
+                        if (!payload || typeof payload !== "object") {
+                            throw new Error("Ungültiges Datenformat");
+                        }
+
+                        const incomingData = payload.data || payload;
+                        const incomingKeys = Object.keys(incomingData);
+
+                        if (incomingKeys.length === 0) {
+                            throw new Error(
+                                "Keine Daten zum Importieren vorhanden",
+                            );
+                        }
+
+                        const currentData = getAllLocalStorage();
+                        const categories = categorizeData(incomingData);
+
+                        let conflictCount = 0;
+                        let newCount = 0;
+                        incomingKeys.forEach((key) => {
+                            if (currentData[key]) conflictCount++;
+                            else newCount++;
+                        });
+
+                        let html = `
+                        <h1>🎮 Spielstand übertragen</h1>
+                        <p class="subtitle">Wähle aus, welche Daten du übernehmen möchtest</p>
+                    `;
+
+                        if (conflictCount > 0) {
+                            html += `
+                            <div class="info-box">
+                                <h3><span>⚠️</span> Wichtiger Hinweis</h3>
+                                <p>Du hast bereits Spielstände auf dieser Webseite. ${conflictCount} ${conflictCount === 1 ? "Eintrag würde" : "Einträge würden"} überschrieben werden. Prüfe die Daten genau, bevor du sie überträgst!</p>
+                            </div>
+                        `;
+                        } else {
+                            html += `
+                            <div class="status success">
+                                <span class="icon">✓</span>
+                                <span>Alles klar! Du hast noch keine Spielstände hier - alle ${newCount} Einträge sind neu.</span>
+                            </div>
+                        `;
+                        }
+
+                        html += `
+                        <div class="summary-card">
+                            <div class="summary-grid">
+                                <div class="summary-item">
+                                    <span class="summary-value">${incomingKeys.length}</span>
+                                    <span class="summary-label">Gesamt-Einträge</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-value">${newCount}</span>
+                                    <span class="summary-label">Neue Einträge</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-value">${conflictCount}</span>
+                                    <span class="summary-label">Überschreibungen</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="actions">
+                            <button class="primary" onclick="importSelected()">
+                                ✓ Ausgewählte Daten übertragen
+                            </button>
+                            <button class="secondary" onclick="selectAll(true)">Alle auswählen</button>
+                            <button class="secondary" onclick="selectAll(false)">Alle abwählen</button>
+                            <button class="secondary" onclick="smartSelect()">🧠 Automatisch beste Wahl treffen</button>
+                        </div>
+
+                        <div class="help-text">
+                            <strong>💡 Tipp:</strong> Mit "Automatisch beste Wahl treffen" werden automatisch die Spielstände mit mehr Punkten ausgewählt. Bei Einstellungen bleibt dein aktueller Stand erhalten.
+                        </div>
+
+                        <div class="data-grid">
+                    `;
+
+                        // Kategorien durchgehen
+                        const categoryOrder = [
+                            "levels",
+                            "progress",
+                            "achievements",
+                            "settings",
+                            "other",
+                        ];
+                        categoryOrder.forEach((catKey) => {
+                            if (!categories[catKey]) return;
+
+                            const catInfo = CATEGORY_LABELS[catKey];
+                            html += `
+                            <div class="data-category">
+                                <div class="category-header">
+                                    <span class="icon">${catInfo.icon}</span>
+                                    <div>
+                                        <div>${catInfo.label}</div>
+                                        <div style="font-size: 13px; font-weight: normal; opacity: 0.9;">${catInfo.description}</div>
+                                    </div>
+                                </div>
+                        `;
+
+                            categories[catKey].forEach((key) => {
+                                const currentValue = currentData[key];
+                                const incomingValue = incomingData[key];
+                                const hasConflict = !!currentValue;
+                                const keyInfo = KNOWN_KEYS[key];
+                                const label = keyInfo ? keyInfo.label : key;
+
+                                const currentPoints =
+                                    extractPoints(currentValue);
+                                const incomingPoints =
+                                    extractPoints(incomingValue);
+                                const incomingIsBetter =
+                                    incomingPoints !== null &&
+                                    currentPoints !== null &&
+                                    incomingPoints > currentPoints;
+
+                                html += `
+                                <div class="data-item ${hasConflict ? "has-conflict" : ""}" data-key="${key}">
+                                    <div class="checkbox-wrapper">
+                                        <input type="checkbox" id="cb_${key}" ${incomingIsBetter || !hasConflict ? "checked" : ""} data-key="${key}">
+                                    </div>
+                                    <div class="item-content">
+                                        <div class="item-header">
+                                            <span class="item-title">${label}</span>
+                                            ${hasConflict ? '<span class="badge conflict">⚠️ Überschreibt vorhandene Daten</span>' : '<span class="badge new">✨ Neu</span>'}
+                                        </div>
+                                        <div class="comparison">
+                                            <div class="comparison-side ${!incomingIsBetter && currentPoints !== null ? "highlight" : ""}">
+                                                <div class="comparison-label">Aktuell auf dieser Seite</div>
+                                                <div class="comparison-value">${formatValueSimple(currentValue, key)}</div>
+                                            </div>
+                                            <div class="comparison-side ${incomingIsBetter ? "highlight" : ""}">
+                                                <div class="comparison-label">Neue Daten (werden übernommen wenn ✓)</div>
+                                                <div class="comparison-value">${formatValueSimple(incomingValue, key)}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            });
+
+                            html += `</div>`;
+                        });
+
+                        html += `</div>`;
+
+                        content.innerHTML = html;
+                        window.importPayload = incomingData;
+                    } catch (error) {
+                        content.innerHTML = `
+                        <div class="center-content">
+                            <div class="big-icon">❌</div>
+                            <h1>Import fehlgeschlagen</h1>
+                            <div class="status error">
+                                <span class="icon">✗</span>
+                                <span>Fehler: ${error.message}</span>
+                            </div>
+                            <p class="subtitle">Die Daten konnten nicht gelesen werden. Bitte stelle sicher, dass du den richtigen Link verwendet hast.</p>
+                        </div>
+                    `;
+                    }
+                }, 800);
+            }
+
+            function selectAll(checked) {
+                document
+                    .querySelectorAll('input[type="checkbox"][data-key]')
+                    .forEach((cb) => {
+                        cb.checked = checked;
+                    });
+            }
+
+            function smartSelect() {
+                document
+                    .querySelectorAll('input[type="checkbox"][data-key]')
+                    .forEach((cb) => {
+                        const key = cb.getAttribute("data-key");
+                        const currentValue = localStorage.getItem(key);
+                        const incomingValue = window.importPayload[key];
+
+                        if (!currentValue) {
+                            cb.checked = true;
+                            return;
+                        }
+
+                        const keyInfo = KNOWN_KEYS[key];
+                        if (keyInfo && keyInfo.category === "levels") {
+                            const currentPoints = extractPoints(currentValue);
+                            const incomingPoints = extractPoints(incomingValue);
+
+                            if (
+                                currentPoints !== null &&
+                                incomingPoints !== null
+                            ) {
+                                cb.checked = incomingPoints > currentPoints;
+                            } else {
+                                cb.checked = true;
+                            }
+                        } else {
+                            cb.checked = false;
+                        }
+                    });
+            }
+
+            function importSelected() {
+                const selectedKeys = [];
+                document
+                    .querySelectorAll(
+                        'input[type="checkbox"][data-key]:checked',
+                    )
+                    .forEach((cb) => {
+                        selectedKeys.push(cb.getAttribute("data-key"));
+                    });
+
+                if (selectedKeys.length === 0) {
+                    alert(
+                        "Bitte wähle mindestens einen Eintrag zum Übertragen aus.",
+                    );
+                    return;
+                }
+
+                const confirmMsg = `Möchtest du wirklich ${selectedKeys.length} ${selectedKeys.length === 1 ? "Eintrag" : "Einträge"} übertragen?\n\nVorhandene Daten für die ausgewählten Einträge werden überschrieben.`;
+                if (!confirm(confirmMsg)) {
+                    return;
+                }
+
+                let imported = 0;
+                let errors = 0;
+
+                selectedKeys.forEach((key) => {
+                    try {
+                        localStorage.setItem(key, window.importPayload[key]);
+                        imported++;
+                    } catch (error) {
+                        console.error(
+                            `Fehler beim Importieren von ${key}:`,
+                            error,
+                        );
+                        errors++;
+                    }
+                });
+
+                const content = document.getElementById("content");
+                content.innerHTML = `
+                <div class="center-content">
+                    <div class="big-icon">🎉</div>
+                    <h1>Erfolgreich übertragen!</h1>
+                    <p class="subtitle">Deine Spielstände wurden erfolgreich übertragen.</p>
+                    <div class="status success">
+                        <span class="icon">✓</span>
+                        <span>${imported} ${imported === 1 ? "Eintrag wurde" : "Einträge wurden"} erfolgreich übertragen</span>
+                    </div>
+                    ${
+                        errors > 0
+                            ? `
+                        <div class="status error">
+                            <span class="icon">✗</span>
+                            <span>${errors} ${errors === 1 ? "Eintrag konnte" : "Einträge konnten"} nicht übertragen werden</span>
+                        </div>
+                    `
+                            : ""
+                    }
+                    <div class="summary-card">
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <span class="summary-value">${imported}</span>
+                                <span class="summary-label">Übertragen</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-value">${Object.keys(window.importPayload).length - imported}</span>
+                                <span class="summary-label">Übersprungen</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <h3><span>✅</span> Fertig!</h3>
+                        <p>Du kannst jetzt mit deinen übertragenen Spielständen weiterspielen. Viel Spaß!</p>
+                    </div>
+                    <button class="primary" onclick="window.location.href='/'">
+                        Zum Spiel →
+                    </button>
+                </div>
+            `;
+            }
+
+            // Hauptfunktion
+            function init() {
+                const params = getUrlParams();
+
+                if (!params.action) {
+                    document.getElementById("content").innerHTML = `
+                    <div class="center-content">
+                        <div class="big-icon">📋</div>
+                        <h1>Spielstand-Übertragung</h1>
+                        <p class="subtitle">Übertrage deine AI Bytes Spielstände auf eine neue Webseite</p>
+
+                        <div class="info-box">
+                            <h3><span>ℹ️</span> Wie funktioniert das?</h3>
+                            <p>Mit diesem Tool kannst du deine Spielstände von einer Domain auf eine andere übertragen. Das ist nützlich, wenn das Spiel auf eine neue Webseite umzieht.</p>
+                        </div>
+
+                        <div class="info-box">
+                            <h3><span>📝</span> Anleitung</h3>
+                            <ol class="step-list">
+                                <li>Gehe auf die <strong>alte Webseite</strong>, wo dein Spielstand gespeichert ist</li>
+                                <li>Öffne dort die URL: <code>alte-domain.de/migrate.html?action=out&target=neue-domain.de/migrate.html</code></li>
+                                <li>Du wirst automatisch zur neuen Webseite weitergeleitet</li>
+                                <li>Wähle aus, welche Daten du übernehmen möchtest</li>
+                                <li>Fertig! Deine Spielstände sind übertragen</li>
+                            </ol>
+                        </div>
+
+                        <div class="help-text">
+                            <strong>💡 Tipp:</strong> Du kannst auch <code>mercedes-benz.de/migrate.html</code> als Ziel verwenden - das Protokoll (http:// oder https://) wird automatisch ergänzt!<br><br>
+                            <strong>🔒 Sicherheit:</strong> Alle Daten bleiben in deinem Browser. Es werden keine Daten an einen Server gesendet.
+                        </div>
+                    </div>
+                `;
+                    return;
+                }
+
+                if (params.action === "out") {
+                    if (!params.target) {
+                        document.getElementById("content").innerHTML = `
+                        <div class="center-content">
+                            <div class="big-icon">❌</div>
+                            <h1>Fehler</h1>
+                            <div class="status error">
+                                <span class="icon">✗</span>
+                                <span>Der Parameter 'target' fehlt in der URL</span>
+                            </div>
+                            <p class="subtitle">Bitte gib die Ziel-URL an, wohin die Daten übertragen werden sollen.</p>
+                        </div>
+                    `;
+                        return;
+                    }
+                    handleExport(params.target);
+                } else if (params.action === "in") {
+                    if (!params.payload) {
+                        document.getElementById("content").innerHTML = `
+                        <div class="center-content">
+                            <div class="big-icon">❌</div>
+                            <h1>Fehler</h1>
+                            <div class="status error">
+                                <span class="icon">✗</span>
+                                <span>Keine Daten zum Importieren vorhanden</span>
+                            </div>
+                            <p class="subtitle">Der Parameter 'payload' fehlt in der URL. Bitte verwende den vollständigen Link von der Export-Seite.</p>
+                        </div>
+                    `;
+                        return;
+                    }
+                    handleImport(params.payload);
+                } else {
+                    document.getElementById("content").innerHTML = `
+                    <div class="center-content">
+                        <div class="big-icon">❌</div>
+                        <h1>Ungültige Aktion</h1>
+                        <div class="status error">
+                            <span class="icon">✗</span>
+                            <span>Unbekannte Aktion: ${params.action}</span>
+                        </div>
+                        <p class="subtitle">Gültige Aktionen sind 'out' (Exportieren) oder 'in' (Importieren).</p>
+                    </div>
+                `;
+                }
+            }
+
+            window.addEventListener("DOMContentLoaded", init);
+        </script>
+    </body>
+</html>

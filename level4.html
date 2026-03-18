@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auch Bilder sind kein Problem</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="level4.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- TXP Speech Bubble (Top Left) -->
+        <div class="mo-speech-container">
+            <div class="txp-host" id="txpHost">
+                <img id="txpHostImg" src="TXP/TXP_Stand_Pose/TXP Stand Pose_00000.png" alt="TXP Roboter">
+            </div>
+            <div class="mo-speech-bubble" id="moSpeech" style="display: none;">
+                <p id="moSpeechText">Willkommen beim Bild-KI Training! Bewege mich mit den Pfeiltasten!</p>
+            </div>
+        </div>
+
+        <!-- Game HUD -->
+        <div class="hud-wrapper">
+            <div class="game-hud">
+                <div class="hud-left">
+                    <div class="score-display">
+                        <span class="score-label">Score:</span>
+                        <span class="score-value" id="scoreValue">0</span>
+                    </div>
+                    <div class="lives-display">
+                        <span class="lives-label">Leben:</span>
+                        <span class="lives-value" id="livesValue">❤️❤️❤️</span>
+                    </div>
+                </div>
+                <div class="hud-right">
+                    <div class="time-display">
+                        <span class="time-label">Zeit:</span>
+                        <span class="time-value" id="timeValue">0s</span>
+                    </div>
+                </div>
+            </div>
+            <span class="rank-badge" id="rankBadge" style="display: none;"></span>
+        </div>
+
+        <!-- Main Game Area -->
+        <main class="game-area" id="gameArea">
+
+            <!-- Intro Screen -->
+            <div class="game-screen active" id="introScreen">
+                <div class="intro-content">
+                    <!-- Starfield Background -->
+                    <div class="starfield" id="starfield"></div>
+
+                    <!-- Background Grid -->
+                    <div class="grid-background"></div>
+
+                    <!-- Scanlines Effect -->
+                    <div class="scanlines"></div>
+
+                    <!-- Light Beams -->
+                    <div class="light-beam light-beam-1"></div>
+                    <div class="light-beam light-beam-2"></div>
+
+                    <!-- Main Title -->
+                    <h1 class="game-title">
+                        <span class="title-line-1">Auch Bilder</span>
+                        <span class="title-line-2">sind kein Problem</span>
+                    </h1>
+
+                    <!-- Press Any Key -->
+                    <div class="press-key">Drücke eine beliebige Taste</div>
+
+                    <!-- Copyright -->
+                    <div class="copyright">© 2026 AI Bytes</div>
+                </div>
+            </div>
+
+            <!-- Tutorial Screen -->
+            <div class="game-screen" id="tutorialScreen">
+                <div class="tutorial-content">
+                    <h2 class="tutorial-title">Wie funktioniert das Spiel?</h2>
+
+                    <div class="tutorial-section">
+                        <h3>🎮 Steuerung:</h3>
+                        <div class="controls-guide">
+                            <div class="control-item">
+                                <span class="key">←</span>
+                                <span class="key">→</span>
+                                <span>Pfeiltasten - Bewegen</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="key">↑</span>
+                                <strong style="margin: 0 10px; color: var(--saffron);">ODER</strong>
+                                <span class="key">Leertaste</span>
+                                <span>Springen</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="key">ESC</span>
+                                <span>Pause</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tutorial Demo Scene -->
+                    <div class="tutorial-demo">
+                        <div class="demo-hint" id="demoHint"></div>
+                        <div class="demo-player" id="demoPlayer">
+                            <img id="demoPlayerImg" src="Mo_man_Stand_Pose/Mo man Stand Pose_00000.png" alt="Mo Man Demo">
+                        </div>
+                        <div id="demoCardsContainer"></div>
+                    </div>
+
+                    <button class="start-button" onclick="startGame()"><span>Spiel starten</span></button>
+                </div>
+            </div>
+
+            <!-- Game Play Screen -->
+            <div class="game-screen" id="gameScreen">
+                <canvas id="gameCanvas"></canvas>
+
+                <!-- Mo Man Player -->
+                <div class="mo-player" id="moPlayer">
+                    <img id="moPlayerImg" src="Mo_man_Stand_Pose/Mo man Stand Pose_00000.png" alt="Mo Man">
+                </div>
+
+                <!-- Falling Cards Container -->
+                <div id="cardsContainer"></div>
+
+                <!-- Power-Up Status Container -->
+                <div class="power-up-status" id="powerUpStatus"></div>
+
+                <!-- Tutorial Info Box -->
+                <div class="tutorial-info-box" id="tutorialInfoBox" style="display: none;">
+                    <div class="tutorial-info-content">
+                        <h3 id="tutorialInfoTitle"></h3>
+                        <p id="tutorialInfoText"></p>
+                        <button class="tutorial-continue-btn" id="tutorialContinueBtn">Weiter</button>
+                    </div>
+                </div>
+
+                <!-- Pause Overlay -->
+                <div class="pause-overlay" id="pauseOverlay" style="display: none;">
+                    <div class="pause-content">
+                        <h2>⏸️ Pause</h2>
+                        <p>Drücke ESC um fortzufahren</p>
+                        <button class="resume-button" onclick="resumeGame()"><span>Fortsetzen</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div class="game-screen" id="resultsScreen">
+                <div class="results-content">
+                    <h2 class="results-title" id="resultsTitle">🎉 Geschafft!</h2>
+
+                    <div class="results-layout">
+                        <div class="results-left">
+                            <div class="final-score-display">
+                                <div class="score-big">
+                                    <span class="score-label">Endpunktzahl:</span>
+                                    <span class="score-big-value" id="finalScoreValue">0</span>
+                                </div>
+                                <div class="highscore-display" id="highscoreDisplay">
+                                    <span class="highscore-label">Highscore:</span>
+                                    <span class="highscore-value" id="highscoreValue">0</span>
+                                </div>
+                            </div>
+
+                            <div class="rank-display">
+                                <div class="rank-badge" id="rankBadge">
+                                    <span class="rank-title">Rang:</span>
+                                    <span class="rank-name" id="rankName">Bronze</span>
+                                </div>
+                            </div>
+
+                            <div class="rank-requirements">
+                                <h3>🏆 Rang-Anforderungen:</h3>
+                                <div class="requirements-list">
+                                    <div class="requirement bronze">🥉 Bronze: 150-299 Punkte</div>
+                                    <div class="requirement silver">🥈 Silber: 300-499 Punkte</div>
+                                    <div class="requirement gold">🥇 Gold: 500+ Punkte</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="results-right">
+                            <div class="stats-display">
+                                <h3>📊 Deine Statistiken:</h3>
+                                <div class="stats-grid">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Gesammelt:</span>
+                                        <span class="stat-value" id="statCollected">0</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Ausgewichen:</span>
+                                        <span class="stat-value" id="statAvoided">0</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Genauigkeit:</span>
+                                        <span class="stat-value" id="statAccuracy">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="results-actions">
+                                <button class="play-again-button" onclick="restartGame()"><span>Nochmal spielen</span></button>
+                            </div>
+
+                            <div class="tutorial-skip-option">
+                                <label class="tutorial-skip-label">
+                                    <input type="checkbox" id="skipTutorialCheckbox" onchange="toggleSkipTutorial(this.checked)">
+                                    <span>Tutorial am Anfang des Levels überspringen</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="script.js"></script>
+    <script src="level4.js"></script>
+</body>
+</html>
